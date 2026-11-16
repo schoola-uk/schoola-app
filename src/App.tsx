@@ -594,78 +594,125 @@ export default function App() {
       {/* Clean Grounded Footer (stripped in Activity Land Map view) */}
       {!isMapFocus && (
       <footer className="bg-slate-900 text-slate-300 py-10 px-4 sm:px-8 lg:px-12 border-t border-slate-800 text-xs no-print">
-        <div className="w-full flex flex-col md:flex-row justify-between items-start gap-8">
-          <div className="space-y-2 max-w-sm text-left">
-            <p className="font-heading font-extrabold text-white text-base">
-              Schoola – Discover. Play. Learn.
-            </p>
-            <p className="text-slate-400 leading-relaxed">
-              Big adventures. Brilliant learning. Free curriculum-aligned learning journeys for ages 5–11 across England&apos;s Primary National Curriculum.
-            </p>
-            <p className="text-emerald-400 font-semibold flex items-center gap-1.5 pt-1">
-              <ShieldCheck className="w-4 h-4" />
-              Privacy-first · No ads · No account required
-            </p>
+        <div className="w-full space-y-6">
+          <div className="w-full flex flex-col md:flex-row justify-between items-start gap-8">
+            <div className="space-y-2 max-w-sm text-left">
+              <p className="font-heading font-extrabold text-white text-base">
+                Schoola – Discover. Play. Learn.
+              </p>
+              <p className="text-slate-400 leading-relaxed">
+                A free, independent UK primary curriculum learning hub &amp; signposting tool. Every subject, every topic — Years 1–6 across England&apos;s Primary National Curriculum.
+              </p>
+              <p className="text-emerald-400 font-semibold flex items-center gap-1.5 pt-1">
+                <ShieldCheck className="w-4 h-4" />
+                Privacy-first · No ads · No account required
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-8 text-left">
+              <div className="space-y-2">
+                <p className="font-bold text-white">Learning Paths</p>
+                <ul className="space-y-1.5 text-slate-400">
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTopic(null);
+                        setActiveWorldSubjectId(null);
+                        setChildViewMode('map');
+                        setRole('child');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="hover:text-white cursor-pointer"
+                    >
+                      Activity Land Map
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTopic(null);
+                        setRole('parent');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="hover:text-white cursor-pointer"
+                    >
+                      Parent &amp; Teacher Hub
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      onClick={() => setIsA11yOpen(true)}
+                      className="hover:text-white cursor-pointer"
+                    >
+                      Accessibility Options
+                    </button>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="space-y-2">
+                <p className="font-bold text-white">Curriculum Partners</p>
+                <ul className="space-y-1.5 text-slate-400">
+                  <li>
+                    <a href="https://www.bbc.co.uk/teach" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                      BBC Teach
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://www.thenational.academy" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                      Oak National Academy
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://www.bbc.co.uk/bitesize" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                      BBC Bitesize
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://www.twinkl.co.uk" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                      Twinkl
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://www.gov.uk/national-curriculum" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                      DfE Curriculum
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="space-y-2">
+                <p className="font-bold text-white">Your Progress</p>
+                <p className="text-slate-400 tabular-nums flex items-center gap-1.5">
+                  <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                  {progress.stars} Stars · {progress.completedTopics.length} Topics
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setCertTitle(`${progress.selectedYear} Learning Journey`)}
+                  className="text-sky-400 hover:text-sky-300 font-bold cursor-pointer"
+                >
+                  Print Certificate →
+                </button>
+              </div>
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-8 text-left">
-            <div className="space-y-2">
-              <p className="font-bold text-white">Learning Paths</p>
-              <ul className="space-y-1.5 text-slate-400">
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveTopic(null);
-                      setActiveWorldSubjectId(null);
-                      setChildViewMode('map');
-                      setRole('child');
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                    className="hover:text-white cursor-pointer"
-                  >
-                    Activity Land Map
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveTopic(null);
-                      setRole('parent');
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                    className="hover:text-white cursor-pointer"
-                  >
-                    Parent &amp; Teacher Hub
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => setIsA11yOpen(true)}
-                    className="hover:text-white cursor-pointer"
-                  >
-                    Accessibility Options
-                  </button>
-                </li>
-              </ul>
-            </div>
-
-            <div className="space-y-2">
-              <p className="font-bold text-white">Your Progress</p>
-              <p className="text-slate-400 tabular-nums flex items-center gap-1.5">
-                <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                {progress.stars} Stars · {progress.completedTopics.length} Topics
-              </p>
-              <button
-                type="button"
-                onClick={() => setCertTitle(`${progress.selectedYear} Learning Journey`)}
-                className="text-sky-400 hover:text-sky-300 font-bold cursor-pointer"
-              >
-                Print Certificate →
-              </button>
-            </div>
+          <div className="bg-slate-800/60 border border-slate-700/70 rounded-xl p-4 text-[11px] text-slate-400 leading-relaxed text-left">
+            <strong className="text-slate-200 block mb-1">Disclaimer</strong>
+            Schoola (schoola.uk) is an independent educational tool and signposting website. Parents and guardians are encouraged to review any linked third-party resources (BBC Teach, Oak National Academy, BBC Bitesize, Twinkl) before sharing with children. For statutory guidance visit{' '}
+            <a
+              href="https://www.gov.uk/national-curriculum"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sky-400 hover:underline"
+            >
+              gov.uk/national-curriculum
+            </a>
+            . Not affiliated with the UK Government, DfE, BBC, Twinkl, or Oak National Academy.
           </div>
         </div>
       </footer>

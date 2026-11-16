@@ -10,6 +10,7 @@ import { SUBJECTS, TOPICS } from '../data/curriculum';
 import { Topic, YearGroup } from '../types';
 import { PlayfulMonstersBar } from './PlayfulMonsters';
 import { BitesizeSearchSection } from './BitesizeSearchSection';
+import { CurriculumDirectorySection } from './CurriculumDirectorySection';
 import {
   AbacusMath,
   AncientSpellbook,
@@ -134,9 +135,9 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
         <div className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-sky-300/20 blur-2xl pointer-events-none" />
         <div className="absolute -bottom-24 -left-16 w-80 h-80 rounded-full bg-indigo-900/25 blur-2xl pointer-events-none" />
 
-        <div className="relative z-10 w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-          {/* Left: Punchy headline + bouncy Year selector + Playful CTAs */}
-          <div className="lg:col-span-5 text-left space-y-4">
+        <div className="relative z-10 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          {/* Left: Requested Curriculum Headline + Subcopy + Key Stage & Year Controls */}
+          <div className="lg:col-span-6 text-left space-y-4">
             <div className="flex items-center gap-2 text-xs font-bold text-sky-100">
               <svg viewBox="0 0 24 16" className="w-5 h-3.5 rounded-[2px] shrink-0" aria-hidden="true">
                 <rect width="24" height="16" fill="#012169" />
@@ -159,14 +160,55 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
               </span>
             </div>
 
-            <h1 className="font-playful font-bold text-4xl sm:text-5xl xl:text-6xl leading-[1.06] tracking-tight [text-wrap:balance]">
-              <span className="text-white">Discover.</span>{' '}
-              <span className="text-amber-300">Play.</span>{' '}
-              <span className="text-emerald-300">Learn.</span>
+            <h1 className="font-playful font-bold text-3xl sm:text-4xl xl:text-5xl leading-[1.08] tracking-tight [text-wrap:balance]">
+              <span className="block text-white">Your child&apos;s complete</span>
+              <span className="block text-amber-300">UK primary curriculum</span>
+              <span className="block text-emerald-300">in one place</span>
             </h1>
 
+            <p className="text-sm sm:text-base text-sky-50/95 leading-relaxed max-w-xl font-medium">
+              Every subject, every topic for Years 1–6 — mapped to the National Curriculum with free videos, printables, and quizzes.
+            </p>
+
+            {/* Key Stage Quick-Jump Buttons */}
+            <div className="flex flex-wrap items-center gap-2.5 pt-0.5" role="group" aria-label="Choose Key Stage">
+              <motion.button
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.96 }}
+                type="button"
+                onClick={() => {
+                  onSelectYear(selectedYear === 'Year 1' ? 'Year 2' : 'Year 1');
+                }}
+                className={`min-h-[44px] px-4 py-2 rounded-2xl text-xs sm:text-sm font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer border-2 border-b-4 transition-colors flex items-center gap-2 ${
+                  selectedYear === 'Year 1' || selectedYear === 'Year 2'
+                    ? 'bg-emerald-400 text-slate-950 border-emerald-700 shadow-md'
+                    : 'bg-white/15 text-white border-white/30 hover:bg-white/25'
+                }`}
+              >
+                <span aria-hidden="true">📗</span>
+                <span>Key Stage 1 · Years 1–2</span>
+              </motion.button>
+
+              <motion.button
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.96 }}
+                type="button"
+                onClick={() => {
+                  onSelectYear(selectedYear === 'Year 3' ? 'Year 4' : 'Year 3');
+                }}
+                className={`min-h-[44px] px-4 py-2 rounded-2xl text-xs sm:text-sm font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer border-2 border-b-4 transition-colors flex items-center gap-2 ${
+                  selectedYear !== 'Year 1' && selectedYear !== 'Year 2'
+                    ? 'bg-sky-300 text-slate-950 border-sky-700 shadow-md'
+                    : 'bg-white/15 text-white border-white/30 hover:bg-white/25'
+                }`}
+              >
+                <span aria-hidden="true">📘</span>
+                <span>Key Stage 2 · Years 3–6</span>
+              </motion.button>
+            </div>
+
             {/* Playful Quick Year-Group Selector */}
-            <div className="flex flex-wrap gap-2 pt-1" role="group" aria-label="Choose your year group">
+            <div className="flex flex-wrap gap-2 pt-0.5" role="group" aria-label="Choose your year group">
               {years.map((yr) => {
                 const active = selectedYear === yr;
                 return (
@@ -176,7 +218,7 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
                     whileTap={{ scale: 0.94 }}
                     type="button"
                     onClick={() => onSelectYear(yr)}
-                    className={`min-h-[42px] px-3.5 py-1.5 rounded-2xl text-xs font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer border-2 border-b-4 transition-colors ${
+                    className={`min-h-[40px] px-3.5 py-1.5 rounded-2xl text-xs font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer border-2 border-b-4 transition-colors ${
                       active
                         ? 'bg-amber-400 text-slate-950 border-amber-600 shadow-sm'
                         : 'bg-white/15 text-white border-white/30 hover:bg-white/25'
@@ -194,7 +236,7 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
                 whileTap={{ scale: 0.95 }}
                 type="button"
                 onClick={onEnterChild}
-                className="min-h-[54px] px-7 py-3.5 bg-gradient-to-r from-[#F97316] to-[#F59E0B] hover:from-[#EA580C] hover:to-[#D97706] border-2 border-orange-700 border-b-4 text-white font-playful font-bold text-lg rounded-2xl shadow-lg flex items-center gap-2 cursor-pointer whitespace-nowrap shrink-0"
+                className="min-h-[52px] px-7 py-3 bg-gradient-to-r from-[#F97316] to-[#F59E0B] hover:from-[#EA580C] hover:to-[#D97706] border-2 border-orange-700 border-b-4 text-white font-playful font-bold text-lg rounded-2xl shadow-lg flex items-center gap-2 cursor-pointer whitespace-nowrap shrink-0"
               >
                 <Sparkles className="w-5 h-5" />
                 Let&apos;s Learn!
@@ -206,11 +248,29 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
                 whileTap={{ scale: 0.94 }}
                 type="button"
                 onClick={handleSurpriseAdventure}
-                className="min-h-[54px] px-5 py-3.5 bg-emerald-400 hover:bg-emerald-300 border-2 border-emerald-700 border-b-4 text-slate-950 font-playful font-bold text-base rounded-2xl shadow-lg flex items-center gap-2 cursor-pointer whitespace-nowrap shrink-0"
+                className="min-h-[52px] px-5 py-3 bg-emerald-400 hover:bg-emerald-300 border-2 border-emerald-700 border-b-4 text-slate-950 font-playful font-bold text-base rounded-2xl shadow-lg flex items-center gap-2 cursor-pointer whitespace-nowrap shrink-0"
               >
                 <Dices className="w-5 h-5" />
                 Surprise Me!
               </motion.button>
+            </div>
+
+            {/* Clean Curriculum Coverage Stats */}
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2 text-sky-100">
+              <div className="flex items-baseline gap-1.5">
+                <span className="font-playful font-bold text-xl text-amber-300 tabular-nums">200+</span>
+                <span className="text-xs font-semibold text-sky-100">Curriculum topics</span>
+              </div>
+              <span className="text-sky-300/50" aria-hidden="true">|</span>
+              <div className="flex items-baseline gap-1.5">
+                <span className="font-playful font-bold text-xl text-emerald-300 tabular-nums">12</span>
+                <span className="text-xs font-semibold text-sky-100">Subjects covered</span>
+              </div>
+              <span className="text-sky-300/50" aria-hidden="true">|</span>
+              <div className="flex items-baseline gap-1.5">
+                <span className="font-playful font-bold text-xl text-white tabular-nums">100%</span>
+                <span className="text-xs font-semibold text-sky-100">Free, always</span>
+              </div>
             </div>
           </div>
 
@@ -218,7 +278,7 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
           <motion.div
             animate={{ y: [0, -6, 0] }}
             transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
-            className="lg:col-span-7 flex justify-center"
+            className="lg:col-span-6 flex justify-center"
           >
             <BlueStageCharactersIllustration className="w-full max-w-2xl h-auto drop-shadow-xl" />
           </motion.div>
@@ -477,6 +537,9 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
           ))}
         </div>
       </section>
+
+      {/* 5. FEATURED VIDEO LESSONS & FULL NATIONAL CURRICULUM DIRECTORY */}
+      <CurriculumDirectorySection onOpenTopic={onOpenTopic} onOpenWorld={onOpenWorld} />
     </div>
   );
 };
