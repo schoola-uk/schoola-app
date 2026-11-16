@@ -1,0 +1,6 @@
+{
+  "name": "UK Primary Curriculum Resources",
+  "description": "A pastel pink and blue Teenieping-styled curriculum resource navigator for Years 1 and 2, featuring interactive magic doors to explore subjects and discover videos, printables, and quizzes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Fredoka:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Lexend:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Outfit", "Plus Jakarta Sans", sans-serif;
+  --font-playful: "Fredoka", "Baloo 2", "Outfit", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-dyslexia: "Lexend", "Plus Jakarta Sans", sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #F8FAFC;
+  color: #0F172A;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: var(--font-heading);
+}
+
+.font-playful {
+  font-family: var(--font-playful);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Accessibility modes */
+.a11y-large-text {
+  font-size: 112.5%;
+}
+
+.a11y-dyslexia,
+.a11y-dyslexia h1,
+.a11y-dyslexia h2,
+.a11y-dyslexia h3,
+.a11y-dyslexia p,
+.a11y-dyslexia button,
+.a11y-dyslexia span {
+  font-family: var(--font-dyslexia) !important;
+  letter-spacing: 0.02em;
+  line-height: 1.7;
+}
+
+.a11y-high-contrast {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+.a11y-high-contrast .hc-card {
+  border-color: #0F172A !important;
+  border-width: 2px !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Printable Certificate Layout */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  #printable-certificate-area,
+  #printable-certificate-area * {
+    visibility: visible !important;
+  }
+  #printable-certificate-area {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 2rem !important;
+    box-shadow: none !important;
+    background: #FFFFFF !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
