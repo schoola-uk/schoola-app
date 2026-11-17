@@ -1,15 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, Dices, Flame, Play, Sparkles, Star } from 'lucide-react';
-import {
-  BlueStageCharactersIllustration,
-  WorldBannerIllustration,
-} from './WorldIllustrations';
+import { WorldBannerIllustration } from './WorldIllustrations';
 import { LEARNING_WORLDS, matchesYearFilter } from '../data/learningWorlds';
 import { SUBJECTS, TOPICS } from '../data/curriculum';
 import { Topic, YearGroup } from '../types';
 import { PlayfulMonstersBar } from './PlayfulMonsters';
-import { BitesizeSearchSection } from './BitesizeSearchSection';
+import { SubjectDoor } from './SubjectDoor';
+import { InteractiveBottomStage } from './InteractiveBottomStage';
 import { CurriculumDirectorySection } from './CurriculumDirectorySection';
 import {
   AbacusMath,
@@ -28,6 +26,8 @@ interface WelcomeGatewayProps {
   onEarnStar: () => void;
   stars: number;
   streakDays: number;
+  directoryKS?: 'ks1' | 'ks2';
+  onSelectDirectoryKS?: (ks: 'ks1' | 'ks2') => void;
 }
 
 interface AdventureCardItem {
@@ -91,6 +91,8 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
   onEarnStar,
   stars,
   streakDays,
+  directoryKS,
+  onSelectDirectoryKS,
 }) => {
   const featuredWorlds = LEARNING_WORLDS.filter((w) => w.featured);
   const years: YearGroup[] = ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6'];
@@ -127,207 +129,238 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
 
   return (
     <div className="w-full">
-      {/* 1. LARGE COLOURFUL BLUE MAIN STAGE — 100% FULL WIDTH */}
+      {/* 1. HERO HEADER PHOTO BANNER (bubble-show-card.jpg) — 100% FULL WIDTH */}
       <section
-        aria-label="Schoola Child Adventure Stage"
-        className="relative w-full overflow-hidden bg-gradient-to-br from-[#2575FC] via-[#1D5BF2] to-[#0284C7] text-white py-8 sm:py-11 px-4 sm:px-8 lg:px-12 border-b-4 border-sky-300/40"
+        aria-label="Schoola UK Primary Curriculum Hero"
+        className="relative w-full overflow-hidden bg-[#1a1033] text-white"
       >
-        <div className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-sky-300/20 blur-2xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-16 w-80 h-80 rounded-full bg-indigo-900/25 blur-2xl pointer-events-none" />
+        {/* Background Header Photo from schoola-uk/curriculum */}
+        <img
+          src="./bubble-show-card.jpg"
+          alt="Children enjoying a bright bubble science show"
+          onError={(e) => {
+            const img = e.currentTarget;
+            if (!img.dataset.fallbackApplied) {
+              img.dataset.fallbackApplied = '1';
+              img.src = 'https://raw.githubusercontent.com/schoola-uk/curriculum/main/bubble-show-card.jpg';
+            }
+          }}
+          className="absolute inset-0 w-full h-full object-cover object-[center_26%] sm:object-[68%_24%] select-none"
+        />
+        {/* High-contrast left-to-right scrim keeping the girls & giant soap bubble clear on the right */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#130d2b]/92 via-[#172554]/72 to-[#1a1033]/25 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#130d2b]/65 via-transparent to-[#130d2b]/25 pointer-events-none" />
 
-        <div className="relative z-10 w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          {/* Left: Requested Curriculum Headline + Subcopy + Key Stage & Year Controls */}
-          <div className="lg:col-span-6 text-left space-y-4">
-            <div className="flex items-center gap-2 text-xs font-bold text-sky-100">
-              <svg viewBox="0 0 24 16" className="w-5 h-3.5 rounded-[2px] shrink-0" aria-hidden="true">
-                <rect width="24" height="16" fill="#012169" />
-                <path d="M0 0L24 16M24 0L0 16" stroke="#fff" strokeWidth="3" />
-                <path d="M0 0L24 16M24 0L0 16" stroke="#C8102E" strokeWidth="1.4" />
-                <path d="M12 0V16M0 8H24" stroke="#fff" strokeWidth="4.5" />
-                <path d="M12 0V16M0 8H24" stroke="#C8102E" strokeWidth="2.5" />
-              </svg>
-              <span>UK Primary</span>
-              <span aria-hidden="true">·</span>
-              <span>Ages 5–11</span>
-              <span aria-hidden="true">·</span>
-              <span className="inline-flex items-center gap-1 tabular-nums">
-                <Star className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
-                {stars}
-              </span>
-              <span className="inline-flex items-center gap-1 tabular-nums">
-                <Flame className="w-3.5 h-3.5 text-orange-300" />
-                {streakDays}d
-              </span>
-            </div>
-
-            <h1 className="font-playful font-bold text-3xl sm:text-4xl xl:text-5xl leading-[1.08] tracking-tight [text-wrap:balance]">
-              <span className="block text-white">Your child&apos;s complete</span>
-              <span className="block text-amber-300">UK primary curriculum</span>
-              <span className="block text-emerald-300">in one place</span>
-            </h1>
-
-            <p className="text-sm sm:text-base text-sky-50/95 leading-relaxed max-w-xl font-medium">
-              Every subject, every topic for Years 1–6 — mapped to the National Curriculum with free videos, printables, and quizzes.
-            </p>
-
-            {/* Key Stage Quick-Jump Buttons */}
-            <div className="flex flex-wrap items-center gap-2.5 pt-0.5" role="group" aria-label="Choose Key Stage">
-              <motion.button
-                whileHover={{ y: -2 }}
-                whileTap={{ scale: 0.96 }}
-                type="button"
-                onClick={() => {
-                  onSelectYear(selectedYear === 'Year 1' ? 'Year 2' : 'Year 1');
-                }}
-                className={`min-h-[44px] px-4 py-2 rounded-2xl text-xs sm:text-sm font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer border-2 border-b-4 transition-colors flex items-center gap-2 ${
-                  selectedYear === 'Year 1' || selectedYear === 'Year 2'
-                    ? 'bg-emerald-400 text-slate-950 border-emerald-700 shadow-md'
-                    : 'bg-white/15 text-white border-white/30 hover:bg-white/25'
-                }`}
-              >
-                <span aria-hidden="true">📗</span>
-                <span>Key Stage 1 · Years 1–2</span>
-              </motion.button>
-
-              <motion.button
-                whileHover={{ y: -2 }}
-                whileTap={{ scale: 0.96 }}
-                type="button"
-                onClick={() => {
-                  onSelectYear(selectedYear === 'Year 3' ? 'Year 4' : 'Year 3');
-                }}
-                className={`min-h-[44px] px-4 py-2 rounded-2xl text-xs sm:text-sm font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer border-2 border-b-4 transition-colors flex items-center gap-2 ${
-                  selectedYear !== 'Year 1' && selectedYear !== 'Year 2'
-                    ? 'bg-sky-300 text-slate-950 border-sky-700 shadow-md'
-                    : 'bg-white/15 text-white border-white/30 hover:bg-white/25'
-                }`}
-              >
-                <span aria-hidden="true">📘</span>
-                <span>Key Stage 2 · Years 3–6</span>
-              </motion.button>
-            </div>
-
-            {/* Playful Quick Year-Group Selector */}
-            <div className="flex flex-wrap gap-2 pt-0.5" role="group" aria-label="Choose your year group">
-              {years.map((yr) => {
-                const active = selectedYear === yr;
-                return (
-                  <motion.button
-                    key={yr}
-                    whileHover={{ y: -2 }}
-                    whileTap={{ scale: 0.94 }}
-                    type="button"
-                    onClick={() => onSelectYear(yr)}
-                    className={`min-h-[40px] px-3.5 py-1.5 rounded-2xl text-xs font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer border-2 border-b-4 transition-colors ${
-                      active
-                        ? 'bg-amber-400 text-slate-950 border-amber-600 shadow-sm'
-                        : 'bg-white/15 text-white border-white/30 hover:bg-white/25'
-                    }`}
-                  >
-                    {yr}
-                  </motion.button>
-                );
-              })}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 pt-1">
-              <motion.button
-                whileHover={{ scale: 1.04, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                type="button"
-                onClick={onEnterChild}
-                className="min-h-[52px] px-7 py-3 bg-gradient-to-r from-[#F97316] to-[#F59E0B] hover:from-[#EA580C] hover:to-[#D97706] border-2 border-orange-700 border-b-4 text-white font-playful font-bold text-lg rounded-2xl shadow-lg flex items-center gap-2 cursor-pointer whitespace-nowrap shrink-0"
-              >
-                <Sparkles className="w-5 h-5" />
-                Let&apos;s Learn!
-                <ArrowRight className="w-5 h-5" />
-              </motion.button>
-
-              <motion.button
-                whileHover={{ scale: 1.04, y: -2, rotate: -2 }}
-                whileTap={{ scale: 0.94 }}
-                type="button"
-                onClick={handleSurpriseAdventure}
-                className="min-h-[52px] px-5 py-3 bg-emerald-400 hover:bg-emerald-300 border-2 border-emerald-700 border-b-4 text-slate-950 font-playful font-bold text-base rounded-2xl shadow-lg flex items-center gap-2 cursor-pointer whitespace-nowrap shrink-0"
-              >
-                <Dices className="w-5 h-5" />
-                Surprise Me!
-              </motion.button>
-            </div>
-
-            {/* Clean Curriculum Coverage Stats */}
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2 text-sky-100">
-              <div className="flex items-baseline gap-1.5">
-                <span className="font-playful font-bold text-xl text-amber-300 tabular-nums">200+</span>
-                <span className="text-xs font-semibold text-sky-100">Curriculum topics</span>
+        <div className="relative z-10 w-full px-6 sm:px-10 lg:px-16 pt-12 pb-12 sm:pt-16 sm:pb-16 space-y-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-end">
+            {/* Left: Requested Curriculum Headline + Subcopy + Key Stage & Year Controls */}
+            <div className="lg:col-span-7 text-left space-y-4">
+              <div className="flex flex-wrap items-center gap-2.5 text-xs font-bold text-amber-200/95 tracking-wide">
+                <span className="h-[2px] w-6 bg-amber-300/80 rounded-full" aria-hidden="true" />
+                <span className="uppercase">England National Curriculum · 100% Free</span>
+                <span aria-hidden="true">·</span>
+                <span className="inline-flex items-center gap-1.5 text-sky-100 normal-case">
+                  <svg viewBox="0 0 24 16" className="w-4 h-3 rounded-[2px] shrink-0" aria-hidden="true">
+                    <rect width="24" height="16" fill="#012169" />
+                    <path d="M0 0L24 16M24 0L0 16" stroke="#fff" strokeWidth="3" />
+                    <path d="M0 0L24 16M24 0L0 16" stroke="#C8102E" strokeWidth="1.4" />
+                    <path d="M12 0V16M0 8H24" stroke="#fff" strokeWidth="4.5" />
+                    <path d="M12 0V16M0 8H24" stroke="#C8102E" strokeWidth="2.5" />
+                  </svg>
+                  <span>Ages 5–11</span>
+                </span>
+                <span className="inline-flex items-center gap-1 tabular-nums text-amber-200">
+                  <Star className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
+                  {stars}
+                </span>
+                <span className="inline-flex items-center gap-1 tabular-nums text-orange-200">
+                  <Flame className="w-3.5 h-3.5 text-orange-300" />
+                  {streakDays}d
+                </span>
               </div>
-              <span className="text-sky-300/50" aria-hidden="true">|</span>
-              <div className="flex items-baseline gap-1.5">
-                <span className="font-playful font-bold text-xl text-emerald-300 tabular-nums">12</span>
-                <span className="text-xs font-semibold text-sky-100">Subjects covered</span>
+
+              <h1 className="font-playful font-bold text-3xl sm:text-4xl xl:text-5xl leading-[1.08] tracking-tight [text-wrap:balance] drop-shadow-sm">
+                <span className="block text-white">Your child&apos;s complete</span>
+                <span className="block text-amber-300">UK primary curriculum</span>
+                <span className="block text-emerald-300">in one place</span>
+              </h1>
+
+              <p className="text-sm sm:text-base text-slate-100 leading-relaxed max-w-xl font-medium drop-shadow-xs">
+                Every subject, every topic for Years 1–6 — mapped to the National Curriculum with free videos, printables, and quizzes.
+              </p>
+
+              {/* Key Stage Quick-Jump Buttons */}
+              <div className="flex flex-wrap items-center gap-2.5 pt-0.5" role="group" aria-label="Choose Key Stage">
+                <motion.button
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.96 }}
+                  type="button"
+                  onClick={() => {
+                    onSelectYear(selectedYear === 'Year 1' ? 'Year 2' : 'Year 1');
+                    onSelectDirectoryKS?.('ks1');
+                  }}
+                  className={`min-h-[44px] px-4 py-2 rounded-2xl text-xs sm:text-sm font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer border-2 border-b-4 transition-colors flex items-center gap-2 ${
+                    selectedYear === 'Year 1' || selectedYear === 'Year 2'
+                      ? 'bg-emerald-400 text-slate-950 border-emerald-700 shadow-md'
+                      : 'bg-slate-950/55 text-white border-white/35 hover:bg-slate-950/75 backdrop-blur-xs'
+                  }`}
+                >
+                  <span aria-hidden="true">📗</span>
+                  <span>Key Stage 1 · Years 1–2</span>
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.96 }}
+                  type="button"
+                  onClick={() => {
+                    onSelectYear(selectedYear === 'Year 3' ? 'Year 4' : 'Year 3');
+                    onSelectDirectoryKS?.('ks2');
+                  }}
+                  className={`min-h-[44px] px-4 py-2 rounded-2xl text-xs sm:text-sm font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer border-2 border-b-4 transition-colors flex items-center gap-2 ${
+                    selectedYear !== 'Year 1' && selectedYear !== 'Year 2'
+                      ? 'bg-sky-300 text-slate-950 border-sky-700 shadow-md'
+                      : 'bg-slate-950/55 text-white border-white/35 hover:bg-slate-950/75 backdrop-blur-xs'
+                  }`}
+                >
+                  <span aria-hidden="true">📘</span>
+                  <span>Key Stage 2 · Years 3–6</span>
+                </motion.button>
               </div>
-              <span className="text-sky-300/50" aria-hidden="true">|</span>
-              <div className="flex items-baseline gap-1.5">
-                <span className="font-playful font-bold text-xl text-white tabular-nums">100%</span>
-                <span className="text-xs font-semibold text-sky-100">Free, always</span>
+
+              {/* Playful Quick Year-Group Selector */}
+              <div className="flex flex-wrap gap-2 pt-0.5" role="group" aria-label="Choose your year group">
+                {years.map((yr) => {
+                  const active = selectedYear === yr;
+                  return (
+                    <motion.button
+                      key={yr}
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.94 }}
+                      type="button"
+                      onClick={() => onSelectYear(yr)}
+                      className={`min-h-[40px] px-3.5 py-1.5 rounded-2xl text-xs font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer border-2 border-b-4 transition-colors ${
+                        active
+                          ? 'bg-amber-400 text-slate-950 border-amber-600 shadow-sm'
+                          : 'bg-slate-950/50 text-white border-white/30 hover:bg-slate-950/75 backdrop-blur-xs'
+                      }`}
+                    >
+                      {yr}
+                    </motion.button>
+                  );
+                })}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 pt-1">
+                <motion.button
+                  whileHover={{ scale: 1.04, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  type="button"
+                  onClick={onEnterChild}
+                  className="min-h-[50px] px-7 py-2.5 bg-gradient-to-r from-[#F97316] to-[#F59E0B] hover:from-[#EA580C] hover:to-[#D97706] border-2 border-orange-700 border-b-4 text-white font-playful font-bold text-base sm:text-lg rounded-2xl shadow-lg flex items-center gap-2 cursor-pointer whitespace-nowrap shrink-0"
+                >
+                  <Sparkles className="w-5 h-5" />
+                  Let&apos;s Learn!
+                  <ArrowRight className="w-5 h-5" />
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.04, y: -2, rotate: -2 }}
+                  whileTap={{ scale: 0.94 }}
+                  type="button"
+                  onClick={handleSurpriseAdventure}
+                  className="min-h-[50px] px-5 py-2.5 bg-emerald-400 hover:bg-emerald-300 border-2 border-emerald-700 border-b-4 text-slate-950 font-playful font-bold text-sm sm:text-base rounded-2xl shadow-lg flex items-center gap-2 cursor-pointer whitespace-nowrap shrink-0"
+                >
+                  <Dices className="w-5 h-5" />
+                  Surprise Me!
+                </motion.button>
+              </div>
+
+              {/* Inline Curriculum Trust Stats */}
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 pt-1 text-slate-100">
+                <span className="text-xs font-semibold">
+                  <strong className="font-playful text-base text-amber-300 tabular-nums">200+</strong> Curriculum topics
+                </span>
+                <span className="text-white/35" aria-hidden="true">|</span>
+                <span className="text-xs font-semibold">
+                  <strong className="font-playful text-base text-emerald-300 tabular-nums">12</strong> Subjects covered
+                </span>
+                <span className="text-white/35" aria-hidden="true">|</span>
+                <span className="text-xs font-semibold">
+                  <strong className="font-playful text-base text-white tabular-nums">£0</strong> Always free
+                </span>
+              </div>
+            </div>
+
+            {/* Right: Parent Testimonial Glass Card positioned cleanly without covering faces */}
+            <div className="lg:col-span-5 flex lg:justify-end">
+              <div className="max-w-sm rounded-2xl bg-slate-950/50 backdrop-blur-md border border-white/25 p-5 text-left shadow-xl">
+                <p className="text-[11px] font-extrabold uppercase tracking-widest text-amber-200 mb-2">
+                  From a parent
+                </p>
+                <blockquote className="text-sm sm:text-base italic font-semibold text-white leading-snug">
+                  “My girls ask to do their Schoola topics before I&apos;ve even had my coffee.”
+                </blockquote>
+                <p className="text-xs text-slate-200 mt-2.5 font-medium">
+                  — A Schoola parent, Year 2 &amp; Reception
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Right: Large Colourful Illustrated Character Trio */}
-          <motion.div
-            animate={{ y: [0, -6, 0] }}
-            transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
-            className="lg:col-span-6 flex justify-center"
-          >
-            <BlueStageCharactersIllustration className="w-full max-w-2xl h-auto drop-shadow-xl" />
-          </motion.div>
-        </div>
-
-        {/* Bottom Row: Tilted Colourful Illustrated Subject World Cards */}
-        <div className="relative z-10 w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-7 pt-2">
-          {featuredWorlds.map((world, idx) => {
-            const tiltClass =
-              idx === 0
-                ? 'lg:-rotate-2'
-                : idx === 1
-                ? 'lg:rotate-1'
-                : idx === 2
-                ? 'lg:-rotate-1'
-                : 'lg:rotate-2';
-            return (
-              <motion.button
-                key={world.id}
-                type="button"
-                whileHover={{ y: -7, rotate: 0, scale: 1.03 }}
-                whileTap={{ scale: 0.96 }}
-                onClick={() => onOpenWorld(world.subjectId)}
-                className={`text-left bg-white text-slate-900 rounded-2xl p-3.5 shadow-lg border-2 border-sky-200 border-b-4 transition-shadow cursor-pointer flex flex-col gap-2.5 ${tiltClass}`}
-              >
-                <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-sky-600 text-white font-mono text-xs font-extrabold flex items-center justify-center shrink-0">
-                    {idx + 1}
-                  </span>
-                  <span className="font-playful font-bold text-base text-slate-900 truncate">
-                    {world.worldTitle}
-                  </span>
-                </div>
-                <div className="w-full h-24 rounded-xl overflow-hidden border border-slate-100">
-                  <WorldBannerIllustration
-                    worldKey={world.illustrationKey}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </motion.button>
-            );
-          })}
+          {/* Bottom of Header: 4 Featured Learning Worlds Cards for Selected Year */}
+          <div className="pt-4 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="font-playful font-bold text-sm sm:text-base text-white/95 drop-shadow-xs">
+                Featured <span className="text-amber-300">Learning Worlds</span> for {selectedYear}
+              </h2>
+              <span className="text-xs font-bold text-sky-100/90">Tap any card to enter</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {featuredWorlds.map((world, idx) => {
+                const tiltClass =
+                  idx === 0
+                    ? 'lg:-rotate-2'
+                    : idx === 1
+                    ? 'lg:rotate-1'
+                    : idx === 2
+                    ? 'lg:-rotate-1'
+                    : 'lg:rotate-2';
+                return (
+                  <motion.button
+                    key={world.id}
+                    type="button"
+                    whileHover={{ y: -7, rotate: 0, scale: 1.03 }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => onOpenWorld(world.subjectId)}
+                    className={`text-left bg-white/95 hover:bg-white text-slate-900 rounded-2xl p-3.5 shadow-xl border-2 border-sky-200 border-b-4 transition-all cursor-pointer flex flex-col gap-2.5 ${tiltClass}`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-sky-600 text-white font-mono text-xs font-extrabold flex items-center justify-center shrink-0">
+                        {idx + 1}
+                      </span>
+                      <span className="font-playful font-bold text-base text-slate-900 truncate">
+                        {world.worldTitle}
+                      </span>
+                    </div>
+                    <div className="w-full h-24 rounded-xl overflow-hidden border border-slate-100">
+                      <WorldBannerIllustration
+                        worldKey={world.illustrationKey}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </section>
 
       {/* 2. LITTLE MONSTERS & INTERACTIVE PLAYGROUND — 100% FULL WIDTH LIGHT BLUE SKY */}
       <section
         aria-labelledby="monster-arcade-heading"
-        className="relative w-full overflow-hidden bg-gradient-to-b from-[#BAE6FD] via-[#E0F2FE] to-[#F0F9FF] border-b-2 border-sky-200 py-8 sm:py-10 px-4 sm:px-8 lg:px-12 space-y-6"
+        className="relative w-full overflow-hidden bg-gradient-to-b from-[#BAE6FD] via-[#E0F2FE] to-[#F0F9FF] border-b-2 border-sky-200 py-14 sm:py-20 px-6 sm:px-10 lg:px-16 space-y-10"
       >
         {/* Soft Sky Sunbeam & Floating Clouds */}
         <div className="pointer-events-none absolute -top-10 -right-10 w-56 h-56 rounded-full bg-amber-200/45 blur-xl" />
@@ -409,15 +442,15 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
         </div>
 
         {/* Interactive Panels Grid */}
-        <div className="relative z-10 w-full">
+        <div className="relative z-10 w-full pt-2">
           {panelPack === 'pack1' ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-start">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-7 items-start">
               <AbacusMath onEarnStar={onEarnStar} setFairyMessage={setMonsterMessage} />
               <GlobeTrivia onEarnStar={onEarnStar} setFairyMessage={setMonsterMessage} />
               <AncientSpellbook onEarnStar={onEarnStar} setFairyMessage={setMonsterMessage} />
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-7 items-start">
               <PatternPath onEarnStar={onEarnStar} setFairyMessage={setMonsterMessage} />
               <VintageClockAndBell onEarnStar={onEarnStar} setFairyMessage={setMonsterMessage} />
             </div>
@@ -425,56 +458,45 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
         </div>
       </section>
 
-      {/* BBC BITESIZE-INSPIRED TOPIC SEARCH & EVERYDAY MATERIALS MINI-LAB */}
-      <BitesizeSearchSection onOpenTopic={onOpenTopic} onEarnStar={onEarnStar} />
-
-      {/* 3. JUMP STRAIGHT TO A SUBJECT — 100% FULL WIDTH */}
-      <section aria-labelledby="subject-strip-heading" className="w-full bg-white py-8 px-4 sm:px-8 lg:px-12 border-b border-slate-200 space-y-4">
-        <div className="flex items-center justify-between gap-4">
-          <h2 id="subject-strip-heading" className="font-playful font-bold text-xl sm:text-2xl text-slate-900">
-            <span className="text-violet-600">Pick</span> a{' '}
-            <span className="text-sky-600">world!</span>
-          </h2>
+      {/* 3. PICK A WORLD — RICH ILLUSTRATED SUBJECT DOORS */}
+      <section aria-labelledby="subject-strip-heading" className="w-full bg-white py-14 sm:py-20 px-6 sm:px-10 lg:px-16 border-b border-slate-200 space-y-10">
+        <div className="flex flex-wrap items-center justify-between gap-5">
+          <div>
+            <h2 id="subject-strip-heading" className="font-playful font-bold text-2xl sm:text-3xl text-slate-900">
+              <span className="text-violet-600">Pick</span> a{' '}
+              <span className="text-sky-600">world!</span>
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 mt-1.5">
+              Unlock any Learning World gate to explore videos, games, and curriculum quests.
+            </p>
+          </div>
           <motion.button
             whileHover={{ y: -1 }}
             whileTap={{ scale: 0.95 }}
             type="button"
             onClick={onEnterChild}
-            className="min-h-[38px] px-4 py-1.5 rounded-xl bg-sky-100 hover:bg-sky-200 border-b-2 border-sky-300 text-xs sm:text-sm font-playful font-bold text-sky-900 whitespace-nowrap shrink-0 cursor-pointer"
+            className="min-h-[42px] px-5 py-2 rounded-xl bg-sky-100 hover:bg-sky-200 border-b-2 border-sky-300 text-xs sm:text-sm font-playful font-bold text-sky-900 whitespace-nowrap shrink-0 cursor-pointer"
           >
-            All 12 →
+            Open Activity Land Map →
           </motion.button>
         </div>
 
-        <div className="flex items-stretch justify-between gap-3 overflow-x-auto pb-2 pt-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-7 pt-2">
           {SUBJECTS.map((subj) => (
-            <motion.button
+            <SubjectDoor
               key={subj.id}
-              whileHover={{ y: -5, scale: 1.05 }}
-              whileTap={{ scale: 0.92 }}
-              type="button"
+              subject={subj}
               onClick={() => onOpenWorld(subj.id)}
-              className="min-w-[84px] flex flex-col items-center gap-1.5 text-center cursor-pointer shrink-0 rounded-2xl p-1"
-            >
-              <div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl shadow-sm border-2 border-b-4"
-                style={{
-                  backgroundColor: subj.bg,
-                  borderColor: subj.borderColor,
-                }}
-              >
-                <span aria-hidden="true">{subj.emoji}</span>
-              </div>
-              <span className="text-xs font-playful font-bold text-slate-800 whitespace-nowrap">
-                {subj.id}
-              </span>
-            </motion.button>
+            />
           ))}
         </div>
       </section>
 
+      {/* 4. FLIP THE PAGES STORYBOOK + INTERACTIVE UK SCHOOL CALENDAR & SYNC */}
+      <InteractiveBottomStage onOpenTopic={onOpenTopic} onEarnStar={onEarnStar} />
+
       {/* 4. TODAY & FEATURED ADVENTURES — 100% FULL WIDTH */}
-      <section aria-labelledby="adventures-strip-heading" className="w-full bg-[#F8FAFC] py-8 px-4 sm:px-8 lg:px-12 space-y-4">
+      <section aria-labelledby="adventures-strip-heading" className="w-full bg-[#F8FAFC] py-14 sm:py-20 px-6 sm:px-10 lg:px-16 space-y-8">
         <div className="flex items-center justify-between gap-4">
           <h2 id="adventures-strip-heading" className="font-playful font-bold text-xl sm:text-2xl text-slate-900">
             <span className="text-rose-500">Today&apos;s</span>{' '}
@@ -485,7 +507,7 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 pb-2 pt-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 pb-2 pt-1">
           {/* Dynamic Today Card → Daily Challenge */}
           <motion.button
             whileHover={{ y: -4, scale: 1.02 }}
@@ -539,7 +561,12 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
       </section>
 
       {/* 5. FEATURED VIDEO LESSONS & FULL NATIONAL CURRICULUM DIRECTORY */}
-      <CurriculumDirectorySection onOpenTopic={onOpenTopic} onOpenWorld={onOpenWorld} />
+      <CurriculumDirectorySection
+        onOpenTopic={onOpenTopic}
+        onOpenWorld={onOpenWorld}
+        activeKS={directoryKS}
+        onSelectKS={onSelectDirectoryKS}
+      />
     </div>
   );
 };

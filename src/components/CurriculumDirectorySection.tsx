@@ -18,6 +18,8 @@ import { Topic } from '../types';
 interface CurriculumDirectorySectionProps {
   onOpenTopic: (topic: Topic) => void;
   onOpenWorld: (subjectId: string) => void;
+  activeKS?: 'ks1' | 'ks2';
+  onSelectKS?: (ks: 'ks1' | 'ks2') => void;
 }
 
 interface DirectoryRow {
@@ -429,8 +431,15 @@ function findMatchingAppTopic(subjectId: string, textQuery: string): Topic {
 export const CurriculumDirectorySection: React.FC<CurriculumDirectorySectionProps> = ({
   onOpenTopic,
   onOpenWorld,
+  activeKS,
+  onSelectKS,
 }) => {
-  const [selectedKS, setSelectedKS] = useState<'ks1' | 'ks2'>('ks1');
+  const [internalKS, setInternalKS] = useState<'ks1' | 'ks2'>('ks1');
+  const selectedKS = activeKS ?? internalKS;
+  const setSelectedKS = (ks: 'ks1' | 'ks2') => {
+    setInternalKS(ks);
+    onSelectKS?.(ks);
+  };
   const [subjectFilter, setSubjectFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeRowModal, setActiveRowModal] = useState<{ ks: 'ks1' | 'ks2'; row: DirectoryRow } | null>(
@@ -469,7 +478,7 @@ export const CurriculumDirectorySection: React.FC<CurriculumDirectorySectionProp
       {/* FEATURED VIDEO LESSONS STRIP */}
       <section
         aria-labelledby="featured-videos-heading"
-        className="w-full bg-white py-8 px-4 sm:px-8 lg:px-12 border-t border-b border-slate-200 space-y-4"
+        className="w-full bg-white py-14 sm:py-20 px-6 sm:px-10 lg:px-16 border-t border-b border-slate-200 space-y-8"
       >
         <div className="flex items-center justify-between gap-4">
           <h2 id="featured-videos-heading" className="font-playful font-bold text-xl sm:text-2xl text-slate-900">
@@ -485,7 +494,7 @@ export const CurriculumDirectorySection: React.FC<CurriculumDirectorySectionProp
           </a>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
           {FEATURED_VIDEOS.map((vid) => (
             <motion.button
               key={vid.title}
@@ -529,7 +538,7 @@ export const CurriculumDirectorySection: React.FC<CurriculumDirectorySectionProp
       <section
         id="full-curriculum-directory"
         aria-labelledby="full-curriculum-heading"
-        className="w-full bg-[#F8FAFC] py-9 px-4 sm:px-8 lg:px-12 border-b border-slate-200 space-y-5"
+        className="w-full bg-[#F8FAFC] py-14 sm:py-20 px-6 sm:px-10 lg:px-16 border-b border-slate-200 space-y-8"
       >
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>

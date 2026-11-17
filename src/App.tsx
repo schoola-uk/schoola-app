@@ -10,14 +10,14 @@ import {
   YearGroup,
 } from './types';
 import { SUBJECTS, TOPICS } from './data/curriculum';
-import { LEARNING_WORLDS, matchesYearFilter } from './data/learningWorlds';
+import { matchesYearFilter } from './data/learningWorlds';
 import { WelcomeGateway } from './components/WelcomeGateway';
 import { ChildDashboard } from './components/ChildDashboard';
 import { ActivityLandMap } from './components/ActivityLandMap';
 import { LearningHub } from './components/LearningHub';
 import { ParentTeacherHub } from './components/ParentTeacherHub';
 import { PrintableCertificateModal } from './components/PrintableCertificateModal';
-import { DarkCloudsSkyBackdrop, RedOrangeDoorIcon } from './components/WorldIllustrations';
+import { RedOrangeDoorIcon } from './components/WorldIllustrations';
 import { stopSpeaking } from './utils/speech';
 
 const PROGRESS_STORAGE_KEY = 'schoola_v2_progress';
@@ -106,6 +106,8 @@ export default function App() {
   });
 
   const [isA11yOpen, setIsA11yOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [directoryKS, setDirectoryKS] = useState<'ks1' | 'ks2'>('ks1');
   const [certTitle, setCertTitle] = useState<string | null>(null);
   const [mascotExpression, setMascotExpression] = useState<
     'happy' | 'thinking' | 'sparkle' | 'sad' | 'excited'
@@ -297,16 +299,12 @@ export default function App() {
 
   return (
     <div className={`min-h-screen flex flex-col bg-[#F8FAFC] text-slate-900 ${rootA11yClasses}`}>
-      {/* Dark Clouds Scrollable Top Panel with Red-Orange Door Parent Portal (stripped in Activity Land Map view) */}
+      {/* Clean Schoola Cream Header (stripped in Activity Land Map view) */}
       {!isMapFocus && (
-      <header className="sticky top-0 z-40 relative overflow-hidden bg-[#090D16] text-white border-b border-slate-800 shadow-md no-print">
-        <div className="absolute inset-0 pointer-events-none opacity-95">
-          <DarkCloudsSkyBackdrop className="w-full h-full" />
-        </div>
-
-        <div className="relative z-10 w-full px-4 sm:px-8 lg:px-12 py-2.5 space-y-2">
-          {/* Top Row: Brand, Quick Nav, and Red-Orange Door Parent Portal */}
-          <div className="flex items-center justify-between gap-4">
+      <header className="sticky top-0 z-40 bg-[#FFFEF7]/95 backdrop-blur-sm text-slate-900 border-b border-[#E5E4DC] no-print">
+        <div className="w-full px-4 sm:px-8 lg:px-12 h-16 flex items-center justify-between gap-4">
+          {/* Zone 1: Gradient Schoola Logo + UK Companion Strapline */}
+          <div className="flex items-center gap-4 min-w-0 shrink-0">
             <button
               type="button"
               onClick={() => {
@@ -314,54 +312,35 @@ export default function App() {
                 setActiveTopic(null);
                 setActiveWorldSubjectId(null);
                 setRole('welcome');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="font-heading font-extrabold text-xl sm:text-2xl tracking-tight text-white whitespace-nowrap shrink-0 cursor-pointer"
+              className="flex flex-col items-start text-left shrink-0 cursor-pointer group"
             >
-              Schoola
+              <span className="font-playful font-extrabold text-2xl sm:text-[1.7rem] leading-none tracking-tight bg-gradient-to-r from-[#5B4FCF] via-[#3B9FE0] to-[#2DC89A] bg-clip-text text-transparent whitespace-nowrap">
+                Schoola
+              </span>
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 leading-tight mt-0.5 whitespace-nowrap">
+                <Check className="w-2.5 h-2.5 shrink-0" />
+                Aligned to England National Curriculum
+              </span>
             </button>
 
-            <div className="flex items-center gap-3 shrink-0">
-              <button
-                type="button"
-                onClick={() => setIsA11yOpen(true)}
-                className="min-h-[40px] px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer transition-colors"
-                aria-label="Open accessibility options"
-              >
-                <Accessibility className="w-4 h-4 text-sky-400" />
-                <span className="hidden sm:inline">Accessibility</span>
-              </button>
-
-              {/* Red-Orange Door Button for Parents & Teachers */}
-              <button
-                type="button"
-                onClick={() => {
-                  stopSpeaking();
-                  setActiveTopic(null);
-                  setRole(role === 'parent' ? 'child' : 'parent');
-                }}
-                className={`min-h-[44px] pl-2.5 pr-4 py-1.5 rounded-2xl border transition-all flex items-center gap-2.5 whitespace-nowrap shrink-0 cursor-pointer shadow-md ${
-                  role === 'parent'
-                    ? 'bg-emerald-600 hover:bg-emerald-700 border-emerald-400 text-white'
-                    : 'bg-gradient-to-r from-[#EA580C] to-[#DC2626] hover:from-[#C2410C] hover:to-[#B91C1C] border-orange-300/60 text-white'
-                }`}
-              >
-                <RedOrangeDoorIcon className="w-7 h-8 shrink-0" />
-                <span className="text-left leading-tight">
-                  <span className="block text-[10px] font-semibold text-orange-100">
-                    {role === 'parent' ? 'Back to kids' : 'Parents & Teachers'}
-                  </span>
-                  <span className="block text-xs font-extrabold">
-                    {role === 'parent' ? 'Child Explorer Hub' : 'Parent Portal'}
-                  </span>
-                </span>
-              </button>
-            </div>
+            <span className="hidden xl:inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 whitespace-nowrap">
+              <svg viewBox="0 0 60 40" className="w-4 h-3 rounded-[2px] shrink-0" aria-hidden="true">
+                <rect width="60" height="40" fill="#012169" />
+                <path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" strokeWidth="8" />
+                <path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" strokeWidth="5" />
+                <path d="M30,0 V40 M0,20 H60" stroke="#fff" strokeWidth="13" />
+                <path d="M30,0 V40 M0,20 H60" stroke="#C8102E" strokeWidth="8" />
+              </svg>
+              <span>Your free UK curriculum companion</span>
+            </span>
           </div>
 
-          {/* Horizontally Scrollable Dark Cloud Strip */}
+          {/* Zone 2: Clean Single-Line Navigation Links */}
           <nav
-            aria-label="Scrollable Learning Worlds and Journey Strip"
-            className="flex items-center gap-2 overflow-x-auto pb-1 pt-0.5"
+            aria-label="Primary navigation"
+            className="hidden md:flex items-center gap-1.5 overflow-x-auto"
           >
             <button
               type="button"
@@ -370,14 +349,60 @@ export default function App() {
                 setActiveTopic(null);
                 setActiveWorldSubjectId(null);
                 setRole('welcome');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className={`min-h-[36px] px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shrink-0 cursor-pointer border transition-colors ${
+              className={`min-h-[36px] px-3.5 py-1.5 rounded-full text-sm font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer transition-colors ${
                 role === 'welcome'
-                  ? 'bg-sky-500 text-white border-sky-400'
-                  : 'bg-slate-900/75 text-slate-200 border-slate-700/80 hover:bg-slate-800'
+                  ? 'bg-[#F5F4EC] text-slate-900'
+                  : 'text-slate-600 hover:bg-[#F5F4EC] hover:text-slate-900'
               }`}
             >
-              Home Stage
+              Home
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                stopSpeaking();
+                setActiveTopic(null);
+                setActiveWorldSubjectId(null);
+                setRole('welcome');
+                setDirectoryKS('ks1');
+                setProgress((prev) => ({
+                  ...prev,
+                  selectedYear: prev.selectedYear === 'Year 2' ? 'Year 2' : 'Year 1',
+                }));
+                setTimeout(() => {
+                  document.getElementById('full-curriculum-directory')?.scrollIntoView({ behavior: 'smooth' });
+                }, 60);
+              }}
+              className="min-h-[36px] px-3.5 py-1.5 rounded-full text-sm font-playful font-bold bg-[#FFF0EE] hover:bg-[#FFE0DC] text-[#c4402e] whitespace-nowrap shrink-0 cursor-pointer transition-colors"
+            >
+              KS1
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                stopSpeaking();
+                setActiveTopic(null);
+                setActiveWorldSubjectId(null);
+                setRole('welcome');
+                setDirectoryKS('ks2');
+                setProgress((prev) => ({
+                  ...prev,
+                  selectedYear:
+                    prev.selectedYear === 'Year 1' || prev.selectedYear === 'Year 2'
+                      ? 'Year 3'
+                      : prev.selectedYear,
+                }));
+                setTimeout(() => {
+                  document.getElementById('full-curriculum-directory')?.scrollIntoView({ behavior: 'smooth' });
+                }, 60);
+              }}
+              className="min-h-[36px] px-3.5 py-1.5 rounded-full text-sm font-playful font-bold bg-[#EEF2FF] hover:bg-[#E0E7FF] text-[#1e40af] whitespace-nowrap shrink-0 cursor-pointer transition-colors"
+            >
+              KS2
             </button>
 
             <button
@@ -389,10 +414,10 @@ export default function App() {
                 setChildViewMode('map');
                 setRole('child');
               }}
-              className={`min-h-[36px] px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shrink-0 cursor-pointer border transition-colors ${
+              className={`min-h-[36px] px-3.5 py-1.5 rounded-full text-sm font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer transition-colors ${
                 role === 'child' && !activeWorldSubjectId && !activeTopic && childViewMode === 'map'
-                  ? 'bg-emerald-500 text-white border-emerald-400'
-                  : 'bg-slate-900/75 text-slate-200 border-slate-700/80 hover:bg-slate-800'
+                  ? 'bg-emerald-50 text-emerald-700'
+                  : 'text-slate-600 hover:bg-[#F5F4EC] hover:text-slate-900'
               }`}
             >
               Activity Land
@@ -407,39 +432,143 @@ export default function App() {
                 setChildViewMode('dashboard');
                 setRole('child');
               }}
-              className={`min-h-[36px] px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shrink-0 cursor-pointer border transition-colors ${
+              className={`min-h-[36px] px-3.5 py-1.5 rounded-full text-sm font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer transition-colors ${
                 role === 'child' && !activeWorldSubjectId && !activeTopic && childViewMode === 'dashboard'
-                  ? 'bg-sky-500 text-white border-sky-400'
-                  : 'bg-slate-900/75 text-slate-200 border-slate-700/80 hover:bg-slate-800'
+                  ? 'bg-sky-50 text-sky-700'
+                  : 'text-slate-600 hover:bg-[#F5F4EC] hover:text-slate-900'
               }`}
             >
-              Child Dashboard
+              Dashboard
             </button>
 
-            {LEARNING_WORLDS.slice(0, 6).map((w) => {
-              const isSelected = role === 'child' && activeWorldSubjectId === w.subjectId;
-              return (
-                <button
-                  key={w.id}
-                  type="button"
-                  onClick={() => {
-                    stopSpeaking();
-                    setActiveTopic(null);
-                    setActiveWorldSubjectId(w.subjectId);
-                    setRole('child');
-                  }}
-                  className={`min-h-[36px] px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shrink-0 cursor-pointer border transition-colors ${
-                    isSelected
-                      ? 'bg-amber-500 text-slate-950 border-amber-300'
-                      : 'bg-slate-900/75 text-slate-200 border-slate-700/80 hover:bg-slate-800'
-                  }`}
-                >
-                  {w.worldTitle}
-                </button>
-              );
-            })}
+            <button
+              type="button"
+              onClick={() => setIsAboutOpen(true)}
+              className="min-h-[36px] px-3.5 py-1.5 rounded-full text-sm font-playful font-bold text-slate-600 hover:bg-[#F5F4EC] hover:text-slate-900 whitespace-nowrap shrink-0 cursor-pointer transition-colors"
+            >
+              About
+            </button>
           </nav>
+
+          {/* Zone 3: Accessibility & Parent Portal */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => setIsA11yOpen(true)}
+              className="min-h-[40px] px-3 py-1.5 rounded-xl bg-[#F5F4EC] hover:bg-[#EEEEE6] border border-[#E5E4DC] text-slate-700 text-xs font-bold flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer transition-colors"
+              aria-label="Open accessibility options"
+            >
+              <Accessibility className="w-4 h-4 text-[#5B4FCF]" />
+              <span className="hidden sm:inline">Accessibility</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                stopSpeaking();
+                setActiveTopic(null);
+                setRole(role === 'parent' ? 'child' : 'parent');
+              }}
+              className={`min-h-[40px] pl-2 pr-3.5 py-1 rounded-xl border transition-all flex items-center gap-2 whitespace-nowrap shrink-0 cursor-pointer shadow-xs ${
+                role === 'parent'
+                  ? 'bg-emerald-600 hover:bg-emerald-700 border-emerald-500 text-white'
+                  : 'bg-gradient-to-r from-[#EA580C] to-[#DC2626] hover:from-[#C2410C] hover:to-[#B91C1C] border-orange-300 text-white'
+              }`}
+            >
+              <RedOrangeDoorIcon className="w-5 h-6 shrink-0" />
+              <span className="text-xs font-extrabold whitespace-nowrap">
+                {role === 'parent' ? 'Kids Hub' : 'Parent Portal'}
+              </span>
+            </button>
+          </div>
         </div>
+
+        {/* Compact Mobile Navigation Strip */}
+        <nav
+          aria-label="Mobile navigation"
+          className="flex md:hidden items-center gap-1.5 px-4 pb-2 overflow-x-auto"
+        >
+          <button
+            type="button"
+            onClick={() => {
+              stopSpeaking();
+              setActiveTopic(null);
+              setActiveWorldSubjectId(null);
+              setRole('welcome');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className={`px-3 py-1 rounded-full text-xs font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer ${
+              role === 'welcome' ? 'bg-[#F5F4EC] text-slate-900' : 'text-slate-600'
+            }`}
+          >
+            Home
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              stopSpeaking();
+              setActiveTopic(null);
+              setActiveWorldSubjectId(null);
+              setRole('welcome');
+              setDirectoryKS('ks1');
+              setTimeout(() => {
+                document.getElementById('full-curriculum-directory')?.scrollIntoView({ behavior: 'smooth' });
+              }, 60);
+            }}
+            className="px-3 py-1 rounded-full text-xs font-playful font-bold bg-[#FFF0EE] text-[#c4402e] whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            KS1
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              stopSpeaking();
+              setActiveTopic(null);
+              setActiveWorldSubjectId(null);
+              setRole('welcome');
+              setDirectoryKS('ks2');
+              setTimeout(() => {
+                document.getElementById('full-curriculum-directory')?.scrollIntoView({ behavior: 'smooth' });
+              }, 60);
+            }}
+            className="px-3 py-1 rounded-full text-xs font-playful font-bold bg-[#EEF2FF] text-[#1e40af] whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            KS2
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              stopSpeaking();
+              setActiveTopic(null);
+              setActiveWorldSubjectId(null);
+              setChildViewMode('map');
+              setRole('child');
+            }}
+            className="px-3 py-1 rounded-full text-xs font-playful font-bold text-emerald-700 bg-emerald-50 whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            Activity Land
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              stopSpeaking();
+              setActiveTopic(null);
+              setActiveWorldSubjectId(null);
+              setChildViewMode('dashboard');
+              setRole('child');
+            }}
+            className="px-3 py-1 rounded-full text-xs font-playful font-bold text-slate-600 whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            Dashboard
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsAboutOpen(true)}
+            className="px-3 py-1 rounded-full text-xs font-playful font-bold text-slate-600 whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            About
+          </button>
+        </nav>
       </header>
       )}
 
@@ -472,6 +601,8 @@ export default function App() {
             }}
             stars={progress.stars}
             streakDays={progress.streakDays}
+            directoryKS={directoryKS}
+            onSelectDirectoryKS={setDirectoryKS}
           />
         )}
 
@@ -799,6 +930,43 @@ export default function App() {
               className="min-h-[44px] w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-sm font-bold cursor-pointer"
             >
               Done
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* About Schoola Modal */}
+      {isAboutOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-4 text-left">
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="font-playful font-extrabold text-2xl bg-gradient-to-r from-[#5B4FCF] via-[#3B9FE0] to-[#2DC89A] bg-clip-text text-transparent">
+                About Schoola
+              </h2>
+              <button
+                type="button"
+                onClick={() => setIsAboutOpen(false)}
+                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 cursor-pointer"
+                aria-label="Close about Schoola dialog"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-sm text-slate-700 leading-relaxed">
+              Schoola (schoola.uk) is a free, independent curriculum companion and interactive learning hub for UK primary school pupils aged 5–11 and their parents.
+            </p>
+            <p className="text-sm text-slate-700 leading-relaxed">
+              We map the full statutory National Curriculum (Key Stage 1 and Key Stage 2) with interactive quests and curated links to trusted free resources — including BBC Teach, Oak National Academy, Twinkl, and BBC Bitesize.
+            </p>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Privacy-first: no login or personal account required. Learning progress stays strictly in your browser.
+            </p>
+            <button
+              type="button"
+              onClick={() => setIsAboutOpen(false)}
+              className="min-h-[44px] w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-sm font-bold cursor-pointer"
+            >
+              Back to Schoola
             </button>
           </div>
         </div>
