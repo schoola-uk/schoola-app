@@ -17,7 +17,7 @@ import {
   Volume2,
 } from 'lucide-react';
 import { HubStage, LearnerProgress, Subject, Topic } from '../types';
-import { CURATED_YOUTUBE_VIDEOS } from '../data/youtubeVideos';
+import { findMatchingYouTubeVideo, getFallbackVideoSearchUrl } from '../data/youtubeVideos';
 import { getWorldForSubject, SURPRISE_FUN_FACTS } from '../data/learningWorlds';
 import { PlayActivityStage } from './PlayActivityStage';
 import { InteractiveQuiz } from './InteractiveQuiz';
@@ -84,19 +84,11 @@ export const LearningHub: React.FC<LearningHubProps> = ({
     [topic.title]
   );
 
-  // Match a curated YouTube video link (external link only, no iframe)
-  const matchedVideo = useMemo(() => {
-    const exact = CURATED_YOUTUBE_VIDEOS.find(
-      (v) =>
-        v.subjectId === topic.subjectId &&
-        cleanTopicKeyword
-          .toLowerCase()
-          .split(/\s+/)
-          .some((word) => word.length > 4 && v.title.toLowerCase().includes(word))
-    );
-    if (exact) return exact;
-    return CURATED_YOUTUBE_VIDEOS.find((v) => v.subjectId === topic.subjectId) || null;
-  }, [topic.subjectId, cleanTopicKeyword]);
+  // Match a verified topic-matched YouTube video link (external link only, zero broken 404 channels)
+  const matchedVideo = useMemo(
+    () => findMatchingYouTubeVideo(topic.subjectId, topic.id, cleanTopicKeyword),
+    [topic.subjectId, topic.id, cleanTopicKeyword]
+  );
 
   const subjectFunFact = useMemo(() => {
     return (
@@ -113,7 +105,7 @@ export const LearningHub: React.FC<LearningHubProps> = ({
 
   const videoResourceUrl = matchedVideo
     ? `https://www.youtube.com/watch?v=${matchedVideo.youtubeId}`
-    : `https://www.youtube.com/@schoolauk`;
+    : getFallbackVideoSearchUrl(cleanTopicKeyword);
 
   const handleRevealGoal = (idx: number, text: string) => {
     if (!revealedGoals.includes(idx)) {
@@ -141,7 +133,7 @@ export const LearningHub: React.FC<LearningHubProps> = ({
       id: 'bbc',
       label: 'BBC',
       emoji: '📺',
-      href: `https://www.bbc.co.uk/search?q=%22${encodeURIComponent(cleanTopicKeyword)}%22&d=search_ps`,
+      href: `https://www.bbc.co.uk/bitesize/search?q=${encodeURIComponent(cleanTopicKeyword)}&d=BITESIZE`,
       style: 'bg-indigo-500 hover:bg-indigo-600 border-indigo-700 text-white',
     },
     {
@@ -155,7 +147,7 @@ export const LearningHub: React.FC<LearningHubProps> = ({
       id: 'oak',
       label: 'Oak',
       emoji: '🌳',
-      href: `https://www.thenational.academy/search?q=${encodeURIComponent(cleanTopicKeyword)}`,
+      href: `https://www.thenational.academy/teachers/search?term=${encodeURIComponent(cleanTopicKeyword)}`,
       style: 'bg-amber-400 hover:bg-amber-500 border-amber-600 text-slate-950',
     },
   ];
@@ -336,7 +328,36 @@ export const LearningHub: React.FC<LearningHubProps> = ({
             </div>
 
             {/* Playful Outsourced Resource Launch Tiles (Zero iframes) */}
-            <div className="space-y-2 pt-1">
+            <div className="space-y-2.5 pt-1">
+              {matchedVideo && (
+                <a
+                  href={videoResourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => {
+                    onStageWatchDone(topic.id);
+                    onMascotUpdate('sparkle', `Have fun watching "${matchedVideo.title}"!`);
+                  }}
+                  className="flex items-center gap-3 p-2.5 rounded-2xl bg-rose-50/80 hover:bg-rose-100/80 border border-rose-200 transition-colors group"
+                >
+                  <img
+                    src={`https://img.youtube.com/vi/${matchedVideo.youtubeId}/mqdefault.jpg`}
+                    alt={matchedVideo.title}
+                    referrerPolicy="no-referrer"
+                    className="w-20 h-12 rounded-xl object-cover shrink-0 border border-rose-200"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[11px] font-extrabold text-rose-700 uppercase tracking-wide">
+                      Matched Video · {matchedVideo.channelName} · {matchedVideo.duration}
+                    </p>
+                    <p className="text-xs sm:text-sm font-bold text-slate-900 truncate group-hover:text-rose-700">
+                      {matchedVideo.title}
+                    </p>
+                  </div>
+                  <ExternalLink className="w-4 h-4 text-rose-600 shrink-0 mr-1" />
+                </a>
+              )}
+
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 {outsourcedLinks.map((res) => (
                   <motion.a

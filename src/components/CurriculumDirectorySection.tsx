@@ -13,6 +13,7 @@ import {
   X,
 } from 'lucide-react';
 import { SUBJECTS, TOPICS } from '../data/curriculum';
+import { findMatchingYouTubeVideo, getFallbackVideoSearchUrl, YouTubeVideo } from '../data/youtubeVideos';
 import { Topic } from '../types';
 
 interface CurriculumDirectorySectionProps {
@@ -37,68 +38,75 @@ interface FeaturedVideo {
   emoji: string;
   subjectId: string;
   searchKw: string;
+  youtubeId: string;
 }
 
 const FEATURED_VIDEOS: FeaturedVideo[] = [
   {
     title: 'The Circulatory System',
-    series: 'Miniclips: Body Systems S02 · E03',
+    series: 'Learn Bright · Body Systems',
     ks: 'L KS2 – U KS2',
-    dur: '4m',
+    dur: '6m',
     gradient: 'from-[#1a1060] to-[#3b1d8a]',
     emoji: '🫀',
     subjectId: 'Science',
-    searchKw: 'circulatory system',
+    searchKw: 'circulatory system heart blood',
+    youtubeId: 'Dw0WO2XZ5fM',
   },
   {
     title: 'The Respiratory System',
-    series: 'Miniclips: Body Systems S02 · E02',
+    series: 'Learn Bright · Lungs & Breathing',
     ks: 'L KS2 – U KS2',
-    dur: '4m',
+    dur: '6m',
     gradient: 'from-[#2d0a4e] to-[#5b21b6]',
     emoji: '🫁',
     subjectId: 'Science',
-    searchKw: 'respiratory system breathing',
+    searchKw: 'respiratory system breathing lungs',
+    youtubeId: '67Jbbu7UZAA',
   },
   {
     title: 'The Water Cycle',
-    series: 'BBC Teach Science',
+    series: 'SciShow Kids · Ecology & States',
     ks: 'L KS2 – U KS2',
-    dur: '5m',
+    dur: '4m',
     gradient: 'from-[#0c4a6e] to-[#0369a1]',
     emoji: '💧',
-    subjectId: 'Geography',
-    searchKw: 'water cycle',
+    subjectId: 'Science',
+    searchKw: 'water cycle evaporation condensation',
+    youtubeId: 'R0K7VKkksyc',
   },
   {
     title: 'Fractions: Halves and Quarters',
-    series: 'Numberblocks · Season 3',
-    ks: 'KS1',
-    dur: '8m',
+    series: 'Primary Maths Songs · KS1–KS2',
+    ks: 'KS1 – L KS2',
+    dur: '4m',
     gradient: 'from-[#1e3a8a] to-[#2563eb]',
     emoji: '½',
     subjectId: 'Maths',
-    searchKw: 'halves and quarters fractions',
+    searchKw: 'fractions decimals half',
+    youtubeId: 'DnFrOetuUKg',
   },
   {
     title: 'The Great Fire of London',
-    series: 'BBC Teach History',
+    series: 'BBC Teach History · KS1',
     ks: 'KS1',
     dur: '6m',
     gradient: 'from-[#7c2d12] to-[#c2410c]',
     emoji: '🔥',
     subjectId: 'History',
-    searchKw: 'Great Fire of London',
+    searchKw: 'Great Fire of London 1666',
+    youtubeId: 'DSH81jl-uAk',
   },
   {
     title: 'Forces and Magnets',
-    series: 'Oak National Academy · Year 3',
+    series: 'Miacademy Science · KS2',
     ks: 'L KS2',
-    dur: '15m',
+    dur: '5m',
     gradient: 'from-[#14532d] to-[#15803d]',
     emoji: '🧲',
     subjectId: 'Science',
-    searchKw: 'forces and magnets',
+    searchKw: 'forces electricity light',
+    youtubeId: 'Kll5A6xX9cY',
   },
 ];
 
@@ -402,30 +410,51 @@ function shortKeywords(topic: string): string {
     .join(' ');
 }
 
-function buildTopicLinks(topic: string, subjectId: string) {
+function buildTopicLinks(topic: string, subjectId: string): {
+  kw: string;
+  matchedVideo: YouTubeVideo | null;
+  watch: string;
+  bbcSearch: string;
+  oak: string;
+  print: string;
+  classroomSecrets: string;
+  quiz: string;
+} {
   const kw = shortKeywords(topic);
   const bbcKw = encodeURIComponent(kw);
   const twinklKw = encodeURIComponent(`${kw} ${subjectId.replace('&', '').trim()}`);
+  const matchedVideo = findMatchingYouTubeVideo(subjectId, undefined, topic, false);
+  const watch = matchedVideo
+    ? `https://www.youtube.com/watch?v=${matchedVideo.youtubeId}`
+    : getFallbackVideoSearchUrl(`${kw} ${subjectId}`);
   return {
     kw,
-    watch: `https://www.bbc.co.uk/teach/search?q=${bbcKw}`,
+    matchedVideo,
+    watch,
+    bbcSearch: `https://www.bbc.co.uk/search?q=${bbcKw}&d=search_ps`,
     oak: `https://www.thenational.academy/teachers/search?term=${bbcKw}`,
     print: `https://www.twinkl.co.uk/search?q=${twinklKw}`,
     classroomSecrets: `https://classroomsecrets.co.uk/?s=${bbcKw}`,
-    quiz: `https://www.bbc.co.uk/bitesize/search?q=${bbcKw}`,
+    quiz: `https://www.bbc.co.uk/bitesize/search?q=${bbcKw}&d=BITESIZE`,
   };
 }
 
 function findMatchingAppTopic(subjectId: string, textQuery: string): Topic {
-  const words = shortKeywords(textQuery)
-    .toLowerCase()
-    .split(' ')
+  const phrase = textQuery.toLowerCase().trim();
+  const words = phrase
+    .split(/\s+/)
     .filter((w) => w.length > 3);
   const subjectTopics = TOPICS.filter((t) => t.subjectId === subjectId);
-  const exact = subjectTopics.find((t) =>
+  const exactPhrase = subjectTopics.find(
+    (t) =>
+      t.title.toLowerCase().includes(phrase) ||
+      t.objectives.some((o) => o.toLowerCase().includes(phrase))
+  );
+  if (exactPhrase) return exactPhrase;
+  const wordMatch = subjectTopics.find((t) =>
     words.some((w) => t.title.toLowerCase().includes(w) || t.objectives.some((o) => o.toLowerCase().includes(w)))
   );
-  return exact || subjectTopics[0] || TOPICS[0];
+  return wordMatch || subjectTopics[0] || TOPICS[0];
 }
 
 export const CurriculumDirectorySection: React.FC<CurriculumDirectorySectionProps> = ({
@@ -445,6 +474,7 @@ export const CurriculumDirectorySection: React.FC<CurriculumDirectorySectionProp
   const [activeRowModal, setActiveRowModal] = useState<{ ks: 'ks1' | 'ks2'; row: DirectoryRow } | null>(
     null
   );
+  const [activeFeaturedVideo, setActiveFeaturedVideo] = useState<FeaturedVideo | null>(null);
   const [openTipIdx, setOpenTipIdx] = useState<number | null>(0);
 
   const subjectMap = useMemo(() => {
@@ -501,7 +531,7 @@ export const CurriculumDirectorySection: React.FC<CurriculumDirectorySectionProp
               whileHover={{ y: -4, scale: 1.02 }}
               whileTap={{ scale: 0.96 }}
               type="button"
-              onClick={() => onOpenTopic(findMatchingAppTopic(vid.subjectId, vid.searchKw))}
+              onClick={() => setActiveFeaturedVideo(vid)}
               className="rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-sm hover:shadow-md transition-shadow text-left cursor-pointer flex flex-col"
             >
               <div className={`relative h-36 bg-gradient-to-br ${vid.gradient} flex flex-col items-center justify-center p-3 text-center`}>
@@ -808,9 +838,25 @@ export const CurriculumDirectorySection: React.FC<CurriculumDirectorySectionProp
                 <BookOpen className="w-4 h-4 text-violet-600" />
                 Video lessons &amp; explainers
               </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <a
                   href={modalLinks.watch}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-3.5 rounded-xl border border-rose-200 bg-rose-50/40 hover:border-rose-400 hover:bg-rose-50 transition-colors space-y-1.5"
+                >
+                  <p className="text-[11px] font-bold text-rose-600 uppercase">
+                    {modalLinks.matchedVideo ? `Video · ${modalLinks.matchedVideo.channelName}` : 'YouTube Kids'}
+                  </p>
+                  <p className="font-playful font-bold text-sm text-slate-900 line-clamp-2">
+                    {modalLinks.matchedVideo ? modalLinks.matchedVideo.title : modalLinks.kw}
+                  </p>
+                  <span className="inline-flex items-center gap-1 text-xs font-bold text-rose-700">
+                    ▶ Watch video →
+                  </span>
+                </a>
+                <a
+                  href={modalLinks.bbcSearch}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-3.5 rounded-xl border border-slate-200 hover:border-violet-300 hover:bg-violet-50/50 transition-colors space-y-1.5"
@@ -818,7 +864,7 @@ export const CurriculumDirectorySection: React.FC<CurriculumDirectorySectionProp
                   <p className="text-[11px] font-bold text-slate-500 uppercase">BBC Teach</p>
                   <p className="font-playful font-bold text-sm text-slate-900">{modalLinks.kw}</p>
                   <span className="inline-flex items-center gap-1 text-xs font-bold text-violet-700">
-                    ▶ Watch on BBC Teach →
+                    ▶ Search BBC →
                   </span>
                 </a>
                 <a
@@ -911,6 +957,76 @@ export const CurriculumDirectorySection: React.FC<CurriculumDirectorySectionProp
                   );
                 })}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* FEATURED VIDEO LESSON THEATER MODAL */}
+      {activeFeaturedVideo && (
+        <div
+          className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="featured-video-modal-title"
+        >
+          <div className="bg-slate-950 text-white border border-slate-800 rounded-3xl max-w-3xl w-full p-5 sm:p-7 shadow-2xl space-y-5 text-left">
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-1">
+                <p className="text-xs font-bold text-sky-300">
+                  {activeFeaturedVideo.emoji} {activeFeaturedVideo.series} · {activeFeaturedVideo.ks}
+                </p>
+                <h3 id="featured-video-modal-title" className="font-playful font-bold text-xl sm:text-2xl">
+                  {activeFeaturedVideo.title}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveFeaturedVideo(null)}
+                className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white cursor-pointer shrink-0"
+                aria-label="Close video player"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="aspect-video rounded-2xl overflow-hidden bg-black border border-slate-800">
+              <iframe
+                width="100%"
+                height="100%"
+                src={`https://www.youtube.com/embed/${activeFeaturedVideo.youtubeId}?autoplay=1&rel=0`}
+                title={activeFeaturedVideo.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                referrerPolicy="no-referrer"
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <a
+                href={`https://www.youtube.com/watch?v=${activeFeaturedVideo.youtubeId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="min-h-[42px] px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs sm:text-sm inline-flex items-center gap-2"
+              >
+                <span>Watch on YouTube</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const topic = findMatchingAppTopic(
+                    activeFeaturedVideo.subjectId,
+                    activeFeaturedVideo.searchKw
+                  );
+                  setActiveFeaturedVideo(null);
+                  onOpenTopic(topic);
+                }}
+                className="min-h-[42px] px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-playful font-bold text-xs sm:text-sm cursor-pointer"
+              >
+                Practice {activeFeaturedVideo.subjectId} Quiz in Learning Hub →
+              </button>
             </div>
           </div>
         </div>

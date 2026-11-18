@@ -19,7 +19,7 @@ import {
   Youtube,
 } from 'lucide-react';
 import { SUBJECTS, TOPICS } from '../data/curriculum';
-import { CURATED_YOUTUBE_VIDEOS, EDUCATION_CHANNELS } from '../data/youtubeVideos';
+import { CURATED_YOUTUBE_VIDEOS, EDUCATION_CHANNELS, findMatchingYouTubeVideo } from '../data/youtubeVideos';
 import {
   downloadSchoolTermsCalendar,
   downloadTopicRevisionEvent,
@@ -366,20 +366,20 @@ export const ParentTeacherHub: React.FC<ParentTeacherHubProps> = ({
             </div>
           </div>
 
-          {/* UK Curriculum Trust & YouTube @schoolauk Banner */}
+          {/* UK Curriculum Trust & Video Classroom Banner */}
           <div className="bg-slate-900 text-white rounded-3xl p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="space-y-1.5">
               <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-rose-300">
                 <Youtube className="w-4 h-4" />
-                <span>@schoolauk</span>
+                <span>Verified UK Video Lessons</span>
                 <span aria-hidden="true">·</span>
-                <span>200+ Free Curriculum Videos (KS1–KS2)</span>
+                <span>All 12 Primary Subjects (KS1–KS2)</span>
               </div>
               <h2 className="font-heading font-extrabold text-xl">
-                Schoola on YouTube &amp; National Curriculum Directory
+                Curated Video Classroom &amp; National Curriculum Directory
               </h2>
               <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
-                Explore the full colour-coded KS1 &amp; KS2 curriculum table with instant links to interactive Schoola Learning Hubs, BBC Teach, Twinkl, and Oak National Academy.
+                Explore the full colour-coded KS1 &amp; KS2 curriculum table with instant topic-matched videos, BBC Bitesize guides, Twinkl worksheets, and Oak National Academy lessons.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3 shrink-0">
@@ -390,14 +390,13 @@ export const ParentTeacherHub: React.FC<ParentTeacherHubProps> = ({
               >
                 Open KS1–KS2 Rainbow Table →
               </button>
-              <a
-                href="https://www.youtube.com/@schoolauk"
-                target="_blank"
-                rel="noreferrer"
-                className="min-h-[42px] px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs inline-flex items-center gap-1.5 whitespace-nowrap"
+              <button
+                type="button"
+                onClick={() => setTab('videos')}
+                className="min-h-[42px] px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs inline-flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
               >
-                Visit @schoolauk <ExternalLink className="w-3.5 h-3.5" />
-              </a>
+                Open Video Classroom ({CURATED_YOUTUBE_VIDEOS.length}) →
+              </button>
             </div>
           </div>
 
@@ -606,6 +605,7 @@ export const ParentTeacherHub: React.FC<ParentTeacherHubProps> = ({
                       const style = YEAR_RAINBOW_STYLES[topic.year] || YEAR_RAINBOW_STYLES['Year 1'];
                       const subj = SUBJECTS.find((s) => s.id === topic.subjectId);
                       const isCompleted = progress.completedTopics.includes(topic.id);
+                      const matchedVid = findMatchingYouTubeVideo(topic.subjectId, topic.id, cleanKeyword);
                       return (
                         <tr
                           key={topic.id}
@@ -652,8 +652,19 @@ export const ParentTeacherHub: React.FC<ParentTeacherHubProps> = ({
                               >
                                 Launch Hub
                               </button>
+                              {matchedVid && (
+                                <a
+                                  href={`https://www.youtube.com/watch?v=${matchedVid.youtubeId}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  title={matchedVid.title}
+                                  className="min-h-[34px] px-2.5 py-1 rounded-lg bg-rose-50 border border-rose-200 hover:border-rose-400 text-xs font-bold text-rose-700 inline-flex items-center gap-1 whitespace-nowrap"
+                                >
+                                  Video <ExternalLink className="w-3 h-3" />
+                                </a>
+                              )}
                               <a
-                                href={`https://www.bbc.co.uk/search?q=%22${encodeURIComponent(cleanKeyword)}%22&d=search_ps`}
+                                href={`https://www.bbc.co.uk/bitesize/search?q=${encodeURIComponent(cleanKeyword)}&d=BITESIZE`}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="min-h-[34px] px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-sky-400 text-xs font-bold text-slate-700 inline-flex items-center gap-1 whitespace-nowrap"
@@ -669,7 +680,7 @@ export const ParentTeacherHub: React.FC<ParentTeacherHubProps> = ({
                                 Twinkl <ExternalLink className="w-3 h-3" />
                               </a>
                               <a
-                                href={`https://www.thenational.academy/search?q=${encodeURIComponent(cleanKeyword)}`}
+                                href={`https://www.thenational.academy/teachers/search?term=${encodeURIComponent(cleanKeyword)}`}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="min-h-[34px] px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-amber-400 text-xs font-bold text-slate-700 inline-flex items-center gap-1 whitespace-nowrap"
@@ -691,6 +702,7 @@ export const ParentTeacherHub: React.FC<ParentTeacherHubProps> = ({
               {filteredTopics.map((topic) => {
                 const cleanKeyword = topic.title.replace(/^[^:—]+[:—]\s*/, '').trim();
                 const style = YEAR_RAINBOW_STYLES[topic.year] || YEAR_RAINBOW_STYLES['Year 1'];
+                const matchedVid = findMatchingYouTubeVideo(topic.subjectId, topic.id, cleanKeyword);
                 return (
                   <div
                     key={topic.id}
@@ -724,9 +736,19 @@ export const ParentTeacherHub: React.FC<ParentTeacherHubProps> = ({
                         Launch in Learning Hub
                       </button>
 
-                      <div className="flex items-center gap-3 text-xs font-semibold text-slate-600">
+                      <div className="flex items-center gap-3 text-xs font-semibold text-slate-600 flex-wrap">
+                        {matchedVid && (
+                          <a
+                            href={`https://www.youtube.com/watch?v=${matchedVid.youtubeId}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-rose-700 hover:underline inline-flex items-center gap-1"
+                          >
+                            Video <ExternalLink className="w-3 h-3" />
+                          </a>
+                        )}
                         <a
-                          href={`https://www.bbc.co.uk/search?q=%22${encodeURIComponent(cleanKeyword)}%22&d=search_ps`}
+                          href={`https://www.bbc.co.uk/bitesize/search?q=${encodeURIComponent(cleanKeyword)}&d=BITESIZE`}
                           target="_blank"
                           rel="noreferrer"
                           className="hover:text-sky-700 inline-flex items-center gap-1"
@@ -742,7 +764,7 @@ export const ParentTeacherHub: React.FC<ParentTeacherHubProps> = ({
                           Twinkl <ExternalLink className="w-3 h-3" />
                         </a>
                         <a
-                          href={`https://www.thenational.academy/search?q=${encodeURIComponent(cleanKeyword)}`}
+                          href={`https://www.thenational.academy/teachers/search?term=${encodeURIComponent(cleanKeyword)}`}
                           target="_blank"
                           rel="noreferrer"
                           className="hover:text-amber-700 inline-flex items-center gap-1"
@@ -916,32 +938,32 @@ export const ParentTeacherHub: React.FC<ParentTeacherHubProps> = ({
       {/* TAB 4: CURATED VIDEO CLASSROOM */}
       {tab === 'videos' && (
         <div className="space-y-6">
-          {/* @schoolauk Official YouTube Showcase */}
+          {/* Verified Video Classroom Banner */}
           <div className="bg-gradient-to-r from-[#0F172A] via-[#1E293B] to-[#312E81] text-white rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1">
               <p className="text-xs font-bold text-rose-300 flex items-center gap-1.5">
                 <Youtube className="w-4 h-4" />
-                Schoola on YouTube · @schoolauk · 200+ Free Videos (KS1–KS2)
+                Verified UK Primary Video Library · {CURATED_YOUTUBE_VIDEOS.length} Lessons (KS1–KS2)
               </p>
               <h2 className="font-heading font-extrabold text-xl">
                 Curated UK Primary Video Classroom
               </h2>
               <p className="text-xs text-slate-300">
-                Watch ad-conscious, curriculum-matched primary lessons in-app or visit the official Schoola channel.
+                Every video is checked and matched across all 12 England National Curriculum subjects — watch in-app or directly on YouTube.
               </p>
             </div>
             <a
-              href="https://www.youtube.com/@schoolauk"
+              href="https://www.youtube.com/@bbcteach"
               target="_blank"
               rel="noreferrer"
               className="min-h-[42px] px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold inline-flex items-center gap-1.5 shrink-0 whitespace-nowrap"
             >
-              Visit @schoolauk <ExternalLink className="w-3.5 h-3.5" />
+              Browse @bbcteach <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            {['All', 'Maths', 'English', 'Science', 'History', 'Geography'].map((subj) => (
+            {['All', ...SUBJECTS.map((s) => s.id)].map((subj) => (
               <button
                 key={subj}
                 type="button"
@@ -1037,13 +1059,22 @@ export const ParentTeacherHub: React.FC<ParentTeacherHubProps> = ({
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {EDUCATION_CHANNELS.map((ch) => (
-                <div key={ch.name} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
-                  <p className="font-bold text-sm text-slate-900">
-                    {ch.logo} {ch.name}
+                <a
+                  key={ch.name}
+                  href={ch.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-4 rounded-2xl bg-slate-50 border border-slate-200 hover:border-sky-400 hover:bg-sky-50/40 transition-colors space-y-1 block"
+                >
+                  <p className="font-bold text-sm text-slate-900 flex items-center justify-between gap-2">
+                    <span>
+                      {ch.logo} {ch.name}
+                    </span>
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                   </p>
-                  <p className="text-xs text-slate-500 font-mono">{ch.handle}</p>
+                  <p className="text-xs text-sky-700 font-mono">{ch.handle}</p>
                   <p className="text-xs text-slate-600 leading-relaxed pt-1">{ch.description}</p>
-                </div>
+                </a>
               ))}
             </div>
           </div>

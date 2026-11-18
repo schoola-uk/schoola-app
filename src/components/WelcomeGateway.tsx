@@ -129,10 +129,10 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
 
   return (
     <div className="w-full">
-      {/* 1. HERO HEADER PHOTO BANNER (bubble-show-card.jpg) — 100% FULL WIDTH */}
+      {/* 1. HERO HEADER PHOTO BANNER (bubble-show-card.jpg) — PLUM / MAGENTA / ROSE PALETTE */}
       <section
         aria-label="Schoola UK Primary Curriculum Hero"
-        className="relative w-full overflow-hidden bg-[#1a1033] text-white"
+        className="relative w-full overflow-hidden bg-[#241122] text-white"
       >
         {/* Background Header Photo from schoola-uk/curriculum */}
         <img
@@ -145,21 +145,21 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
               img.src = 'https://raw.githubusercontent.com/schoola-uk/curriculum/main/bubble-show-card.jpg';
             }
           }}
-          className="absolute inset-0 w-full h-full object-cover object-[center_26%] sm:object-[68%_24%] select-none"
+          className="absolute inset-0 w-full h-full object-cover object-[center_24%] sm:object-[68%_22%] select-none"
         />
-        {/* High-contrast left-to-right scrim keeping the girls & giant soap bubble clear on the right */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#130d2b]/92 via-[#172554]/72 to-[#1a1033]/25 pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#130d2b]/65 via-transparent to-[#130d2b]/25 pointer-events-none" />
+        {/* Warm deep plum → royal magenta → rose glow scrim matching editorial header palette */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#231021]/92 via-[#4E1B47]/62 to-[#B53D69]/22 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#231021]/78 via-[#2E132B]/10 to-[#231021]/30 pointer-events-none" />
 
         <div className="relative z-10 w-full px-6 sm:px-10 lg:px-16 pt-12 pb-12 sm:pt-16 sm:pb-16 space-y-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-end">
-            {/* Left: Requested Curriculum Headline + Subcopy + Key Stage & Year Controls */}
+            {/* Left: Curriculum Headline + Subcopy + Key Stage & Year Controls */}
             <div className="lg:col-span-7 text-left space-y-4">
-              <div className="flex flex-wrap items-center gap-2.5 text-xs font-bold text-amber-200/95 tracking-wide">
-                <span className="h-[2px] w-6 bg-amber-300/80 rounded-full" aria-hidden="true" />
-                <span className="uppercase">England National Curriculum · 100% Free</span>
-                <span aria-hidden="true">·</span>
-                <span className="inline-flex items-center gap-1.5 text-sky-100 normal-case">
+              <div className="flex flex-wrap items-center gap-2.5 text-xs font-bold text-[#F5C994] tracking-wide">
+                <span className="h-[2px] w-7 bg-[#F5C994]/85 rounded-full" aria-hidden="true" />
+                <span className="uppercase tracking-[0.14em]">England National Curriculum · 100% Free</span>
+                <span className="text-white/40" aria-hidden="true">·</span>
+                <span className="inline-flex items-center gap-1.5 text-[#FCE7EE] normal-case">
                   <svg viewBox="0 0 24 16" className="w-4 h-3 rounded-[2px] shrink-0" aria-hidden="true">
                     <rect width="24" height="16" fill="#012169" />
                     <path d="M0 0L24 16M24 0L0 16" stroke="#fff" strokeWidth="3" />
@@ -169,23 +169,23 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
                   </svg>
                   <span>Ages 5–11</span>
                 </span>
-                <span className="inline-flex items-center gap-1 tabular-nums text-amber-200">
-                  <Star className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
+                <span className="inline-flex items-center gap-1 tabular-nums text-[#F5C994]">
+                  <Star className="w-3.5 h-3.5 text-[#F5C994] fill-[#F5C994]" />
                   {stars}
                 </span>
-                <span className="inline-flex items-center gap-1 tabular-nums text-orange-200">
-                  <Flame className="w-3.5 h-3.5 text-orange-300" />
+                <span className="inline-flex items-center gap-1 tabular-nums text-[#F9B49B]">
+                  <Flame className="w-3.5 h-3.5 text-[#F28C6A]" />
                   {streakDays}d
                 </span>
               </div>
 
               <h1 className="font-playful font-bold text-3xl sm:text-4xl xl:text-5xl leading-[1.08] tracking-tight [text-wrap:balance] drop-shadow-sm">
                 <span className="block text-white">Your child&apos;s complete</span>
-                <span className="block text-amber-300">UK primary curriculum</span>
-                <span className="block text-emerald-300">in one place</span>
+                <span className="block text-[#F5C994] italic">UK primary curriculum</span>
+                <span className="block text-white">in one place</span>
               </h1>
 
-              <p className="text-sm sm:text-base text-slate-100 leading-relaxed max-w-xl font-medium drop-shadow-xs">
+              <p className="text-sm sm:text-base text-[#F7E8EF] leading-relaxed max-w-xl font-medium drop-shadow-xs">
                 Every subject, every topic for Years 1–6 — mapped to the National Curriculum with free videos, printables, and quizzes.
               </p>
 
@@ -201,8 +201,8 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
                   }}
                   className={`min-h-[44px] px-4 py-2 rounded-2xl text-xs sm:text-sm font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer border-2 border-b-4 transition-colors flex items-center gap-2 ${
                     selectedYear === 'Year 1' || selectedYear === 'Year 2'
-                      ? 'bg-emerald-400 text-slate-950 border-emerald-700 shadow-md'
-                      : 'bg-slate-950/55 text-white border-white/35 hover:bg-slate-950/75 backdrop-blur-xs'
+                      ? 'bg-[#F5C994] text-[#2B1224] border-[#C98B4B] shadow-md'
+                      : 'bg-[#3A1731]/55 text-white border-white/30 hover:bg-[#4D1E41]/75 backdrop-blur-md'
                   }`}
                 >
                   <span aria-hidden="true">📗</span>
@@ -219,8 +219,8 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
                   }}
                   className={`min-h-[44px] px-4 py-2 rounded-2xl text-xs sm:text-sm font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer border-2 border-b-4 transition-colors flex items-center gap-2 ${
                     selectedYear !== 'Year 1' && selectedYear !== 'Year 2'
-                      ? 'bg-sky-300 text-slate-950 border-sky-700 shadow-md'
-                      : 'bg-slate-950/55 text-white border-white/35 hover:bg-slate-950/75 backdrop-blur-xs'
+                      ? 'bg-[#FAD7E2] text-[#2B1224] border-[#C77D96] shadow-md'
+                      : 'bg-[#3A1731]/55 text-white border-white/30 hover:bg-[#4D1E41]/75 backdrop-blur-md'
                   }`}
                 >
                   <span aria-hidden="true">📘</span>
@@ -241,8 +241,8 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
                       onClick={() => onSelectYear(yr)}
                       className={`min-h-[40px] px-3.5 py-1.5 rounded-2xl text-xs font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer border-2 border-b-4 transition-colors ${
                         active
-                          ? 'bg-amber-400 text-slate-950 border-amber-600 shadow-sm'
-                          : 'bg-slate-950/50 text-white border-white/30 hover:bg-slate-950/75 backdrop-blur-xs'
+                          ? 'bg-[#DC5A38] text-white border-[#9C351B] shadow-sm'
+                          : 'bg-[#3A1731]/50 text-[#FDF4F7] border-white/25 hover:bg-[#522044]/75 backdrop-blur-md'
                       }`}
                     >
                       {yr}
@@ -257,7 +257,7 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
                   whileTap={{ scale: 0.95 }}
                   type="button"
                   onClick={onEnterChild}
-                  className="min-h-[50px] px-7 py-2.5 bg-gradient-to-r from-[#F97316] to-[#F59E0B] hover:from-[#EA580C] hover:to-[#D97706] border-2 border-orange-700 border-b-4 text-white font-playful font-bold text-base sm:text-lg rounded-2xl shadow-lg flex items-center gap-2 cursor-pointer whitespace-nowrap shrink-0"
+                  className="min-h-[50px] px-7 py-2.5 bg-[#DC5A38] hover:bg-[#C94D2D] border-2 border-[#9A341A] border-b-4 text-white font-playful font-bold text-base sm:text-lg rounded-2xl shadow-lg flex items-center gap-2 cursor-pointer whitespace-nowrap shrink-0"
                 >
                   <Sparkles className="w-5 h-5" />
                   Let&apos;s Learn!
@@ -269,39 +269,39 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
                   whileTap={{ scale: 0.94 }}
                   type="button"
                   onClick={handleSurpriseAdventure}
-                  className="min-h-[50px] px-5 py-2.5 bg-emerald-400 hover:bg-emerald-300 border-2 border-emerald-700 border-b-4 text-slate-950 font-playful font-bold text-sm sm:text-base rounded-2xl shadow-lg flex items-center gap-2 cursor-pointer whitespace-nowrap shrink-0"
+                  className="min-h-[50px] px-5 py-2.5 bg-white/15 hover:bg-white/25 border-2 border-white/35 border-b-4 backdrop-blur-md text-white font-playful font-bold text-sm sm:text-base rounded-2xl shadow-lg flex items-center gap-2 cursor-pointer whitespace-nowrap shrink-0"
                 >
-                  <Dices className="w-5 h-5" />
+                  <Dices className="w-5 h-5 text-[#F5C994]" />
                   Surprise Me!
                 </motion.button>
               </div>
 
               {/* Inline Curriculum Trust Stats */}
-              <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 pt-1 text-slate-100">
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 pt-1 text-[#F7E8EF]">
                 <span className="text-xs font-semibold">
-                  <strong className="font-playful text-base text-amber-300 tabular-nums">200+</strong> Curriculum topics
+                  <strong className="font-playful text-base text-[#F5C994] tabular-nums">200+</strong> Curriculum topics
                 </span>
-                <span className="text-white/35" aria-hidden="true">|</span>
+                <span className="text-white/30" aria-hidden="true">|</span>
                 <span className="text-xs font-semibold">
-                  <strong className="font-playful text-base text-emerald-300 tabular-nums">12</strong> Subjects covered
+                  <strong className="font-playful text-base text-[#FAD7E2] tabular-nums">12</strong> Subjects covered
                 </span>
-                <span className="text-white/35" aria-hidden="true">|</span>
+                <span className="text-white/30" aria-hidden="true">|</span>
                 <span className="text-xs font-semibold">
                   <strong className="font-playful text-base text-white tabular-nums">£0</strong> Always free
                 </span>
               </div>
             </div>
 
-            {/* Right: Parent Testimonial Glass Card positioned cleanly without covering faces */}
+            {/* Right: Frosted Warm Plum Glass Parent Testimonial Card */}
             <div className="lg:col-span-5 flex lg:justify-end">
-              <div className="max-w-sm rounded-2xl bg-slate-950/50 backdrop-blur-md border border-white/25 p-5 text-left shadow-xl">
-                <p className="text-[11px] font-extrabold uppercase tracking-widest text-amber-200 mb-2">
+              <div className="max-w-sm rounded-2xl bg-[#4E203C]/60 backdrop-blur-md border border-white/25 p-5 sm:p-6 text-left shadow-xl">
+                <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#F5C994] mb-2">
                   From a parent
                 </p>
                 <blockquote className="text-sm sm:text-base italic font-semibold text-white leading-snug">
                   “My girls ask to do their Schoola topics before I&apos;ve even had my coffee.”
                 </blockquote>
-                <p className="text-xs text-slate-200 mt-2.5 font-medium">
+                <p className="text-xs text-[#F2D5DF] mt-2.5 font-medium">
                   — A Schoola parent, Year 2 &amp; Reception
                 </p>
               </div>
@@ -312,9 +312,9 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
           <div className="pt-4 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="font-playful font-bold text-sm sm:text-base text-white/95 drop-shadow-xs">
-                Featured <span className="text-amber-300">Learning Worlds</span> for {selectedYear}
+                Featured <span className="text-[#F5C994]">Learning Worlds</span> for {selectedYear}
               </h2>
-              <span className="text-xs font-bold text-sky-100/90">Tap any card to enter</span>
+              <span className="text-xs font-bold text-[#FAD7E2]">Tap any card to enter</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {featuredWorlds.map((world, idx) => {
@@ -333,17 +333,17 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
                     whileHover={{ y: -7, rotate: 0, scale: 1.03 }}
                     whileTap={{ scale: 0.96 }}
                     onClick={() => onOpenWorld(world.subjectId)}
-                    className={`text-left bg-white/95 hover:bg-white text-slate-900 rounded-2xl p-3.5 shadow-xl border-2 border-sky-200 border-b-4 transition-all cursor-pointer flex flex-col gap-2.5 ${tiltClass}`}
+                    className={`text-left bg-[#FFFDF9]/95 hover:bg-white text-slate-900 rounded-2xl p-3.5 shadow-xl border-2 border-[#F5C994]/80 border-b-4 transition-all cursor-pointer flex flex-col gap-2.5 ${tiltClass}`}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-full bg-sky-600 text-white font-mono text-xs font-extrabold flex items-center justify-center shrink-0">
+                      <span className="w-6 h-6 rounded-full bg-[#B53D69] text-white font-mono text-xs font-extrabold flex items-center justify-center shrink-0">
                         {idx + 1}
                       </span>
                       <span className="font-playful font-bold text-base text-slate-900 truncate">
                         {world.worldTitle}
                       </span>
                     </div>
-                    <div className="w-full h-24 rounded-xl overflow-hidden border border-slate-100">
+                    <div className="w-full h-24 rounded-xl overflow-hidden border border-[#F4E6EC]">
                       <WorldBannerIllustration
                         worldKey={world.illustrationKey}
                         className="w-full h-full object-cover"
