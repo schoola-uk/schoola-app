@@ -9,6 +9,13 @@
   --font-dyslexia: "Lexend", "Plus Jakarta Sans", sans-serif;
 }
 
+html,
+body {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   font-family: var(--font-sans);
   background-color: #F8FAFC;
@@ -28,31 +35,290 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   font-variant-numeric: tabular-nums;
 }
 
-/* Accessibility modes */
-.a11y-large-text {
-  font-size: 112.5%;
+/* Automatic Mobile, iPhone & iPad Optimizations */
+.is-touch nav,
+.is-touch .overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
 }
 
-.a11y-dyslexia,
-.a11y-dyslexia h1,
-.a11y-dyslexia h2,
-.a11y-dyslexia h3,
-.a11y-dyslexia p,
-.a11y-dyslexia button,
-.a11y-dyslexia span {
-  font-family: var(--font-dyslexia) !important;
-  letter-spacing: 0.02em;
-  line-height: 1.7;
+.device-iphone header,
+.device-ipad header {
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
-.a11y-high-contrast {
+.device-iphone footer,
+.device-ipad footer {
+  padding-bottom: max(3rem, env(safe-area-inset-bottom));
+  padding-left: max(1.25rem, env(safe-area-inset-left));
+  padding-right: max(1.25rem, env(safe-area-inset-right));
+}
+
+/* Prevent iOS Safari zoom when focusing inputs/textareas on iPhone/iPad */
+.device-ios input[type="text"],
+.device-ios input[type="email"],
+.device-ios input[type="search"],
+.device-ios textarea,
+.device-ios select {
+  font-size: 16px !important;
+}
+
+/* Theme modes: Light, Dark, Multicolour Pastels */
+.theme-light {
+  background-color: #F8FAFC;
+  color: #0F172A;
+}
+
+.theme-dark {
+  background-color: #090E1A;
+  color: #F1F5F9;
+}
+
+/* Outer structural sections in Dark Mode */
+.theme-dark main > div > section.bg-white,
+.theme-dark main > div > section[class*="bg-[#F8FAFC]"],
+.theme-dark main section#full-curriculum-directory,
+.theme-dark section[aria-labelledby="study-featured-videos-heading"],
+.theme-dark section[aria-labelledby="subject-strip-heading"] {
+  background-color: #0F172A !important;
+  color: #F1F5F9 !important;
+  border-color: #1E293B !important;
+}
+
+.theme-dark section[aria-labelledby="monster-arcade-heading"] {
+  background: linear-gradient(180deg, #0F2544 0%, #0B1B34 100%) !important;
+  border-color: #1E3A5F !important;
+}
+
+/* Invert standard white / neutral surfaces inside dark mode containers */
+.theme-dark main .bg-white,
+.theme-dark main .bg-\[\#F8FAFC\] {
+  background-color: #1E293B !important;
+  color: #F1F5F9 !important;
+  border-color: #334155 !important;
+}
+
+.theme-dark main .bg-slate-50,
+.theme-dark main .bg-slate-100 {
+  background-color: #0F172A !important;
+  color: #F1F5F9 !important;
+  border-color: #334155 !important;
+}
+
+.theme-dark main input,
+.theme-dark main textarea,
+.theme-dark main select {
+  background-color: #0F172A !important;
+  color: #F8FAFC !important;
+  border-color: #475569 !important;
+}
+
+.theme-dark main input::placeholder,
+.theme-dark main textarea::placeholder {
+  color: #94A3B8 !important;
+}
+
+/* High-contrast light typography inside inverted dark surfaces */
+.theme-dark main .text-slate-900,
+.theme-dark main .text-slate-800 {
+  color: #F8FAFC !important;
+}
+
+.theme-dark main .text-slate-700,
+.theme-dark main .text-slate-600,
+.theme-dark main .text-slate-500 {
+  color: #CBD5E1 !important;
+}
+
+.theme-dark main .border-slate-100,
+.theme-dark main .border-slate-200 {
+  border-color: #334155 !important;
+}
+
+/* Preserve readable dark ink inside ALL intentionally light, pastel, cream, yellow & gold surfaces in Dark Mode */
+.theme-dark main [style*="background-color:"] h3,
+.theme-dark main [style*="background-color:"] p,
+.theme-dark main [data-light-card="true"],
+.theme-dark main [data-light-card="true"] *,
+.theme-dark main [aria-label="My Achievements & Glitter Badges"],
+.theme-dark main [aria-label="My Achievements & Glitter Badges"] h2,
+.theme-dark main [aria-label="My Achievements & Glitter Badges"] h3,
+.theme-dark main [aria-label="My Achievements & Glitter Badges"] p,
+.theme-dark main [aria-label="My Achievements & Glitter Badges"] span,
+.theme-dark main section[aria-label="Welcome back Explorer & Roadmap"] h1,
+.theme-dark main section[aria-label="Welcome back Explorer & Roadmap"] h2,
+.theme-dark main section[aria-label="Welcome back Explorer & Roadmap"] h3,
+.theme-dark main section[aria-label="Welcome back Explorer & Roadmap"] p,
+.theme-dark main section[aria-label="Welcome back Explorer & Roadmap"] span,
+.theme-dark main aside[aria-label="My Compact Pastel Notebook"] h2,
+.theme-dark main aside[aria-label="My Compact Pastel Notebook"] h3,
+.theme-dark main aside[aria-label="My Compact Pastel Notebook"] p,
+.theme-dark main aside[aria-label="My Compact Pastel Notebook"] span,
+.theme-dark main aside[aria-label="My Compact Pastel Notebook"] input,
+.theme-dark main aside[aria-label="My Compact Pastel Notebook"] textarea,
+.theme-dark main .bg-\[\#FFFBEB\] *,
+.theme-dark main .bg-\[\#FEF9C3\] *,
+.theme-dark main .bg-\[\#FFFDF9\]\/95 *,
+.theme-dark main .bg-amber-50,
+.theme-dark main .bg-amber-50 *,
+.theme-dark main .bg-amber-100,
+.theme-dark main .bg-amber-100 *,
+.theme-dark main .bg-yellow-50,
+.theme-dark main .bg-yellow-50 *,
+.theme-dark main .bg-yellow-100,
+.theme-dark main .bg-yellow-100 *,
+.theme-dark main .bg-sky-50,
+.theme-dark main .bg-sky-50 *,
+.theme-dark main .bg-sky-100,
+.theme-dark main .bg-sky-100 *,
+.theme-dark main .bg-emerald-50,
+.theme-dark main .bg-emerald-50 *,
+.theme-dark main .bg-emerald-100,
+.theme-dark main .bg-emerald-100 *,
+.theme-dark main .bg-rose-50,
+.theme-dark main .bg-rose-50 *,
+.theme-dark main .bg-rose-100,
+.theme-dark main .bg-rose-100 *,
+.theme-dark main .bg-purple-50,
+.theme-dark main .bg-purple-50 *,
+.theme-dark main .bg-indigo-50,
+.theme-dark main .bg-indigo-50 *,
+.theme-dark main .bg-white\/95,
+.theme-dark main .bg-white\/95 .text-slate-900,
+.theme-dark main .bg-white\/95 .text-slate-800,
+.theme-dark main .bg-white\/95 .text-slate-700,
+.theme-dark main .bg-white\/95 .text-slate-600,
+.theme-dark main .bg-white\/90,
+.theme-dark main .bg-white\/90 .text-slate-900,
+.theme-dark main .bg-white\/90 .text-slate-800 {
+  color: #0F172A !important;
+}
+
+/* Restore crisp white backgrounds for inputs, pills, and cards inside bright pastel sections in Dark Mode */
+.theme-dark main aside[aria-label="My Compact Pastel Notebook"] .bg-white,
+.theme-dark main aside[aria-label="My Compact Pastel Notebook"] input,
+.theme-dark main aside[aria-label="My Compact Pastel Notebook"] textarea,
+.theme-dark main section[aria-label="Welcome back Explorer & Roadmap"] .bg-white,
+.theme-dark main section[aria-label="Welcome back Explorer & Roadmap"] .bg-white\/90,
+.theme-dark main section[aria-label="Welcome back Explorer & Roadmap"] .bg-white\/95,
+.theme-dark main section[aria-label="Welcome back Explorer & Roadmap"] input,
+.theme-dark main section[aria-label="Welcome back Explorer & Roadmap"] .bg-slate-100,
+.theme-dark main [data-light-card="true"] .bg-white,
+.theme-dark main [data-light-card="true"] .bg-slate-50,
+.theme-dark main [data-light-card="true"] .bg-slate-100,
+.theme-dark main .bg-amber-50 .bg-white,
+.theme-dark main .bg-emerald-50 .bg-white,
+.theme-dark main .bg-sky-50 .bg-white,
+.theme-dark main .bg-\[\#FFFBEB\] .bg-white,
+.theme-dark main .bg-gradient-to-r button.bg-white {
   background-color: #FFFFFF !important;
-  color: #000000 !important;
+  color: #0F172A !important;
+  border-color: #CBD5E1 !important;
 }
 
-.a11y-high-contrast .hc-card {
-  border-color: #0F172A !important;
-  border-width: 2px !important;
+.theme-dark main [data-light-card="true"] .bg-\[\#F8FAFC\],
+.theme-dark main [data-light-card="true"] .bg-slate-100 {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+}
+
+.theme-dark main [data-light-card="true"] .bg-\[\#FFD814\] {
+  background-color: #FFD814 !important;
+  color: #0F1111 !important;
+}
+
+.theme-dark main [data-light-card="true"] button.bg-emerald-600,
+.theme-dark main [data-light-card="true"] button.bg-emerald-600 *,
+.theme-dark main [data-light-card="true"] button.bg-sky-600,
+.theme-dark main [data-light-card="true"] button.bg-sky-600 *,
+.theme-dark main [data-light-card="true"] button.bg-rose-600,
+.theme-dark main [data-light-card="true"] button.bg-rose-600 *,
+.theme-dark main [data-light-card="true"] button.bg-\[\#0F2147\],
+.theme-dark main [data-light-card="true"] button.bg-\[\#0F2147\] *,
+.theme-dark main aside[aria-label="My Compact Pastel Notebook"] button.bg-emerald-500,
+.theme-dark main aside[aria-label="My Compact Pastel Notebook"] button.bg-emerald-500 *,
+.theme-dark main aside[aria-label="My Compact Pastel Notebook"] .bg-\[\#0F2868\] button,
+.theme-dark main section[aria-label="Welcome back Explorer & Roadmap"] button.bg-sky-600,
+.theme-dark main section[aria-label="Welcome back Explorer & Roadmap"] button.bg-sky-600 span,
+.theme-dark main section[aria-label="Welcome back Explorer & Roadmap"] .bg-slate-900,
+.theme-dark main [aria-label="My Achievements & Glitter Badges"] button.bg-emerald-600,
+.theme-dark main [aria-label="My Achievements & Glitter Badges"] button.bg-emerald-600 *,
+.theme-dark main .bg-emerald-50 button.bg-emerald-600,
+.theme-dark main .bg-emerald-50 button.bg-emerald-600 *,
+.theme-dark main .bg-\[\#FFFBEB\] button.bg-indigo-600,
+.theme-dark main .bg-\[\#FFFBEB\] button.bg-indigo-600 *,
+.theme-dark main .bg-\[\#FFFBEB\] button[class*="from-indigo-600"],
+.theme-dark main .bg-\[\#FFFBEB\] button[class*="from-indigo-600"] *,
+.theme-dark main .bg-white\/95 .bg-\[\#881337\] {
+  color: #FFFFFF !important;
+}
+
+.theme-dark main .bg-gradient-to-r button.bg-white.text-rose-700 {
+  color: #BE123C !important;
+}
+
+/* Keep Parents Hub Amazon Seasonal Shopping panel in crisp white/grey/orange/yellow */
+.theme-dark main [data-amazon-panel="true"] .bg-white {
+  background-color: #FFFFFF !important;
+  color: #0F1111 !important;
+  border-color: #D5D9D9 !important;
+}
+
+/* Pastel Theme Mode */
+.theme-pastel {
+  background: linear-gradient(
+    135deg,
+    #FFE5F1 0%,
+    #FFF4D6 26%,
+    #E0FAEE 54%,
+    #E2F1FF 78%,
+    #F1E6FF 100%
+  );
+  color: #1E1B4B;
+}
+
+.theme-pastel section[aria-labelledby="subject-strip-heading"] {
+  background: linear-gradient(135deg, #FFF0F6 0%, #FFF9E6 50%, #F0FDF4 100%) !important;
+  border-color: #FBCFE8 !important;
+}
+
+.theme-pastel section[aria-labelledby="study-featured-videos-heading"] {
+  background: linear-gradient(135deg, #FEFCE8 0%, #FDF2F8 55%, #EFF6FF 100%) !important;
+  border-color: #E9D5FF !important;
+}
+
+.theme-pastel section#full-curriculum-directory {
+  background: linear-gradient(135deg, #F3E8FF 0%, #FFE4E6 50%, #E0F2FE 100%) !important;
+  border-color: #DDD6FE !important;
+}
+
+@keyframes shine-sweep {
+  0% {
+    transform: translateX(-140%) skewX(-20deg);
+  }
+  55%, 100% {
+    transform: translateX(240%) skewX(-20deg);
+  }
+}
+
+.animate-shine-sweep {
+  animation: shine-sweep 4.8s ease-in-out infinite;
+}
+
+@keyframes glitter-twinkle {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.85) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.22) rotate(18deg);
+  }
+}
+
+.animate-glitter-twinkle {
+  animation: glitter-twinkle 2.6s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

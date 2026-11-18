@@ -39,7 +39,7 @@ export type UserRole = 'welcome' | 'child' | 'parent';
 
 export type ChildView = 'map' | 'dashboard' | 'worlds' | 'world-topics' | 'hub';
 
-export type ParentView = 'overview' | 'curriculum' | 'calendar' | 'videos' | 'safeguarding';
+export type ParentView = 'overview' | 'curriculum' | 'calendar' | 'videos' | 'shopping';
 
 export type HubStage = 'watch' | 'play' | 'test' | 'celebrate';
 

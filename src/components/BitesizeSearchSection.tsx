@@ -149,7 +149,7 @@ export const BitesizeSearchSection: React.FC<BitesizeSearchSectionProps> = ({
   return (
     <section
       aria-labelledby="bitesize-search-heading"
-      className="w-full bg-gradient-to-b from-[#FEF3C7]/65 via-[#FFFBEB] to-white py-8 sm:py-10 px-4 sm:px-8 lg:px-12 border-b border-amber-200 space-y-6"
+      className="w-full bg-gradient-to-b from-[#FEF3C7]/65 via-[#FFFBEB] to-white py-20 sm:py-28 px-6 sm:px-12 lg:px-20 border-b border-amber-200 space-y-12"
     >
       {/* Title + Direct BBC Bitesize Search Link */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -281,9 +281,9 @@ export const BitesizeSearchSection: React.FC<BitesizeSearchSectionProps> = ({
       </div>
 
       {/* Main Content Split: Search Result Cards + Interactive Everyday Materials Mini-Lab */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 sm:gap-10 items-start">
         {/* Left/Main: Bitesize-Style Search Result Cards */}
-        <div className="xl:col-span-8 space-y-3">
+        <div className="xl:col-span-8 space-y-5">
           <div className="flex items-center justify-between">
             <p className="text-xs sm:text-sm font-bold text-slate-600 text-left">
               Showing <span className="text-slate-900 font-extrabold">{searchResults.length}</span>{' '}
@@ -307,7 +307,7 @@ export const BitesizeSearchSection: React.FC<BitesizeSearchSectionProps> = ({
               </a>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-7">
               {searchResults.map((topic) => {
                 const subj = SUBJECTS.find((s) => s.id === topic.subjectId) || SUBJECTS[0];
                 const ks = getKeyStage(topic.year);

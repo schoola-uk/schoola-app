@@ -23,6 +23,7 @@ import { PlayActivityStage } from './PlayActivityStage';
 import { InteractiveQuiz } from './InteractiveQuiz';
 import { WorldBannerIllustration } from './WorldIllustrations';
 import { FairyGuide } from './FairyGuide';
+import { FeaturedVideoLessonsPanel } from './FeaturedVideoLessonsPanel';
 import { speakText } from '../utils/speech';
 
 interface LearningHubProps {
@@ -408,23 +409,23 @@ export const LearningHub: React.FC<LearningHubProps> = ({
                   onMascotUpdate('sparkle', `Did you know? ${subjectFunFact.fact}`);
                   speakText(subjectFunFact.fact);
                 }}
-                className={`w-full p-4 rounded-2xl border-2 border-b-4 text-left cursor-pointer transition-colors ${
+                className={`w-full p-5 rounded-3xl border-2 border-b-4 text-left cursor-pointer transition-colors ${
                   factRevealed
-                    ? 'bg-amber-50 border-amber-300 text-slate-900'
+                    ? 'bg-gradient-to-br from-amber-50 via-rose-50 to-sky-50 border-amber-300 text-slate-900'
                     : 'bg-white border-amber-300 hover:bg-amber-50 text-amber-900'
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-heading font-extrabold text-sm flex items-center gap-2">
-                    <Gift className="w-4 h-4 text-amber-600" />
-                    {factRevealed ? subjectFunFact.title : 'Mystery Fun Fact!'}
+                  <span className="font-playful font-extrabold text-lg sm:text-xl tracking-wide text-amber-900 flex items-center gap-2">
+                    <Gift className="w-5 h-5 text-pink-500" />
+                    {factRevealed ? subjectFunFact.title : '✨ Mystery Fun Fact!'}
                   </span>
-                  <span className="text-xs font-extrabold text-amber-700">
+                  <span className="font-playful text-sm font-extrabold text-amber-700">
                     {factRevealed ? '🔊' : 'Tap!'}
                   </span>
                 </div>
                 {factRevealed && (
-                  <p className="text-xs font-medium text-slate-700 mt-1.5 leading-relaxed">
+                  <p className="font-playful font-medium text-sm sm:text-base text-slate-800 mt-2 leading-relaxed">
                     {subjectFunFact.fact}
                   </p>
                 )}
@@ -497,11 +498,11 @@ export const LearningHub: React.FC<LearningHubProps> = ({
             </p>
           </div>
 
-          <div className="max-w-lg mx-auto bg-sky-50 border border-sky-200 rounded-2xl p-4 text-left space-y-1">
-            <p className="text-xs font-extrabold text-sky-800">
-              Fun Fact · {subjectFunFact.title}
+          <div className="max-w-lg mx-auto bg-gradient-to-br from-amber-50 via-rose-50 to-sky-50 border-2 border-amber-200 rounded-3xl p-5 text-left space-y-1.5">
+            <p className="font-playful text-base sm:text-lg font-extrabold text-indigo-900">
+              ✨ Surprise Fun Fact · {subjectFunFact.title}
             </p>
-            <p className="text-sm text-slate-800 leading-relaxed">{subjectFunFact.fact}</p>
+            <p className="font-playful text-sm sm:text-base text-slate-800 leading-relaxed">{subjectFunFact.fact}</p>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
@@ -545,6 +546,14 @@ export const LearningHub: React.FC<LearningHubProps> = ({
           </div>
         </div>
       )}
+
+      {/* Curated Subject & Topic Video Lessons Panel on this Topic Study Page */}
+      <FeaturedVideoLessonsPanel
+        subjectId={topic.subjectId}
+        topicId={topic.id}
+        topicTitle={cleanTopicKeyword}
+        onOpenTopic={onSelectTopic}
+      />
     </div>
   );
 };

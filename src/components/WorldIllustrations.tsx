@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'motion/react';
 
 export const HeroAdventureIllustration: React.FC<{ className?: string }> = ({ className = 'w-full h-auto' }) => (
   <svg viewBox="0 0 560 320" className={className} fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Children exploring Earth, space, books and numbers">
@@ -58,14 +59,17 @@ export const HeroAdventureIllustration: React.FC<{ className?: string }> = ({ cl
     <path d="M298 116 C324 114 352 134 356 164 C358 184 338 196 322 192 C304 188 292 162 294 140 Z" fill="#10B981" />
     <path d="M312 206 C332 206 346 220 342 238 C332 252 308 256 296 240 C290 226 298 208 312 206 Z" fill="#34D399" />
 
-    {/* Floating Learning Icons */}
+    {/* Floating Learning Icons (pure visual graphics, no text/numbers) */}
     <g transform="translate(132, 206)">
       <rect x="-24" y="-20" width="48" height="40" rx="10" fill="#FFFFFF" />
-      <text x="0" y="7" textAnchor="middle" fill="#0284C7" fontSize="18" fontWeight="800" fontFamily="Outfit, sans-serif">2+3</text>
+      <rect x="-15" y="-11" width="12" height="12" rx="3" fill="#0284C7" />
+      <circle cx="9" cy="-5" r="6" fill="#F59E0B" />
+      <polygon points="0,3 9,14 -9,14" fill="#10B981" />
     </g>
     <g transform="translate(410, 244)">
       <rect x="-24" y="-20" width="48" height="40" rx="10" fill="#FEF3C7" />
-      <text x="0" y="7" textAnchor="middle" fill="#D97706" fontSize="18" fontWeight="800" fontFamily="Outfit, sans-serif">ABC</text>
+      <path d="M-15 8 Q-7 2 0 8 V-9 Q-7 -15 -15 -9 Z" fill="#F59E0B" />
+      <path d="M0 8 Q7 2 15 8 V-9 Q7 -15 0 -9 Z" fill="#FB7185" />
     </g>
 
     {/* Ground hill & curious explorer silhouettes */}
@@ -90,15 +94,31 @@ export const WorldBannerIllustration: React.FC<{
           <rect width="360" height="200" fill="#E0F2FE" />
           <path d="M0 130 Q90 100 180 130 T360 120 L360 200 L0 200 Z" fill="#34D399" />
           <path d="M220 40 C260 40 280 110 295 140 L170 140 C185 110 190 40 220 40 Z" fill="#94A3B8" opacity="0.35" />
-          {/* Winding Number River */}
           <path d="M60 200 C95 150 185 170 210 125 C235 80 290 95 330 65" stroke="#0284C7" strokeWidth="26" strokeLinecap="round" fill="none" />
           <path d="M60 200 C95 150 185 170 210 125 C235 80 290 95 330 65" stroke="#7DD3FC" strokeWidth="14" strokeLinecap="round" strokeDasharray="8 10" fill="none" />
-          {/* Stepping stones */}
-          <rect x="78" y="138" width="84" height="32" rx="10" fill="#FFFFFF" stroke="#0284C7" strokeWidth="2.5" />
-          <text x="120" y="160" textAnchor="middle" fill="#0F172A" fontSize="16" fontWeight="800" fontFamily="Outfit, sans-serif">3 + ? = 7</text>
-          {/* Geometric islands */}
+          <motion.g animate={{ y: [-3, 3, -3] }} transition={{ duration: 3.4, repeat: Infinity, ease: 'easeInOut' }}>
+            <rect x="66" y="132" width="100" height="44" rx="12" fill="#FFFFFF" stroke="#0284C7" strokeWidth="2.5" />
+            <line x1="78" y1="146" x2="154" y2="146" stroke="#CBD5E1" strokeWidth="3" strokeLinecap="round" />
+            <line x1="78" y1="162" x2="154" y2="162" stroke="#CBD5E1" strokeWidth="3" strokeLinecap="round" />
+            <circle cx="90" cy="146" r="5.5" fill="#F43F5E" />
+            <circle cx="106" cy="146" r="5.5" fill="#F43F5E" />
+            <circle cx="122" cy="146" r="5.5" fill="#F59E0B" />
+            <circle cx="94" cy="162" r="5.5" fill="#10B981" />
+            <circle cx="110" cy="162" r="5.5" fill="#0284C7" />
+            <circle cx="126" cy="162" r="5.5" fill="#8B5CF6" />
+            <circle cx="142" cy="162" r="5.5" fill="#8B5CF6" />
+          </motion.g>
           <polygon points="62,48 92,98 32,98" fill="#F59E0B" />
-          <circle cx="290" cy="48" r="22" fill="#38BDF8" stroke="#FFFFFF" strokeWidth="3" />
+          <motion.circle
+            cx="290"
+            cy="48"
+            r="22"
+            fill="#38BDF8"
+            stroke="#FFFFFF"
+            strokeWidth="3"
+            animate={{ scale: [1, 1.09, 1] }}
+            transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+          />
           <rect x="242" y="136" width="38" height="38" rx="8" fill="#F43F5E" transform="rotate(-10 261 155)" />
         </svg>
       );
@@ -106,29 +126,40 @@ export const WorldBannerIllustration: React.FC<{
       return (
         <svg viewBox="0 0 360 200" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="360" height="200" fill="#ECFDF5" />
-          {/* Rainbow */}
-          <path d="M40 155 A120 120 0 0 1 280 155" stroke="#FB7185" strokeWidth="8" fill="none" opacity="0.6" />
-          <path d="M50 155 A110 110 0 0 1 270 155" stroke="#FBBF24" strokeWidth="8" fill="none" opacity="0.6" />
-          <path d="M60 155 A100 100 0 0 1 260 155" stroke="#34D399" strokeWidth="8" fill="none" opacity="0.6" />
-          <path d="M70 155 A90 90 0 0 1 250 155" stroke="#38BDF8" strokeWidth="8" fill="none" opacity="0.6" />
-          {/* Ground */}
+          <motion.circle
+            cx="62"
+            cy="46"
+            r="20"
+            fill="#FDE047"
+            opacity="0.9"
+            animate={{ scale: [1, 1.12, 1] }}
+            transition={{ duration: 3.6, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.g
+            animate={{ rotate: 360 }}
+            transition={{ duration: 16, repeat: Infinity, ease: 'linear' }}
+            style={{ transformOrigin: '180px 54px' }}
+          >
+            <ellipse cx="180" cy="54" rx="42" ry="14" transform="rotate(-18 180 54)" stroke="#38BDF8" strokeWidth="2.5" strokeDasharray="5 5" opacity="0.8" />
+            <ellipse cx="180" cy="54" rx="42" ry="14" transform="rotate(22 180 54)" stroke="#34D399" strokeWidth="2.5" opacity="0.8" />
+          </motion.g>
+          <circle cx="180" cy="54" r="7" fill="#0EA5E9" />
           <path d="M0 150 Q180 128 360 150 L360 200 L0 200 Z" fill="#10B981" />
-          {/* Volcano */}
           <path d="M135 162 L164 95 L196 95 L225 162 Z" fill="#92400E" />
           <path d="M164 95 Q180 105 196 95 L202 108 Q180 118 158 108 Z" fill="#F97316" />
-          <circle cx="174" cy="76" r="8" fill="#FBBF24" />
-          <circle cx="190" cy="66" r="6" fill="#FB7185" />
-          {/* Sprout & Flower */}
+          <motion.circle cx="174" cy="76" r="8" fill="#FBBF24" animate={{ y: [-4, 4, -4], opacity: [0.8, 1, 0.8] }} transition={{ duration: 2.2, repeat: Infinity }} />
+          <motion.circle cx="190" cy="66" r="6" fill="#FB7185" animate={{ y: [4, -5, 4], opacity: [0.7, 1, 0.7] }} transition={{ duration: 2.6, repeat: Infinity }} />
           <path d="M72 162 V112" stroke="#065F46" strokeWidth="4" strokeLinecap="round" />
           <ellipse cx="60" cy="130" rx="12" ry="6" transform="rotate(-25 60 130)" fill="#34D399" />
           <circle cx="72" cy="104" r="14" fill="#F43F5E" />
           <circle cx="72" cy="104" r="6" fill="#FDE047" />
-          {/* Rocket */}
-          <g transform="translate(292, 60) rotate(25)">
-            <ellipse cx="0" cy="0" rx="12" ry="24" fill="#FFFFFF" stroke="#0284C7" strokeWidth="3" />
-            <circle cx="0" cy="-4" r="5" fill="#38BDF8" />
-            <path d="M-6 22 L0 34 L6 22 Z" fill="#F59E0B" />
-          </g>
+          <motion.g animate={{ y: [-5, 5, -5] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}>
+            <g transform="translate(292, 60) rotate(25)">
+              <ellipse cx="0" cy="0" rx="12" ry="24" fill="#FFFFFF" stroke="#0284C7" strokeWidth="3" />
+              <circle cx="0" cy="-4" r="5" fill="#38BDF8" />
+              <path d="M-6 22 L0 34 L6 22 Z" fill="#F59E0B" />
+            </g>
+          </motion.g>
         </svg>
       );
     case 'english':
@@ -136,20 +167,24 @@ export const WorldBannerIllustration: React.FC<{
         <svg viewBox="0 0 360 200" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="360" height="200" fill="#FFF1F2" />
           <circle cx="62" cy="52" r="24" fill="#FDE68A" />
-          {/* Storybook Castle */}
           <rect x="210" y="78" width="90" height="82" rx="6" fill="#FFFFFF" stroke="#E11D48" strokeWidth="2.5" />
           <rect x="234" y="48" width="42" height="112" fill="#FFE4E6" stroke="#E11D48" strokeWidth="2.5" />
           <polygon points="255,18 228,50 282,50" fill="#E11D48" />
           <polygon points="222,52 204,78 240,78" fill="#FB7185" />
           <polygon points="288,52 270,78 306,78" fill="#FB7185" />
           <path d="M244 160 V132 A11 11 0 0 1 266 132 V160 Z" fill="#9F1239" />
-          {/* Open Storybook */}
-          <path d="M44 158 Q88 142 128 158 L128 112 Q88 96 44 112 Z" fill="#FFFFFF" stroke="#E11D48" strokeWidth="2.5" />
-          <path d="M128 158 Q168 142 212 158 L212 112 Q168 96 128 112 Z" fill="#FFF5F5" stroke="#E11D48" strokeWidth="2.5" />
-          {/* Floating Letters */}
-          <text x="108" y="64" fill="#E11D48" fontSize="22" fontWeight="800" fontFamily="Outfit, sans-serif">A</text>
-          <text x="148" y="46" fill="#0284C7" fontSize="20" fontWeight="800" fontFamily="Outfit, sans-serif">B</text>
-          <text x="182" y="72" fill="#D97706" fontSize="22" fontWeight="800" fontFamily="Outfit, sans-serif">C</text>
+          <motion.g animate={{ y: [-3, 3, -3] }} transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}>
+            <path d="M44 158 Q88 142 128 158 L128 112 Q88 96 44 112 Z" fill="#FFFFFF" stroke="#E11D48" strokeWidth="2.5" />
+            <path d="M128 158 Q168 142 212 158 L212 112 Q168 96 128 112 Z" fill="#FFF5F5" stroke="#E11D48" strokeWidth="2.5" />
+          </motion.g>
+          <motion.path
+            d="M114 48 L118 56 L126 60 L118 64 L114 72 L110 64 L102 60 L110 56 Z"
+            fill="#E11D48"
+            animate={{ scale: [0.9, 1.2, 0.9], opacity: [0.7, 1, 0.7] }}
+            transition={{ duration: 2.2, repeat: Infinity }}
+          />
+          <circle cx="152" cy="42" r="7" fill="#38BDF8" />
+          <path d="M180 68 C176 52 190 36 202 34 C198 48 192 60 180 68 Z" fill="#F59E0B" />
           <path d="M0 160 Q180 144 360 160 L360 200 L0 200 Z" fill="#FDA4AF" opacity="0.45" />
         </svg>
       );
@@ -157,33 +192,52 @@ export const WorldBannerIllustration: React.FC<{
       return (
         <svg viewBox="0 0 360 200" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="360" height="200" fill="#F0FDFA" />
-          {/* Globe */}
-          <circle cx="180" cy="100" r="74" fill="#38BDF8" stroke="#0D9488" strokeWidth="3" />
-          <path d="M140 62 C164 52 178 72 172 92 C166 112 184 128 168 152 C144 146 124 118 128 88 Z" fill="#34D399" />
-          <path d="M198 54 C224 58 242 82 238 112 C226 128 202 124 196 102 C192 84 190 66 198 54 Z" fill="#10B981" />
-          {/* Compass */}
+          <motion.g animate={{ y: [-3, 3, -3] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}>
+            <circle cx="180" cy="100" r="74" fill="#38BDF8" stroke="#0D9488" strokeWidth="3" />
+            <path d="M140 62 C164 52 178 72 172 92 C166 112 184 128 168 152 C144 146 124 118 128 88 Z" fill="#34D399" />
+            <path d="M198 54 C224 58 242 82 238 112 C226 128 202 124 196 102 C192 84 190 66 198 54 Z" fill="#10B981" />
+          </motion.g>
           <circle cx="64" cy="144" r="28" fill="#FFFFFF" stroke="#0D9488" strokeWidth="3" />
-          <polygon points="64,122 70,144 64,166 58,144" fill="#F43F5E" />
-          <text x="64" y="112" textAnchor="middle" fill="#115E59" fontSize="11" fontWeight="800">N</text>
-          {/* Mountain & Sun */}
+          <motion.polygon
+            points="64,122 70,144 64,166 58,144"
+            fill="#F43F5E"
+            animate={{ rotate: [-15, 15, -15] }}
+            transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ transformOrigin: '64px 144px' }}
+          />
+          <circle cx="64" cy="144" r="4" fill="#0D9488" />
           <polygon points="274,174 304,116 334,174" fill="#0F766E" />
           <polygon points="294,135 304,116 314,135 304,130" fill="#FFFFFF" />
-          <circle cx="300" cy="48" r="18" fill="#FBBF24" />
+          <motion.circle
+            cx="300"
+            cy="48"
+            r="18"
+            fill="#FBBF24"
+            animate={{ scale: [1, 1.12, 1] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          />
         </svg>
       );
     case 'history':
       return (
         <svg viewBox="0 0 360 200" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="360" height="200" fill="#FFFBEB" />
-          <circle cx="290" cy="48" r="24" fill="#FDE047" />
-          {/* Pyramids */}
+          <motion.circle
+            cx="290"
+            cy="48"
+            r="24"
+            fill="#FDE047"
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ duration: 3.4, repeat: Infinity }}
+          />
           <polygon points="56,166 130,68 204,166" fill="#F59E0B" />
           <polygon points="130,68 204,166 154,166" fill="#D97706" />
           <polygon points="164,166 226,86 288,166" fill="#FBBF24" />
-          {/* Scroll */}
-          <rect x="242" y="106" width="76" height="54" rx="8" fill="#FEF3C7" stroke="#92400E" strokeWidth="2.5" />
-          <line x1="256" y1="124" x2="304" y2="124" stroke="#92400E" strokeWidth="3" strokeLinecap="round" />
-          <line x1="256" y1="138" x2="294" y2="138" stroke="#92400E" strokeWidth="3" strokeLinecap="round" />
+          <motion.g animate={{ y: [-3, 3, -3] }} transition={{ duration: 3.6, repeat: Infinity }}>
+            <rect x="242" y="106" width="76" height="54" rx="8" fill="#FEF3C7" stroke="#92400E" strokeWidth="2.5" />
+            <line x1="256" y1="124" x2="304" y2="124" stroke="#92400E" strokeWidth="3" strokeLinecap="round" />
+            <line x1="256" y1="138" x2="294" y2="138" stroke="#92400E" strokeWidth="3" strokeLinecap="round" />
+          </motion.g>
           <path d="M0 166 L360 166 L360 200 L0 200 Z" fill="#FDE68A" />
         </svg>
       );
@@ -191,11 +245,20 @@ export const WorldBannerIllustration: React.FC<{
       return (
         <svg viewBox="0 0 360 200" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="360" height="200" fill="#EEF2FF" />
-          <circle cx="90" cy="96" r="46" fill="#C7D2FE" />
-          <rect x="150" y="54" width="136" height="92" rx="14" fill="#FFFFFF" stroke="#4F46E5" strokeWidth="3" />
-          <circle cx="186" cy="100" r="16" fill="#4F46E5" />
-          <rect x="216" y="84" width="52" height="12" rx="6" fill="#E0E7FF" />
-          <rect x="216" y="104" width="38" height="12" rx="6" fill="#818CF8" />
+          <motion.circle
+            cx="90"
+            cy="96"
+            r="46"
+            fill="#C7D2FE"
+            animate={{ scale: [1, 1.08, 1] }}
+            transition={{ duration: 3.2, repeat: Infinity }}
+          />
+          <motion.g animate={{ y: [-4, 4, -4] }} transition={{ duration: 3.5, repeat: Infinity }}>
+            <rect x="150" y="54" width="136" height="92" rx="14" fill="#FFFFFF" stroke="#4F46E5" strokeWidth="3" />
+            <circle cx="186" cy="100" r="16" fill="#4F46E5" />
+            <rect x="216" y="84" width="52" height="12" rx="6" fill="#E0E7FF" />
+            <rect x="216" y="104" width="38" height="12" rx="6" fill="#818CF8" />
+          </motion.g>
         </svg>
       );
   }
@@ -211,14 +274,23 @@ export const InterestIllustration: React.FC<{
         <svg viewBox="0 0 280 150" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="280" height="150" fill="#ECFDF5" />
           <path d="M0 116 Q140 96 280 116 L280 150 L0 150 Z" fill="#34D399" />
-          {/* Friendly Green Dino */}
-          <path d="M96 118 C96 86 122 78 138 78 L142 52 C142 36 164 34 172 48 C178 58 172 74 156 76 L156 118 Z" fill="#059669" />
-          <circle cx="158" cy="52" r="4" fill="#FFFFFF" />
-          <circle cx="159" cy="52" r="2" fill="#0F172A" />
-          {/* Fossil spiral */}
-          <circle cx="222" cy="104" r="16" fill="#FEF3C7" stroke="#D97706" strokeWidth="2.5" />
+          <motion.g animate={{ y: [-3, 3, -3] }} transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}>
+            <path d="M96 118 C96 86 122 78 138 78 L142 52 C142 36 164 34 172 48 C178 58 172 74 156 76 L156 118 Z" fill="#059669" />
+            <circle cx="158" cy="52" r="4" fill="#FFFFFF" />
+            <circle cx="159" cy="52" r="2" fill="#0F172A" />
+          </motion.g>
+          <motion.circle
+            cx="222"
+            cy="104"
+            r="16"
+            fill="#FEF3C7"
+            stroke="#D97706"
+            strokeWidth="2.5"
+            animate={{ rotate: [0, 360] }}
+            transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
+            style={{ transformOrigin: '222px 104px' }}
+          />
           <path d="M222 104 m-6 0 a6 6 0 1 0 12 0 a9 9 0 1 0 -18 0" stroke="#92400E" strokeWidth="2" fill="none" />
-          {/* Ferns */}
           <path d="M44 122 Q32 90 54 78 Q58 98 44 122 Z" fill="#10B981" />
           <path d="M56 122 Q72 94 82 86 Q76 106 56 122 Z" fill="#047857" />
         </svg>
@@ -227,13 +299,17 @@ export const InterestIllustration: React.FC<{
       return (
         <svg viewBox="0 0 280 150" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="280" height="150" fill="#0F172A" />
-          <circle cx="48" cy="40" r="18" fill="#FBBF24" />
-          <circle cx="144" cy="78" r="32" fill="#38BDF8" />
-          <path d="M126 62 Q144 74 162 60" stroke="#34D399" strokeWidth="10" strokeLinecap="round" />
-          <circle cx="232" cy="46" r="14" fill="#FB7185" />
-          <ellipse cx="232" cy="46" rx="26" ry="7" transform="rotate(-15 232 46)" stroke="#FDE68A" strokeWidth="3" fill="none" />
-          <circle cx="90" cy="30" r="2" fill="#FFFFFF" />
-          <circle cx="195" cy="24" r="2" fill="#FDE68A" />
+          <motion.circle cx="48" cy="40" r="18" fill="#FBBF24" animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 3.4, repeat: Infinity }} />
+          <motion.g animate={{ y: [-4, 4, -4] }} transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut' }}>
+            <circle cx="144" cy="78" r="32" fill="#38BDF8" />
+            <path d="M126 62 Q144 74 162 60" stroke="#34D399" strokeWidth="10" strokeLinecap="round" />
+          </motion.g>
+          <motion.g animate={{ y: [4, -4, 4] }} transition={{ duration: 3.6, repeat: Infinity, ease: 'easeInOut' }}>
+            <circle cx="232" cy="46" r="14" fill="#FB7185" />
+            <ellipse cx="232" cy="46" rx="26" ry="7" transform="rotate(-15 232 46)" stroke="#FDE68A" strokeWidth="3" fill="none" />
+          </motion.g>
+          <motion.circle cx="90" cy="30" r="2.5" fill="#FFFFFF" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }} />
+          <motion.circle cx="195" cy="24" r="2.5" fill="#FDE68A" animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 2.3, repeat: Infinity }} />
           <circle cx="242" cy="112" r="2" fill="#FFFFFF" />
           <circle cx="52" cy="118" r="2" fill="#BAE6FD" />
         </svg>
@@ -243,15 +319,17 @@ export const InterestIllustration: React.FC<{
         <svg viewBox="0 0 280 150" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="280" height="150" fill="#FFFBEB" />
           <path d="M24 126 Q72 86 130 106 T248 64" stroke="#F59E0B" strokeWidth="6" strokeDasharray="8 8" fill="none" />
-          {/* Treasure Chest */}
           <rect x="176" y="74" width="68" height="46" rx="8" fill="#B45309" stroke="#78350F" strokeWidth="3" />
           <path d="M176 86 H244" stroke="#FBBF24" strokeWidth="6" />
           <rect x="204" y="80" width="12" height="16" rx="3" fill="#FEF3C7" stroke="#78350F" strokeWidth="2" />
-          {/* Gold Coins */}
-          <circle cx="76" cy="96" r="14" fill="#FBBF24" stroke="#D97706" strokeWidth="2.5" />
-          <text x="76" y="101" textAnchor="middle" fill="#78350F" fontSize="13" fontWeight="800">10</text>
-          <circle cx="120" cy="64" r="14" fill="#FDE047" stroke="#D97706" strokeWidth="2.5" />
-          <text x="120" y="69" textAnchor="middle" fill="#78350F" fontSize="13" fontWeight="800">+</text>
+          <motion.g animate={{ y: [-4, 4, -4] }} transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}>
+            <circle cx="76" cy="96" r="14" fill="#FBBF24" stroke="#D97706" strokeWidth="2.5" />
+            <circle cx="76" cy="96" r="7" fill="#FEF3C7" stroke="#D97706" strokeWidth="1.5" />
+          </motion.g>
+          <motion.g animate={{ y: [4, -4, 4] }} transition={{ duration: 3.1, repeat: Infinity, ease: 'easeInOut' }}>
+            <circle cx="120" cy="64" r="14" fill="#FDE047" stroke="#D97706" strokeWidth="2.5" />
+            <polygon points="120,56 125,64 120,72 115,64" fill="#D97706" />
+          </motion.g>
         </svg>
       );
     default:
@@ -259,11 +337,17 @@ export const InterestIllustration: React.FC<{
         <svg viewBox="0 0 280 150" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="280" height="150" fill="#FFF1F2" />
           <path d="M0 118 Q140 96 280 118 L280 150 L0 150 Z" fill="#FECDD3" />
-          {/* Book */}
-          <path d="M74 114 Q106 102 140 114 L140 62 Q106 50 74 62 Z" fill="#FFFFFF" stroke="#E11D48" strokeWidth="2.5" />
-          <path d="M140 114 Q174 102 206 114 L206 62 Q174 50 140 62 Z" fill="#FFF5F5" stroke="#E11D48" strokeWidth="2.5" />
-          {/* Magic sparks */}
-          <path d="M140 34 L144 42 L152 46 L144 50 L140 58 L136 50 L128 46 L136 42 Z" fill="#F59E0B" />
+          <motion.g animate={{ y: [-3, 3, -3] }} transition={{ duration: 3.4, repeat: Infinity, ease: 'easeInOut' }}>
+            <path d="M74 114 Q106 102 140 114 L140 62 Q106 50 74 62 Z" fill="#FFFFFF" stroke="#E11D48" strokeWidth="2.5" />
+            <path d="M140 114 Q174 102 206 114 L206 62 Q174 50 140 62 Z" fill="#FFF5F5" stroke="#E11D48" strokeWidth="2.5" />
+          </motion.g>
+          <motion.path
+            d="M140 34 L144 42 L152 46 L144 50 L140 58 L136 50 L128 46 L136 42 Z"
+            fill="#F59E0B"
+            animate={{ scale: [0.85, 1.2, 0.85], rotate: [0, 20, 0] }}
+            transition={{ duration: 2.4, repeat: Infinity }}
+            style={{ transformOrigin: '140px 46px' }}
+          />
           <circle cx="102" cy="40" r="4" fill="#FB7185" />
           <circle cx="178" cy="36" r="4" fill="#38BDF8" />
         </svg>
@@ -405,7 +489,7 @@ export const BlueStageCharactersIllustration: React.FC<{ className?: string }> =
       <ellipse cx="64" cy="70" rx="28" ry="8" transform="rotate(-20 64 70)" />
       <path d="M132 32 L144 44 M144 32 L132 44" />
       <polygon points="486,44 504,74 468,74" />
-      <text x="454" y="132" fill="#FFFFFF" stroke="none" fontSize="18" fontWeight="800" fontFamily="Outfit, sans-serif">2+3=5</text>
+      <rect x="462" y="116" width="22" height="22" rx="5" />
       <path d="M510 218 Q522 204 534 218" />
     </g>
 
@@ -496,9 +580,19 @@ export const BlueStageCharactersIllustration: React.FC<{ className?: string }> =
         <circle cx="36" cy="18" r="7" fill="#78350F" />
         <line x1="22" y1="18" x2="98" y2="17" stroke="#FEF3C7" strokeWidth="1.5" />
       </g>
-      {/* Musical Notes */}
-      <text x="108" y="88" fill="#FDE047" fontSize="22" fontWeight="800">♪</text>
-      <text x="126" y="66" fill="#FBBF24" fontSize="18" fontWeight="800">♫</text>
+      {/* Vector Musical Notes (no text glyphs) */}
+      <g transform="translate(106, 70)">
+        <ellipse cx="6" cy="18" rx="6" ry="4.5" transform="rotate(-18 6 18)" fill="#FDE047" />
+        <rect x="10" y="2" width="3" height="16" rx="1.5" fill="#FDE047" />
+        <path d="M11 2 Q18 4 19 10" stroke="#FDE047" strokeWidth="3" strokeLinecap="round" fill="none" />
+      </g>
+      <g transform="translate(128, 48)">
+        <ellipse cx="5" cy="18" rx="5" ry="3.8" fill="#FBBF24" />
+        <ellipse cx="19" cy="15" rx="5" ry="3.8" fill="#FBBF24" />
+        <rect x="8" y="3" width="2.8" height="15" fill="#FBBF24" />
+        <rect x="22" y="0" width="2.8" height="15" fill="#FBBF24" />
+        <path d="M8 3 L24.8 0" stroke="#FBBF24" strokeWidth="3.5" strokeLinecap="round" />
+      </g>
     </g>
 
     {/* 3. EXPLORER CAT / PANTHER (Right) */}

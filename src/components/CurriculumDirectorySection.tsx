@@ -1,12 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import { motion } from 'motion/react';
 import {
   BookOpen,
   ChevronDown,
   ChevronUp,
-  ExternalLink,
   HelpCircle,
-  Play,
   Printer,
   Search,
   Sparkles,
@@ -21,6 +18,8 @@ interface CurriculumDirectorySectionProps {
   onOpenWorld: (subjectId: string) => void;
   activeKS?: 'ks1' | 'ks2';
   onSelectKS?: (ks: 'ks1' | 'ks2') => void;
+  isOpen?: boolean;
+  onToggleOpen?: () => void;
 }
 
 interface DirectoryRow {
@@ -28,87 +27,6 @@ interface DirectoryRow {
   y: string;
   t: string;
 }
-
-interface FeaturedVideo {
-  title: string;
-  series: string;
-  ks: string;
-  dur: string;
-  gradient: string;
-  emoji: string;
-  subjectId: string;
-  searchKw: string;
-  youtubeId: string;
-}
-
-const FEATURED_VIDEOS: FeaturedVideo[] = [
-  {
-    title: 'The Circulatory System',
-    series: 'Learn Bright · Body Systems',
-    ks: 'L KS2 – U KS2',
-    dur: '6m',
-    gradient: 'from-[#1a1060] to-[#3b1d8a]',
-    emoji: '🫀',
-    subjectId: 'Science',
-    searchKw: 'circulatory system heart blood',
-    youtubeId: 'Dw0WO2XZ5fM',
-  },
-  {
-    title: 'The Respiratory System',
-    series: 'Learn Bright · Lungs & Breathing',
-    ks: 'L KS2 – U KS2',
-    dur: '6m',
-    gradient: 'from-[#2d0a4e] to-[#5b21b6]',
-    emoji: '🫁',
-    subjectId: 'Science',
-    searchKw: 'respiratory system breathing lungs',
-    youtubeId: '67Jbbu7UZAA',
-  },
-  {
-    title: 'The Water Cycle',
-    series: 'SciShow Kids · Ecology & States',
-    ks: 'L KS2 – U KS2',
-    dur: '4m',
-    gradient: 'from-[#0c4a6e] to-[#0369a1]',
-    emoji: '💧',
-    subjectId: 'Science',
-    searchKw: 'water cycle evaporation condensation',
-    youtubeId: 'R0K7VKkksyc',
-  },
-  {
-    title: 'Fractions: Halves and Quarters',
-    series: 'Primary Maths Songs · KS1–KS2',
-    ks: 'KS1 – L KS2',
-    dur: '4m',
-    gradient: 'from-[#1e3a8a] to-[#2563eb]',
-    emoji: '½',
-    subjectId: 'Maths',
-    searchKw: 'fractions decimals half',
-    youtubeId: 'DnFrOetuUKg',
-  },
-  {
-    title: 'The Great Fire of London',
-    series: 'BBC Teach History · KS1',
-    ks: 'KS1',
-    dur: '6m',
-    gradient: 'from-[#7c2d12] to-[#c2410c]',
-    emoji: '🔥',
-    subjectId: 'History',
-    searchKw: 'Great Fire of London 1666',
-    youtubeId: 'DSH81jl-uAk',
-  },
-  {
-    title: 'Forces and Magnets',
-    series: 'Miacademy Science · KS2',
-    ks: 'L KS2',
-    dur: '5m',
-    gradient: 'from-[#14532d] to-[#15803d]',
-    emoji: '🧲',
-    subjectId: 'Science',
-    searchKw: 'forces electricity light',
-    youtubeId: 'Kll5A6xX9cY',
-  },
-];
 
 const KS1_ROWS: DirectoryRow[] = [
   { s: 'English', y: 'Year 1', t: 'Spoken language: listening and responding' },
@@ -462,7 +380,19 @@ export const CurriculumDirectorySection: React.FC<CurriculumDirectorySectionProp
   onOpenWorld,
   activeKS,
   onSelectKS,
+  isOpen: controlledOpen,
+  onToggleOpen,
 }) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isDirectoryOpen = controlledOpen ?? internalOpen;
+  const handleToggleDirectory = () => {
+    if (onToggleOpen) {
+      onToggleOpen();
+    } else {
+      setInternalOpen((prev) => !prev);
+    }
+  };
+
   const [internalKS, setInternalKS] = useState<'ks1' | 'ks2'>('ks1');
   const selectedKS = activeKS ?? internalKS;
   const setSelectedKS = (ks: 'ks1' | 'ks2') => {
@@ -474,7 +404,6 @@ export const CurriculumDirectorySection: React.FC<CurriculumDirectorySectionProp
   const [activeRowModal, setActiveRowModal] = useState<{ ks: 'ks1' | 'ks2'; row: DirectoryRow } | null>(
     null
   );
-  const [activeFeaturedVideo, setActiveFeaturedVideo] = useState<FeaturedVideo | null>(null);
   const [openTipIdx, setOpenTipIdx] = useState<number | null>(0);
 
   const subjectMap = useMemo(() => {
@@ -505,87 +434,46 @@ export const CurriculumDirectorySection: React.FC<CurriculumDirectorySectionProp
 
   return (
     <>
-      {/* FEATURED VIDEO LESSONS STRIP */}
-      <section
-        aria-labelledby="featured-videos-heading"
-        className="w-full bg-white py-14 sm:py-20 px-6 sm:px-10 lg:px-16 border-t border-b border-slate-200 space-y-8"
-      >
-        <div className="flex items-center justify-between gap-4">
-          <h2 id="featured-videos-heading" className="font-playful font-bold text-xl sm:text-2xl text-slate-900">
-            <span aria-hidden="true">🎬</span> Featured video lessons
-          </h2>
-          <a
-            href="https://www.bbc.co.uk/teach"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs sm:text-sm font-playful font-bold text-sky-700 hover:underline whitespace-nowrap flex items-center gap-1"
-          >
-            BBC Teach <ExternalLink className="w-3.5 h-3.5" />
-          </a>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
-          {FEATURED_VIDEOS.map((vid) => (
-            <motion.button
-              key={vid.title}
-              whileHover={{ y: -4, scale: 1.02 }}
-              whileTap={{ scale: 0.96 }}
-              type="button"
-              onClick={() => setActiveFeaturedVideo(vid)}
-              className="rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-sm hover:shadow-md transition-shadow text-left cursor-pointer flex flex-col"
-            >
-              <div className={`relative h-36 bg-gradient-to-br ${vid.gradient} flex flex-col items-center justify-center p-3 text-center`}>
-                <span className="text-4xl mb-1" aria-hidden="true">
-                  {vid.emoji}
-                </span>
-                <span className="text-xs font-playful font-bold text-white/95 leading-snug line-clamp-2">
-                  {vid.title}
-                </span>
-                <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <span className="w-10 h-10 rounded-full bg-white/90 text-slate-900 flex items-center justify-center shadow-md opacity-90">
-                    <Play className="w-4 h-4 fill-slate-900 ml-0.5" />
-                  </span>
-                </span>
-                <span className="absolute bottom-2 left-2 bg-slate-950/75 text-white text-[11px] font-bold px-2 py-0.5 rounded-md tabular-nums">
-                  {vid.dur}
-                </span>
-                <span className="absolute bottom-2 right-2 bg-white/90 text-slate-900 text-[10px] font-extrabold px-2 py-0.5 rounded-md">
-                  {vid.ks}
-                </span>
-              </div>
-              <div className="p-3 space-y-1 flex-1 flex flex-col justify-between">
-                <p className="text-[11px] font-bold text-slate-500 line-clamp-1">{vid.series}</p>
-                <p className="font-playful font-bold text-sm text-slate-900 leading-snug">
-                  {vid.title}
-                </p>
-              </div>
-            </motion.button>
-          ))}
-        </div>
-      </section>
-
-      {/* FULL NATIONAL CURRICULUM KS1 & KS2 DIRECTORY */}
+      {/* FULL NATIONAL CURRICULUM KS1 & KS2 DIRECTORY (COLLAPSIBLE PANEL — HIDDEN BY DEFAULT) */}
       <section
         id="full-curriculum-directory"
         aria-labelledby="full-curriculum-heading"
-        className="w-full bg-[#F8FAFC] py-14 sm:py-20 px-6 sm:px-10 lg:px-16 border-b border-slate-200 space-y-8"
+        className="w-full bg-[#F8FAFC] py-20 sm:py-28 px-6 sm:px-12 lg:px-20 border-t border-b border-slate-200 space-y-10"
       >
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-          <div>
-            <h2 id="full-curriculum-heading" className="font-playful font-bold text-2xl sm:text-3xl text-slate-900">
-              Full National Curriculum Directory
-            </h2>
-            <p className="text-sm text-slate-600 mt-1">
-              Every topic for KS1 &amp; KS2 — tap any topic to open free BBC Teach videos, Oak National lessons, Twinkl printables, quizzes &amp; Schoola games.
-            </p>
-          </div>
-          <div className="text-xs font-bold text-slate-600 tabular-nums whitespace-nowrap">
-            Showing {filteredRows.length} topics ({selectedKS.toUpperCase()})
-          </div>
-        </div>
+        <div className="bg-white border-2 border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-8">
+          <button
+            type="button"
+            onClick={handleToggleDirectory}
+            aria-expanded={isDirectoryOpen}
+            className="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-5 text-left cursor-pointer group"
+          >
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 text-xs font-extrabold text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-full">
+                <span>📚 KS1 &amp; KS2 · 12 Subjects</span>
+              </div>
+              <h2 id="full-curriculum-heading" className="font-playful font-bold text-2xl sm:text-3xl text-slate-900 group-hover:text-indigo-800 transition-colors">
+                Full National Curriculum Directory
+              </h2>
+              <p className="text-sm text-slate-600 max-w-3xl leading-relaxed">
+                Every topic for KS1 &amp; KS2 — click here to expand and browse BBC Teach videos, Oak National lessons, Twinkl printables, quizzes &amp; Schoola games.
+              </p>
+            </div>
 
-        {/* Key Stage Tabs */}
-        <div className="flex flex-wrap gap-3">
+            <div className="flex items-center gap-3 shrink-0 self-start sm:self-center">
+              <span className="text-xs font-bold text-slate-500 tabular-nums whitespace-nowrap hidden md:inline">
+                {KS1_ROWS.length + KS2_ROWS.length} topics
+              </span>
+              <span className="min-h-[46px] px-5 py-2.5 rounded-2xl bg-[#0B1F4D] group-hover:bg-[#163276] text-white font-playful font-bold text-sm inline-flex items-center gap-2 shadow-sm whitespace-nowrap transition-colors">
+                <span>{isDirectoryOpen ? 'Hide Directory' : 'Open Directory'}</span>
+                {isDirectoryOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </span>
+            </div>
+          </button>
+
+          {isDirectoryOpen && (
+            <div className="pt-6 border-t border-slate-200 space-y-8">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap gap-3">
           <button
             type="button"
             onClick={() => setSelectedKS('ks1')}
@@ -608,7 +496,11 @@ export const CurriculumDirectorySection: React.FC<CurriculumDirectorySectionProp
           >
             📘 Key Stage 2 · Years 3–6 · Ages 7–11
           </button>
-        </div>
+                </div>
+                <div className="text-xs font-bold text-slate-600 tabular-nums whitespace-nowrap">
+                  Showing {filteredRows.length} topics ({selectedKS.toUpperCase()})
+                </div>
+              </div>
 
         {/* Search & Subject Filters */}
         <div className="flex flex-wrap items-center gap-2">
@@ -747,6 +639,9 @@ export const CurriculumDirectorySection: React.FC<CurriculumDirectorySectionProp
               </tbody>
             </table>
           </div>
+        </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -957,76 +852,6 @@ export const CurriculumDirectorySection: React.FC<CurriculumDirectorySectionProp
                   );
                 })}
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* FEATURED VIDEO LESSON THEATER MODAL */}
-      {activeFeaturedVideo && (
-        <div
-          className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="featured-video-modal-title"
-        >
-          <div className="bg-slate-950 text-white border border-slate-800 rounded-3xl max-w-3xl w-full p-5 sm:p-7 shadow-2xl space-y-5 text-left">
-            <div className="flex items-start justify-between gap-4">
-              <div className="space-y-1">
-                <p className="text-xs font-bold text-sky-300">
-                  {activeFeaturedVideo.emoji} {activeFeaturedVideo.series} · {activeFeaturedVideo.ks}
-                </p>
-                <h3 id="featured-video-modal-title" className="font-playful font-bold text-xl sm:text-2xl">
-                  {activeFeaturedVideo.title}
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setActiveFeaturedVideo(null)}
-                className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white cursor-pointer shrink-0"
-                aria-label="Close video player"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="aspect-video rounded-2xl overflow-hidden bg-black border border-slate-800">
-              <iframe
-                width="100%"
-                height="100%"
-                src={`https://www.youtube.com/embed/${activeFeaturedVideo.youtubeId}?autoplay=1&rel=0`}
-                title={activeFeaturedVideo.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                referrerPolicy="no-referrer"
-              />
-            </div>
-
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <a
-                href={`https://www.youtube.com/watch?v=${activeFeaturedVideo.youtubeId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="min-h-[42px] px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs sm:text-sm inline-flex items-center gap-2"
-              >
-                <span>Watch on YouTube</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-
-              <button
-                type="button"
-                onClick={() => {
-                  const topic = findMatchingAppTopic(
-                    activeFeaturedVideo.subjectId,
-                    activeFeaturedVideo.searchKw
-                  );
-                  setActiveFeaturedVideo(null);
-                  onOpenTopic(topic);
-                }}
-                className="min-h-[42px] px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-playful font-bold text-xs sm:text-sm cursor-pointer"
-              >
-                Practice {activeFeaturedVideo.subjectId} Quiz in Learning Hub →
-              </button>
             </div>
           </div>
         </div>

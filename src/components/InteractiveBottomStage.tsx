@@ -29,7 +29,6 @@ import {
 import { speakText } from '../utils/speech';
 import { InterestIllustration, WorldBannerIllustration } from './WorldIllustrations';
 import { playChimeSound } from './CorridorWidgets';
-import { NewsletterSubscription } from './NewsletterSubscription';
 
 interface InteractiveBottomStageProps {
   onOpenTopic: (topic: Topic) => void;
@@ -301,11 +300,11 @@ export const InteractiveBottomStage: React.FC<InteractiveBottomStageProps> = ({
 
   return (
     <section
-      aria-label="Interactive Library Bookshelf, Wall Clock, Calendar, Notepad and Newsletter"
+      aria-label="Interactive Library Bookshelf, Wall Clock, Calendar and Notepad"
       className="w-full bg-gradient-to-b from-[#1E3A8A] via-[#1D4ED8] to-[#1E40AF] text-white border-b-4 border-amber-800"
     >
       {/* BLUE STUDY ROOM WALL + DESK SCENE */}
-      <div className="relative w-full px-6 sm:px-10 lg:px-16 pt-14 pb-16 sm:pt-18 sm:pb-20 space-y-12 overflow-hidden">
+      <div className="relative w-full px-6 sm:px-12 lg:px-20 pt-20 pb-24 sm:pt-28 sm:pb-32 space-y-16 overflow-hidden">
         {/* Subtle Starry Wallpaper Accents */}
         <div className="pointer-events-none absolute top-6 left-[12%] text-sky-300/30 text-2xl">✦</div>
         <div className="pointer-events-none absolute top-14 right-[18%] text-amber-300/30 text-xl">✦</div>
@@ -348,9 +347,9 @@ export const InteractiveBottomStage: React.FC<InteractiveBottomStageProps> = ({
         </div>
 
         {/* MAIN 2-COLUMN ROOM LAYOUT: LEFT = BOOKSHELF + OPEN STORYBOOK | RIGHT = WALL CLOCK + WALL CALENDAR + DESK NOTEPAD */}
-        <div className="relative z-10 grid grid-cols-1 xl:grid-cols-12 gap-10 xl:gap-12 items-start">
+        <div className="relative z-10 grid grid-cols-1 xl:grid-cols-12 gap-12 xl:gap-16 items-start">
           {/* LEFT WALL + DESK: CHOOSE A BOOK FROM THE SHELF + FLIP THE PAGES! */}
-          <div className="xl:col-span-6 space-y-8">
+          <div className="xl:col-span-6 space-y-12">
             {/* 1. WOODEN BOOKSHELF ON THE BLUE WALL */}
             <div className="bg-slate-950/25 border-2 border-sky-300/30 rounded-3xl p-6 sm:p-7 shadow-lg">
               <div className="flex items-center justify-between gap-3 mb-4">
@@ -474,9 +473,9 @@ export const InteractiveBottomStage: React.FC<InteractiveBottomStageProps> = ({
                       </h4>
                       <p className="text-xs text-slate-700 leading-relaxed">{currentPage.description}</p>
 
-                      <div className="bg-white/90 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-700">
-                        <strong className="text-indigo-700">Fun Fact: </strong>
-                        {currentPage.fact}
+                      <div className="bg-gradient-to-br from-amber-50 via-rose-50 to-sky-50 border-2 border-amber-200 rounded-2xl p-3.5 text-sm text-slate-800">
+                        <strong className="font-playful font-extrabold text-base text-rose-600 block mb-0.5">✨ Surprise Fun Fact!</strong>
+                        <span className="font-playful font-medium leading-relaxed">{currentPage.fact}</span>
                       </div>
 
                       <div className="pt-1">
@@ -497,9 +496,9 @@ export const InteractiveBottomStage: React.FC<InteractiveBottomStageProps> = ({
           </div>
 
           {/* RIGHT WALL & DESK: WALL CLOCK + WALL CALENDAR + DESK SPIRAL NOTEPAD */}
-          <div className="xl:col-span-6 space-y-8">
+          <div className="xl:col-span-6 space-y-12">
             {/* ON THE WALL: ANALOG CLOCK + HANGING UK SCHOOL CALENDAR */}
-            <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-stretch">
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-8 items-stretch">
               {/* Live Wall Clock */}
               <div className="sm:col-span-4 bg-slate-950/25 border-2 border-sky-300/30 rounded-3xl p-5 flex flex-col items-center justify-center gap-3 shadow-lg">
                 <div className="relative w-28 h-28">
@@ -782,16 +781,6 @@ export const InteractiveBottomStage: React.FC<InteractiveBottomStageProps> = ({
 
       {/* WARM WOODEN DESK EDGE DIVIDER */}
       <div className="w-full h-5 bg-gradient-to-b from-[#B45309] via-[#92400E] to-[#78350F] border-t-2 border-amber-400/50 shadow-inner" />
-
-      {/* WEEKLY EMAIL NEWSLETTER BAND */}
-      <div className="w-full bg-[#0F172A] px-6 sm:px-10 lg:px-16 py-14 sm:py-16">
-        <NewsletterSubscription
-          onSubscribeSuccess={() => {
-            playChimeSound('success');
-            onEarnStar();
-          }}
-        />
-      </div>
     </section>
   );
 };

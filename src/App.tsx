@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Accessibility, Check, ShieldCheck, Star, X } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, Lock, Moon, Palette, ShieldCheck, Sparkles, Star, Sun, X } from 'lucide-react';
 import {
-  AccessibilitySettings,
   CustomRevisionEvent,
   LearnerProgress,
   MascotId,
@@ -19,11 +18,15 @@ import { ParentTeacherHub } from './components/ParentTeacherHub';
 import { PrintableCertificateModal } from './components/PrintableCertificateModal';
 import { RedOrangeDoorIcon } from './components/WorldIllustrations';
 import { stopSpeaking } from './utils/speech';
+import { playCheerfulTing } from './utils/soundEffects';
+import { useDeviceProfile } from './utils/deviceDetection';
 
 const PROGRESS_STORAGE_KEY = 'schoola_v2_progress';
-const A11Y_STORAGE_KEY = 'schoola_v2_a11y';
+const THEME_STORAGE_KEY = 'schoola_v2_theme';
 const CHECKLIST_STORAGE_KEY = 'schoola_weekly_checklist';
 const EVENTS_STORAGE_KEY = 'schoola_custom_events';
+
+type ThemeMode = 'light' | 'dark' | 'pastel';
 
 const DEFAULT_PROGRESS: LearnerProgress = {
   explorerName: 'Young Explorer',
@@ -42,13 +45,6 @@ const DEFAULT_PROGRESS: LearnerProgress = {
   unlockedFactIds: [],
   adoptedPrizes: ['creature-pip-sprout'],
   weeklyGoalTarget: 5,
-};
-
-const DEFAULT_A11Y: AccessibilitySettings = {
-  largeText: false,
-  highContrast: false,
-  dyslexiaFont: false,
-  autoReadAloud: false,
 };
 
 export default function App() {
@@ -76,14 +72,23 @@ export default function App() {
     }
   });
 
-  const [a11y, setA11y] = useState<AccessibilitySettings>(() => {
+  const [theme, setTheme] = useState<ThemeMode>(() => {
     try {
-      const saved = localStorage.getItem(A11Y_STORAGE_KEY);
-      return saved ? { ...DEFAULT_A11Y, ...JSON.parse(saved) } : DEFAULT_A11Y;
+      const saved = localStorage.getItem(THEME_STORAGE_KEY);
+      if (saved === 'light' || saved === 'dark' || saved === 'pastel') {
+        return saved;
+      }
+      if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)').matches) {
+        return 'dark';
+      }
+      return 'light';
     } catch {
-      return DEFAULT_A11Y;
+      return 'light';
     }
   });
+
+  // Automatically detect iPhone, iPad, mobile, tablet, or desktop & keep HTML device classes synced
+  useDeviceProfile();
 
   const [weeklyChecklist, setWeeklyChecklist] = useState<Record<string, boolean>>(() => {
     try {
@@ -105,10 +110,11 @@ export default function App() {
     }
   });
 
-  const [isA11yOpen, setIsA11yOpen] = useState(false);
-  const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [isThemeOpen, setIsThemeOpen] = useState(false);
+  const [directoryOpen, setDirectoryOpen] = useState(false);
   const [directoryKS, setDirectoryKS] = useState<'ks1' | 'ks2'>('ks1');
   const [certTitle, setCertTitle] = useState<string | null>(null);
+  const [disclaimerOpen, setDisclaimerOpen] = useState(false);
   const [mascotExpression, setMascotExpression] = useState<
     'happy' | 'thinking' | 'sparkle' | 'sad' | 'excited'
   >('happy');
@@ -122,8 +128,12 @@ export default function App() {
   }, [progress]);
 
   useEffect(() => {
-    localStorage.setItem(A11Y_STORAGE_KEY, JSON.stringify(a11y));
-  }, [a11y]);
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) {
+      metaTheme.setAttribute('content', theme === 'dark' ? '#090E1A' : '#001E62');
+    }
+  }, [theme]);
 
   useEffect(() => {
     localStorage.setItem(CHECKLIST_STORAGE_KEY, JSON.stringify(weeklyChecklist));
@@ -166,6 +176,9 @@ export default function App() {
   };
 
   const handleStageWatchDone = (topicId: string) => {
+    if (!progress.watchedTopics.includes(topicId)) {
+      playCheerfulTing('star');
+    }
     setProgress((prev) => {
       const already = prev.watchedTopics.includes(topicId);
       const streak = touchStreak(prev);
@@ -179,6 +192,9 @@ export default function App() {
   };
 
   const handleStagePlayDone = (topicId: string) => {
+    if (!progress.playedTopics.includes(topicId)) {
+      playCheerfulTing('star');
+    }
     setProgress((prev) => {
       const already = prev.playedTopics.includes(topicId);
       const streak = touchStreak(prev);
@@ -192,6 +208,10 @@ export default function App() {
   };
 
   const handleTopicQuizDone = (topicId: string, score: number, _total: number, starsEarned: number) => {
+    const awardedStars = progress.completedTopics.includes(topicId) ? 1 : starsEarned;
+    if (awardedStars > 0) {
+      playCheerfulTing('star');
+    }
     setProgress((prev) => {
       const alreadyCompleted = prev.completedTopics.includes(topicId);
       const bestScore = Math.max(prev.quizScores[topicId] ?? 0, score);
@@ -209,6 +229,7 @@ export default function App() {
   };
 
   const handleCompleteDailyChallenge = (starsEarned: number) => {
+    playCheerfulTing('challenge');
     const today = new Date().toISOString().split('T')[0];
     setProgress((prev) => {
       const streak = touchStreak(prev);
@@ -286,25 +307,31 @@ export default function App() {
     return list[idx + 1];
   }, [activeTopic, progress.selectedYear]);
 
-  const rootA11yClasses = [
-    a11y.largeText ? 'a11y-large-text' : '',
-    a11y.dyslexiaFont ? 'a11y-dyslexia' : '',
-    a11y.highContrast ? 'a11y-high-contrast' : '',
-  ]
-    .filter(Boolean)
-    .join(' ');
+  const rootThemeClass = `theme-${theme}`;
 
   const isMapFocus =
     role === 'child' && !activeTopic && !activeWorldSubjectId && childViewMode === 'map';
 
+  const childFaceIcon = (
+    <svg viewBox="0 0 28 28" className="w-6 h-6 shrink-0" fill="none" aria-hidden="true">
+      <circle cx="14" cy="14" r="12" fill="#FDE68A" stroke="#F59E0B" strokeWidth="1.5" />
+      <path d="M5 12 C6 5 12 3 18 4 C22 5 24 8 23 12 C20 9 16 8 11 9 C8 10 6 11 5 12 Z" fill="#92400E" />
+      <circle cx="10.2" cy="14" r="1.4" fill="#1E293B" />
+      <circle cx="17.8" cy="14" r="1.4" fill="#1E293B" />
+      <circle cx="8" cy="16.5" r="1.6" fill="#FB7185" opacity="0.55" />
+      <circle cx="20" cy="16.5" r="1.6" fill="#FB7185" opacity="0.55" />
+      <path d="M10.5 18 Q14 21 17.5 18" stroke="#92400E" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+    </svg>
+  );
+
   return (
-    <div className={`min-h-screen flex flex-col bg-[#F8FAFC] text-slate-900 ${rootA11yClasses}`}>
-      {/* Clean Schoola Cream Header (stripped in Activity Land Map view) */}
+    <div className={`min-h-screen w-full overflow-x-hidden flex flex-col transition-colors duration-300 ${rootThemeClass}`}>
+      {/* Exact LBS Royal Navy Blue Top Navigation Bar (#001E62) */}
       {!isMapFocus && (
-      <header className="sticky top-0 z-40 bg-[#FFFEF7]/95 backdrop-blur-sm text-slate-900 border-b border-[#E5E4DC] no-print">
-        <div className="w-full px-4 sm:px-8 lg:px-12 h-16 flex items-center justify-between gap-4">
-          {/* Zone 1: Gradient Schoola Logo + UK Companion Strapline */}
-          <div className="flex items-center gap-4 min-w-0 shrink-0">
+      <header className="sticky top-0 z-40 bg-[#001E62] text-white border-b border-[#25458E] shadow-md no-print">
+        <div className="w-full px-5 sm:px-10 lg:px-16 h-16 flex items-center justify-between gap-4">
+          {/* Zone 1: Schoola Wordmark with LBS Crimson Accent Line + UK Companion Strapline */}
+          <div className="flex items-center gap-5 min-w-0 shrink-0">
             <button
               type="button"
               onClick={() => {
@@ -316,16 +343,13 @@ export default function App() {
               }}
               className="flex flex-col items-start text-left shrink-0 cursor-pointer group"
             >
-              <span className="font-playful font-extrabold text-2xl sm:text-[1.7rem] leading-none tracking-tight bg-gradient-to-r from-[#5B4FCF] via-[#3B9FE0] to-[#2DC89A] bg-clip-text text-transparent whitespace-nowrap">
+              <span className="font-playful font-extrabold text-2xl sm:text-[1.75rem] leading-none tracking-tight text-white whitespace-nowrap">
                 Schoola
               </span>
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 leading-tight mt-0.5 whitespace-nowrap">
-                <Check className="w-2.5 h-2.5 shrink-0" />
-                Aligned to England National Curriculum
-              </span>
+              <span className="w-full h-[2.5px] bg-[#C8102E] rounded-full mt-1" aria-hidden="true" />
             </button>
 
-            <span className="hidden xl:inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 whitespace-nowrap">
+            <span className="hidden xl:inline-flex items-center gap-2 text-xs font-medium text-white/80 whitespace-nowrap">
               <svg viewBox="0 0 60 40" className="w-4 h-3 rounded-[2px] shrink-0" aria-hidden="true">
                 <rect width="60" height="40" fill="#012169" />
                 <path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" strokeWidth="8" />
@@ -340,7 +364,7 @@ export default function App() {
           {/* Zone 2: Clean Single-Line Navigation Links */}
           <nav
             aria-label="Primary navigation"
-            className="hidden md:flex items-center gap-1.5 overflow-x-auto"
+            className="hidden md:flex items-center gap-2 overflow-x-auto"
           >
             <button
               type="button"
@@ -353,8 +377,8 @@ export default function App() {
               }}
               className={`min-h-[36px] px-3.5 py-1.5 rounded-full text-sm font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer transition-colors ${
                 role === 'welcome'
-                  ? 'bg-[#F5F4EC] text-slate-900'
-                  : 'text-slate-600 hover:bg-[#F5F4EC] hover:text-slate-900'
+                  ? 'bg-white/20 text-white'
+                  : 'text-sky-100 hover:bg-white/10 hover:text-white'
               }`}
             >
               Home
@@ -368,6 +392,7 @@ export default function App() {
                 setActiveWorldSubjectId(null);
                 setRole('welcome');
                 setDirectoryKS('ks1');
+                setDirectoryOpen(true);
                 setProgress((prev) => ({
                   ...prev,
                   selectedYear: prev.selectedYear === 'Year 2' ? 'Year 2' : 'Year 1',
@@ -376,7 +401,7 @@ export default function App() {
                   document.getElementById('full-curriculum-directory')?.scrollIntoView({ behavior: 'smooth' });
                 }, 60);
               }}
-              className="min-h-[36px] px-3.5 py-1.5 rounded-full text-sm font-playful font-bold bg-[#FFF0EE] hover:bg-[#FFE0DC] text-[#c4402e] whitespace-nowrap shrink-0 cursor-pointer transition-colors"
+              className="min-h-[36px] px-3.5 py-1.5 rounded-full text-sm font-playful font-bold bg-[#FFE4E0] hover:bg-[#FFD0C8] text-[#9A2E1B] whitespace-nowrap shrink-0 cursor-pointer transition-colors"
             >
               KS1
             </button>
@@ -389,6 +414,7 @@ export default function App() {
                 setActiveWorldSubjectId(null);
                 setRole('welcome');
                 setDirectoryKS('ks2');
+                setDirectoryOpen(true);
                 setProgress((prev) => ({
                   ...prev,
                   selectedYear:
@@ -400,7 +426,7 @@ export default function App() {
                   document.getElementById('full-curriculum-directory')?.scrollIntoView({ behavior: 'smooth' });
                 }, 60);
               }}
-              className="min-h-[36px] px-3.5 py-1.5 rounded-full text-sm font-playful font-bold bg-[#EEF2FF] hover:bg-[#E0E7FF] text-[#1e40af] whitespace-nowrap shrink-0 cursor-pointer transition-colors"
+              className="min-h-[36px] px-3.5 py-1.5 rounded-full text-sm font-playful font-bold bg-[#DBEAFE] hover:bg-[#BFDBFE] text-[#1E3A8A] whitespace-nowrap shrink-0 cursor-pointer transition-colors"
             >
               KS2
             </button>
@@ -416,8 +442,8 @@ export default function App() {
               }}
               className={`min-h-[36px] px-3.5 py-1.5 rounded-full text-sm font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer transition-colors ${
                 role === 'child' && !activeWorldSubjectId && !activeTopic && childViewMode === 'map'
-                  ? 'bg-emerald-50 text-emerald-700'
-                  : 'text-slate-600 hover:bg-[#F5F4EC] hover:text-slate-900'
+                  ? 'bg-emerald-400/25 text-emerald-200'
+                  : 'text-sky-100 hover:bg-white/10 hover:text-white'
               }`}
             >
               Activity Land
@@ -432,34 +458,28 @@ export default function App() {
                 setChildViewMode('dashboard');
                 setRole('child');
               }}
-              className={`min-h-[36px] px-3.5 py-1.5 rounded-full text-sm font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer transition-colors ${
+              aria-label="Child Profile"
+              title="Child Profile"
+              className={`min-h-[38px] w-10 h-10 rounded-full flex items-center justify-center shrink-0 cursor-pointer transition-all border ${
                 role === 'child' && !activeWorldSubjectId && !activeTopic && childViewMode === 'dashboard'
-                  ? 'bg-sky-50 text-sky-700'
-                  : 'text-slate-600 hover:bg-[#F5F4EC] hover:text-slate-900'
+                  ? 'bg-amber-400/30 border-amber-300 shadow-sm'
+                  : 'bg-white/10 border-white/20 hover:bg-white/20'
               }`}
             >
-              Dashboard
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsAboutOpen(true)}
-              className="min-h-[36px] px-3.5 py-1.5 rounded-full text-sm font-playful font-bold text-slate-600 hover:bg-[#F5F4EC] hover:text-slate-900 whitespace-nowrap shrink-0 cursor-pointer transition-colors"
-            >
-              About
+              {childFaceIcon}
             </button>
           </nav>
 
-          {/* Zone 3: Accessibility & Parent Portal */}
+          {/* Zone 3: Theme Switcher Icon Button & Parent Portal */}
           <div className="flex items-center gap-2.5 shrink-0">
             <button
               type="button"
-              onClick={() => setIsA11yOpen(true)}
-              className="min-h-[40px] px-3 py-1.5 rounded-xl bg-[#F5F4EC] hover:bg-[#EEEEE6] border border-[#E5E4DC] text-slate-700 text-xs font-bold flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer transition-colors"
-              aria-label="Open accessibility options"
+              onClick={() => setIsThemeOpen(true)}
+              className="w-10 h-10 rounded-xl bg-white/12 hover:bg-white/22 border border-white/25 text-white flex items-center justify-center shrink-0 cursor-pointer transition-colors"
+              aria-label="Switch colour theme"
+              title="Switch colour theme"
             >
-              <Accessibility className="w-4 h-4 text-[#5B4FCF]" />
-              <span className="hidden sm:inline">Accessibility</span>
+              <Palette className="w-5 h-5 text-amber-200" />
             </button>
 
             <button
@@ -471,7 +491,7 @@ export default function App() {
               }}
               className={`min-h-[40px] pl-2 pr-3.5 py-1 rounded-xl border transition-all flex items-center gap-2 whitespace-nowrap shrink-0 cursor-pointer shadow-xs ${
                 role === 'parent'
-                  ? 'bg-emerald-600 hover:bg-emerald-700 border-emerald-500 text-white'
+                  ? 'bg-emerald-600 hover:bg-emerald-700 border-emerald-400 text-white'
                   : 'bg-gradient-to-r from-[#EA580C] to-[#DC2626] hover:from-[#C2410C] hover:to-[#B91C1C] border-orange-300 text-white'
               }`}
             >
@@ -486,7 +506,7 @@ export default function App() {
         {/* Compact Mobile Navigation Strip */}
         <nav
           aria-label="Mobile navigation"
-          className="flex md:hidden items-center gap-1.5 px-4 pb-2 overflow-x-auto"
+          className="flex md:hidden items-center gap-2 px-5 pb-2.5 overflow-x-auto"
         >
           <button
             type="button"
@@ -498,7 +518,7 @@ export default function App() {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             className={`px-3 py-1 rounded-full text-xs font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer ${
-              role === 'welcome' ? 'bg-[#F5F4EC] text-slate-900' : 'text-slate-600'
+              role === 'welcome' ? 'bg-white/20 text-white' : 'text-sky-100'
             }`}
           >
             Home
@@ -511,11 +531,12 @@ export default function App() {
               setActiveWorldSubjectId(null);
               setRole('welcome');
               setDirectoryKS('ks1');
+              setDirectoryOpen(true);
               setTimeout(() => {
                 document.getElementById('full-curriculum-directory')?.scrollIntoView({ behavior: 'smooth' });
               }, 60);
             }}
-            className="px-3 py-1 rounded-full text-xs font-playful font-bold bg-[#FFF0EE] text-[#c4402e] whitespace-nowrap shrink-0 cursor-pointer"
+            className="px-3 py-1 rounded-full text-xs font-playful font-bold bg-[#FFE4E0] text-[#9A2E1B] whitespace-nowrap shrink-0 cursor-pointer"
           >
             KS1
           </button>
@@ -527,11 +548,12 @@ export default function App() {
               setActiveWorldSubjectId(null);
               setRole('welcome');
               setDirectoryKS('ks2');
+              setDirectoryOpen(true);
               setTimeout(() => {
                 document.getElementById('full-curriculum-directory')?.scrollIntoView({ behavior: 'smooth' });
               }, 60);
             }}
-            className="px-3 py-1 rounded-full text-xs font-playful font-bold bg-[#EEF2FF] text-[#1e40af] whitespace-nowrap shrink-0 cursor-pointer"
+            className="px-3 py-1 rounded-full text-xs font-playful font-bold bg-[#DBEAFE] text-[#1E3A8A] whitespace-nowrap shrink-0 cursor-pointer"
           >
             KS2
           </button>
@@ -544,7 +566,7 @@ export default function App() {
               setChildViewMode('map');
               setRole('child');
             }}
-            className="px-3 py-1 rounded-full text-xs font-playful font-bold text-emerald-700 bg-emerald-50 whitespace-nowrap shrink-0 cursor-pointer"
+            className="px-3 py-1 rounded-full text-xs font-playful font-bold text-emerald-200 bg-emerald-500/25 whitespace-nowrap shrink-0 cursor-pointer"
           >
             Activity Land
           </button>
@@ -557,16 +579,11 @@ export default function App() {
               setChildViewMode('dashboard');
               setRole('child');
             }}
-            className="px-3 py-1 rounded-full text-xs font-playful font-bold text-slate-600 whitespace-nowrap shrink-0 cursor-pointer"
+            aria-label="Child Profile"
+            title="Child Profile"
+            className="w-8 h-8 rounded-full bg-white/15 border border-white/25 flex items-center justify-center shrink-0 cursor-pointer"
           >
-            Dashboard
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsAboutOpen(true)}
-            className="px-3 py-1 rounded-full text-xs font-playful font-bold text-slate-600 whitespace-nowrap shrink-0 cursor-pointer"
-          >
-            About
+            {childFaceIcon}
           </button>
         </nav>
       </header>
@@ -593,6 +610,7 @@ export default function App() {
             }}
             onOpenTopic={handleOpenTopic}
             onEarnStar={() => {
+              playCheerfulTing('star');
               setProgress((prev) => ({
                 ...prev,
                 ...touchStreak(prev),
@@ -603,6 +621,8 @@ export default function App() {
             streakDays={progress.streakDays}
             directoryKS={directoryKS}
             onSelectDirectoryKS={setDirectoryKS}
+            directoryOpen={directoryOpen}
+            onToggleDirectory={() => setDirectoryOpen((prev) => !prev)}
           />
         )}
 
@@ -724,10 +744,10 @@ export default function App() {
 
       {/* Clean Grounded Footer (stripped in Activity Land Map view) */}
       {!isMapFocus && (
-      <footer className="bg-slate-900 text-slate-300 py-10 px-4 sm:px-8 lg:px-12 border-t border-slate-800 text-xs no-print">
-        <div className="w-full space-y-6">
-          <div className="w-full flex flex-col md:flex-row justify-between items-start gap-8">
-            <div className="space-y-2 max-w-sm text-left">
+      <footer className="bg-slate-900 text-slate-300 py-14 sm:py-16 px-6 sm:px-12 lg:px-20 border-t border-slate-800 text-xs no-print">
+        <div className="w-full space-y-8">
+          <div className="w-full flex flex-col md:flex-row justify-between items-start gap-10">
+            <div className="space-y-2.5 max-w-sm text-left">
               <p className="font-heading font-extrabold text-white text-base">
                 Schoola – Discover. Play. Learn.
               </p>
@@ -740,10 +760,10 @@ export default function App() {
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-8 text-left">
-              <div className="space-y-2">
+            <div className="flex flex-wrap gap-10 text-left">
+              <div className="space-y-2.5">
                 <p className="font-bold text-white">Learning Paths</p>
-                <ul className="space-y-1.5 text-slate-400">
+                <ul className="space-y-2 text-slate-400">
                   <li>
                     <button
                       type="button"
@@ -775,10 +795,10 @@ export default function App() {
                   <li>
                     <button
                       type="button"
-                      onClick={() => setIsA11yOpen(true)}
+                      onClick={() => setIsThemeOpen(true)}
                       className="hover:text-white cursor-pointer"
                     >
-                      Accessibility Options
+                      Colour Themes
                     </button>
                   </li>
                 </ul>
@@ -832,92 +852,157 @@ export default function App() {
             </div>
           </div>
 
-          <div className="bg-slate-800/60 border border-slate-700/70 rounded-xl p-4 text-[11px] text-slate-400 leading-relaxed text-left">
-            <strong className="text-slate-200 block mb-1">Disclaimer</strong>
-            Schoola (schoola.uk) is an independent educational tool and signposting website. Parents and guardians are encouraged to review any linked third-party resources (BBC Teach, Oak National Academy, BBC Bitesize, Twinkl) before sharing with children. For statutory guidance visit{' '}
-            <a
-              href="https://www.gov.uk/national-curriculum"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sky-400 hover:underline"
+          <div className="bg-slate-800/60 border border-slate-700/70 rounded-xl overflow-hidden text-[11px] text-slate-400 leading-relaxed text-left">
+            <button
+              type="button"
+              onClick={() => setDisclaimerOpen((prev) => !prev)}
+              aria-expanded={disclaimerOpen}
+              className="w-full px-4 py-3 flex items-center justify-between gap-3 text-left hover:bg-slate-800/80 transition-colors cursor-pointer"
             >
-              gov.uk/national-curriculum
-            </a>
-            . Not affiliated with the UK Government, DfE, BBC, Twinkl, or Oak National Academy.
+              <span className="flex items-center gap-2 font-bold text-slate-200">
+                <Lock className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                Disclaimer &amp; Children&apos;s Privacy &amp; Safeguarding Charter
+              </span>
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-sky-400 shrink-0">
+                {disclaimerOpen ? 'Hide' : 'Click to read'}
+                {disclaimerOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              </span>
+            </button>
+
+            {disclaimerOpen && (
+              <div className="px-4 pb-4 pt-3 border-t border-slate-700/70 space-y-4">
+                <p>
+                  <strong className="text-slate-200">Educational Signposting Disclaimer: </strong>
+                  Schoola (schoola.uk) is an independent educational tool and signposting website. Parents and guardians are encouraged to review any linked third-party resources (BBC Teach, Oak National Academy, BBC Bitesize, Twinkl) before sharing with children. For statutory guidance visit{' '}
+                  <a
+                    href="https://www.gov.uk/national-curriculum"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sky-400 hover:underline"
+                  >
+                    gov.uk/national-curriculum
+                  </a>
+                  . Not affiliated with the UK Government, DfE, BBC, Twinkl, or Oak National Academy. As an Amazon Associate I earn from qualifying purchases.
+                </p>
+
+                <div className="space-y-2 pt-2 border-t border-slate-700/60">
+                  <h3 className="font-heading font-bold text-xs text-white flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                    Children&apos;s Privacy &amp; Safeguarding Charter
+                  </h3>
+                  <ul className="space-y-1.5 list-disc list-inside text-slate-300">
+                    <li>
+                      <strong className="text-white">No personal data collection:</strong> Children can use every learning world, game, and quiz without registering an account or entering personal details.
+                    </li>
+                    <li>
+                      <strong className="text-white">Zero advertising or behavioural tracking:</strong> Schoola displays no third-party ads, profiling cookies, or cross-site trackers.
+                    </li>
+                    <li>
+                      <strong className="text-white">No public profiles or open chat:</strong> Children cannot message strangers or share public profiles.
+                    </li>
+                    <li>
+                      <strong className="text-white">ICO Age Appropriate Design Code alignment:</strong> Progress, stars, and badges are stored strictly locally in your browser&apos;s storage.
+                    </li>
+                    <li>
+                      <strong className="text-white">Clear external link separation:</strong> Links to BBC Teach, Twinkl, and Oak National Academy are clearly marked as opening external websites and placed inside adult-oriented panels.
+                    </li>
+                    <li>
+                      <strong className="text-white">England National Curriculum clarity:</strong> All 64 topic sequences align specifically to England&apos;s Key Stage 1 (Years 1–2) and Key Stage 2 (Years 3–6) statutory frameworks.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </footer>
       )}
 
-      {/* Accessibility Options Modal */}
-      {isA11yOpen && (
+      {/* Colour Theme Switcher Modal */}
+      {isThemeOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4 no-print">
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 text-left">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl space-y-5 text-left">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Accessibility className="w-5 h-5 text-sky-700" />
-                <h2 className="font-heading font-extrabold text-lg text-slate-900">
-                  Accessibility Options
+              <div className="flex items-center gap-2.5">
+                <Palette className="w-5 h-5 text-indigo-600" />
+                <h2 className="font-playful font-extrabold text-xl text-slate-900">
+                  Choose Colour Theme
                 </h2>
               </div>
               <button
                 type="button"
-                onClick={() => setIsA11yOpen(false)}
+                onClick={() => setIsThemeOpen(false)}
                 className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 cursor-pointer"
-                aria-label="Close accessibility options"
+                aria-label="Close theme selector"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <p className="text-xs text-slate-600 leading-relaxed">
-              Personalise reading comfort and contrast. You can also tap &quot;Read aloud&quot; inside activities and quizzes to hear instructions spoken out loud.
+              Pick the look that feels best for your study session — crisp daylight, cosy dark night, or bright multicolour pastels.
             </p>
 
             <div className="space-y-3">
               {[
                 {
-                  key: 'largeText' as const,
-                  title: 'Larger Text Size',
-                  desc: 'Increases font size across buttons, questions and reading cards.',
+                  id: 'light' as const,
+                  title: 'Light Daylight',
+                  desc: 'Crisp cream and clean white cards for bright daytime study.',
+                  icon: <Sun className="w-5 h-5 text-amber-500" />,
+                  swatches: ['#FFFEF7', '#F8FAFC', '#E0F2FE', '#FEF3C7'],
                 },
                 {
-                  key: 'dyslexiaFont' as const,
-                  title: 'Dyslexia-Friendly Reading Mode',
-                  desc: 'Uses Lexend font with generous letter and line spacing.',
+                  id: 'dark' as const,
+                  title: 'Night Dark',
+                  desc: 'Deep midnight slate surfaces for comfortable evening reading.',
+                  icon: <Moon className="w-5 h-5 text-indigo-500" />,
+                  swatches: ['#090E1A', '#0F172A', '#1E293B', '#334155'],
                 },
                 {
-                  key: 'highContrast' as const,
-                  title: 'High-Contrast Borders',
-                  desc: 'Enhances contrast between text, cards and backgrounds.',
+                  id: 'pastel' as const,
+                  title: 'Multicolour Pastels',
+                  desc: 'Soft blush pink, buttercream, mint, sky and lavender washes.',
+                  icon: <Sparkles className="w-5 h-5 text-pink-500" />,
+                  swatches: ['#FFE4F1', '#FFF4D2', '#DCFCE7', '#E0F2FE', '#F3E8FF'],
                 },
               ].map((opt) => {
-                const enabled = a11y[opt.key];
+                const selected = theme === opt.id;
                 return (
                   <button
-                    key={opt.key}
+                    key={opt.id}
                     type="button"
-                    onClick={() =>
-                      setA11y((prev) => ({ ...prev, [opt.key]: !prev[opt.key] }))
-                    }
-                    className={`w-full p-4 rounded-2xl border text-left flex items-center justify-between gap-3 cursor-pointer transition-colors ${
-                      enabled
-                        ? 'bg-sky-50 border-sky-400 text-slate-900'
+                    onClick={() => setTheme(opt.id)}
+                    className={`w-full p-4 rounded-2xl border-2 text-left flex items-center justify-between gap-3 cursor-pointer transition-all ${
+                      selected
+                        ? 'bg-indigo-50 border-indigo-500 text-slate-900 shadow-xs'
                         : 'bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-800'
                     }`}
                   >
-                    <div>
-                      <p className="text-sm font-bold">{opt.title}</p>
-                      <p className="text-xs text-slate-600 mt-0.5">{opt.desc}</p>
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        {opt.icon}
+                        <p className="font-playful text-base font-bold">{opt.title}</p>
+                      </div>
+                      <p className="text-xs text-slate-600">{opt.desc}</p>
+                      <div className="flex items-center gap-1.5 pt-0.5">
+                        {opt.swatches.map((hex) => (
+                          <span
+                            key={hex}
+                            className="w-5 h-3 rounded-full border border-slate-300/80"
+                            style={{ backgroundColor: hex }}
+                          />
+                        ))}
+                      </div>
                     </div>
                     <div
                       className={`w-6 h-6 rounded-lg border flex items-center justify-center shrink-0 ${
-                        enabled
-                          ? 'bg-sky-600 border-sky-700 text-white'
+                        selected
+                          ? 'bg-indigo-600 border-indigo-700 text-white'
                           : 'bg-white border-slate-300'
                       }`}
                     >
-                      {enabled && <Check className="w-4 h-4" />}
+                      {selected && <Check className="w-4 h-4" />}
                     </div>
                   </button>
                 );
@@ -926,47 +1011,10 @@ export default function App() {
 
             <button
               type="button"
-              onClick={() => setIsA11yOpen(false)}
-              className="min-h-[44px] w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-sm font-bold cursor-pointer"
+              onClick={() => setIsThemeOpen(false)}
+              className="min-h-[44px] w-full py-2.5 rounded-xl bg-[#001E62] hover:bg-[#0A2C7A] text-white font-playful text-sm font-bold cursor-pointer"
             >
               Done
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* About Schoola Modal */}
-      {isAboutOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4 no-print">
-          <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-4 text-left">
-            <div className="flex items-center justify-between gap-4">
-              <h2 className="font-playful font-extrabold text-2xl bg-gradient-to-r from-[#5B4FCF] via-[#3B9FE0] to-[#2DC89A] bg-clip-text text-transparent">
-                About Schoola
-              </h2>
-              <button
-                type="button"
-                onClick={() => setIsAboutOpen(false)}
-                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 cursor-pointer"
-                aria-label="Close about Schoola dialog"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <p className="text-sm text-slate-700 leading-relaxed">
-              Schoola (schoola.uk) is a free, independent curriculum companion and interactive learning hub for UK primary school pupils aged 5–11 and their parents.
-            </p>
-            <p className="text-sm text-slate-700 leading-relaxed">
-              We map the full statutory National Curriculum (Key Stage 1 and Key Stage 2) with interactive quests and curated links to trusted free resources — including BBC Teach, Oak National Academy, Twinkl, and BBC Bitesize.
-            </p>
-            <p className="text-xs text-slate-500 leading-relaxed">
-              Privacy-first: no login or personal account required. Learning progress stays strictly in your browser.
-            </p>
-            <button
-              type="button"
-              onClick={() => setIsAboutOpen(false)}
-              className="min-h-[44px] w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-sm font-bold cursor-pointer"
-            >
-              Back to Schoola
             </button>
           </div>
         </div>

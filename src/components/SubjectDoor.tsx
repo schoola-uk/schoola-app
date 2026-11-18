@@ -26,10 +26,10 @@ const SubjectSceneIllustration: React.FC<{ subjectId: string }> = ({ subjectId }
           {/* Open Book */}
           <path d="M36 104 Q76 92 114 104 V62 Q76 50 36 62 Z" fill="#FFFFFF" stroke="#E11D48" strokeWidth="2.5" />
           <path d="M114 104 Q152 92 190 104 V62 Q152 50 114 62 Z" fill="#FFF5F5" stroke="#E11D48" strokeWidth="2.5" />
-          {/* Floating Letters */}
-          <text x="90" y="42" fill="#E11D48" fontSize="19" fontWeight="900">A</text>
-          <text x="128" y="30" fill="#0284C7" fontSize="18" fontWeight="900">B</text>
-          <text x="158" y="48" fill="#D97706" fontSize="19" fontWeight="900">C</text>
+          {/* Floating Sparkles & Quill Feather (no text or letters) */}
+          <path d="M92 28 L95 35 L102 38 L95 41 L92 48 L89 41 L82 38 L89 35 Z" fill="#E11D48" />
+          <circle cx="128" cy="24" r="6" fill="#38BDF8" />
+          <path d="M156 44 C153 31 165 18 175 16 C171 28 166 38 156 44 Z" fill="#F59E0B" />
         </svg>
       );
     case 'Maths':
@@ -37,25 +37,33 @@ const SubjectSceneIllustration: React.FC<{ subjectId: string }> = ({ subjectId }
         <svg viewBox="0 0 320 130" className="w-full h-full object-cover" fill="none">
           <rect width="320" height="130" fill="#DBEAFE" />
           <path d="M0 86 Q80 62 160 86 T320 78 V130 H0 Z" fill="#34D399" />
-          {/* Number River */}
+          {/* Winding River */}
           <path d="M36 130 C76 94 162 112 192 78 C222 44 272 54 306 30" stroke="#0284C7" strokeWidth="22" strokeLinecap="round" />
           <path d="M36 130 C76 94 162 112 192 78 C222 44 272 54 306 30" stroke="#7DD3FC" strokeWidth="10" strokeLinecap="round" strokeDasharray="6 8" />
-          {/* Floating Math Shapes & Sign */}
+          {/* Geometric Shapes & Abacus Beads Card (no digits or equations) */}
           <polygon points="56,22 82,66 30,66" fill="#F59E0B" />
           <circle cx="268" cy="30" r="17" fill="#38BDF8" stroke="#FFFFFF" strokeWidth="3" />
           <rect x="226" y="78" width="32" height="32" rx="7" fill="#F43F5E" transform="rotate(-10 242 94)" />
-          <rect x="92" y="72" width="76" height="28" rx="9" fill="#FFFFFF" stroke="#0284C7" strokeWidth="2.5" />
-          <text x="130" y="91" textAnchor="middle" fill="#0F172A" fontSize="14" fontWeight="900">3 + ? = 7</text>
+          <rect x="86" y="68" width="88" height="36" rx="10" fill="#FFFFFF" stroke="#0284C7" strokeWidth="2.5" />
+          <line x1="98" y1="80" x2="162" y2="80" stroke="#CBD5E1" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="98" y1="92" x2="162" y2="92" stroke="#CBD5E1" strokeWidth="2.5" strokeLinecap="round" />
+          <circle cx="108" cy="80" r="4.5" fill="#F43F5E" />
+          <circle cx="122" cy="80" r="4.5" fill="#F59E0B" />
+          <circle cx="136" cy="80" r="4.5" fill="#F59E0B" />
+          <circle cx="112" cy="92" r="4.5" fill="#10B981" />
+          <circle cx="126" cy="92" r="4.5" fill="#0284C7" />
+          <circle cx="140" cy="92" r="4.5" fill="#8B5CF6" />
+          <circle cx="154" cy="92" r="4.5" fill="#8B5CF6" />
         </svg>
       );
     case 'Science':
       return (
         <svg viewBox="0 0 320 130" className="w-full h-full object-cover" fill="none">
           <rect width="320" height="130" fill="#DCFCE7" />
-          {/* Rainbow */}
-          <path d="M40 104 A100 100 0 0 1 240 104" stroke="#FB7185" strokeWidth="6" opacity="0.65" />
-          <path d="M48 104 A92 92 0 0 1 232 104" stroke="#FBBF24" strokeWidth="6" opacity="0.65" />
-          <path d="M56 104 A84 84 0 0 1 224 104" stroke="#38BDF8" strokeWidth="6" opacity="0.65" />
+          {/* Atom Orbit & Stars */}
+          <ellipse cx="160" cy="34" rx="34" ry="11" transform="rotate(-16 160 34)" stroke="#38BDF8" strokeWidth="2.5" opacity="0.7" />
+          <ellipse cx="160" cy="34" rx="34" ry="11" transform="rotate(20 160 34)" stroke="#34D399" strokeWidth="2.5" opacity="0.7" />
+          <circle cx="160" cy="34" r="5" fill="#0EA5E9" />
           <path d="M0 98 Q160 80 320 98 V130 H0 Z" fill="#10B981" />
           {/* Volcano */}
           <path d="M120 108 L146 58 H174 L200 108 Z" fill="#92400E" />
@@ -204,9 +212,11 @@ const SubjectSceneIllustration: React.FC<{ subjectId: string }> = ({ subjectId }
           <line x1="244" y1="0" x2="244" y2="30" stroke="#D97706" strokeWidth="2.5" />
           <rect x="226" y="30" width="36" height="44" rx="14" fill="#F59E0B" stroke="#92400E" strokeWidth="2.5" />
           <circle cx="244" cy="52" r="7" fill="#FEF08A" />
-          {/* Dove / Heart */}
+          {/* Vector Peace Dove & Star (no text node) */}
           <circle cx="160" cy="64" r="24" fill="#FFFFFF" stroke="#E11D48" strokeWidth="2.5" />
-          <text x="160" y="72" textAnchor="middle" fontSize="24">🕊️</text>
+          <path d="M148 72 C152 62 162 56 172 58 C166 64 166 72 158 76 C154 78 148 76 148 72 Z" fill="#FDA4AF" />
+          <path d="M150 64 C156 50 166 48 172 54 C164 56 158 62 154 68 Z" fill="#E11D48" />
+          <circle cx="168" cy="56" r="3" fill="#E11D48" />
         </svg>
       );
     default:
@@ -266,15 +276,15 @@ export const SubjectDoor: React.FC<SubjectDoorProps> = ({ subject, onClick }) =>
       </div>
 
       {/* Circular Emblem Badge straddling the window */}
-      <div className="relative px-5 pt-8 pb-5 flex flex-col flex-1 justify-between" style={{ backgroundColor: subject.bg }}>
+      <div className="relative px-6 pt-9 pb-6 flex flex-col flex-1 justify-between" style={{ backgroundColor: subject.bg }}>
         <div
-          className="absolute -top-6 left-5 w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-md border-2 border-white transform group-hover:-rotate-6 transition-transform"
+          className="absolute -top-6 left-6 w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-md border-2 border-white transform group-hover:-rotate-6 transition-transform"
           style={{ backgroundColor: subject.color }}
         >
           <span aria-hidden="true">{subject.emoji}</span>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           <h3
             className="font-playful font-bold text-lg tracking-tight leading-snug"
             style={{ color: subject.textColor }}
@@ -288,7 +298,7 @@ export const SubjectDoor: React.FC<SubjectDoorProps> = ({ subject, onClick }) =>
 
         {/* Tactile Bottom Gate Action Bar */}
         <div
-          className="flex items-center justify-between w-full mt-4 pt-3 border-t border-dashed"
+          className="flex items-center justify-between w-full mt-5 pt-4 border-t border-dashed"
           style={{ borderColor: subject.borderColor }}
         >
           <span
