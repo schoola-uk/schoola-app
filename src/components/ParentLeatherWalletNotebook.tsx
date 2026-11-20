@@ -21,7 +21,6 @@ import {
 import {
   buildAmazonAllDiscountsUrl,
   DEFAULT_AMAZON_TAG,
-  MUM_HUMOUR_ARTICLES,
 } from '../data/seasonalShop';
 import { SUBJECTS, TOPICS } from '../data/curriculum';
 import { findMatchingYouTubeVideo } from '../data/youtubeVideos';
@@ -51,12 +50,47 @@ interface ParentLeatherWalletNotebookProps {
 }
 
 const SHOPPING_BAG_OPTIONS = [
-  'School Prep Bag',
-  'Winter Kit Bag',
-  'Teacher Gift Bag',
-  'Party Bag',
-  'Christmas Bag',
+  'School',
+  'Clothing',
+  'Teacher',
+  'Friends Gifts',
+  'Christmas',
 ] as const;
+
+const LEGACY_BAG_NAME_MAP: Record<string, string> = {
+  'School Prep Bag': 'School',
+  'Winter Kit Bag': 'Clothing',
+  'Teacher Gift Bag': 'Teacher',
+  'Party Bag': 'Friends Gifts',
+  'Christmas Bag': 'Christmas',
+};
+
+const DEFAULT_SHOPPING_LIST: ShoppingChecklistItem[] = [
+  {
+    id: 'shop-1',
+    label: 'Leakproof bento lunchbox & flip bottle',
+    bagName: 'School',
+    checked: false,
+  },
+  {
+    id: 'shop-2',
+    label: 'Class signing card + under-£5 teacher gift',
+    bagName: 'Teacher',
+    checked: false,
+  },
+  {
+    id: 'shop-3',
+    label: 'Under-£15 girls birthday party gift stash',
+    bagName: 'Friends Gifts',
+    checked: false,
+  },
+  {
+    id: 'shop-4',
+    label: 'Winter wellies / puddle suit check',
+    bagName: 'Clothing',
+    checked: false,
+  },
+];
 
 export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookProps> = ({
   progress,
@@ -78,12 +112,10 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
   const [calSubscribed, setCalSubscribed] = useState(false);
   const [calFeedCopied, setCalFeedCopied] = useState(false);
 
-  // Shopping list (starts as clean empty blank lined page) & witty mum articles state inside notepad
-  const [activeArticleId, setActiveArticleId] = useState<string>(MUM_HUMOUR_ARTICLES[0].id);
-  const [selectedBag, setSelectedBag] = useState<string>(SHOPPING_BAG_OPTIONS[0]);
-  const [shoppingList, setShoppingList] = useState<ShoppingChecklistItem[]>(() => {
+  // Shopping list & custom bag builder
+  const [customBags, setCustomBags] = useState<string[]>(() => {
     try {
-      const saved = localStorage.getItem('schoola_family_shopping_bag_v2');
+      const saved = localStorage.getItem('schoola_custom_shopping_bags_v1');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) return parsed;
@@ -93,10 +125,32 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
     }
     return [];
   });
+  const allBags = useMemo(
+    () => [...SHOPPING_BAG_OPTIONS, ...customBags],
+    [customBags]
+  );
+  const [selectedBag, setSelectedBag] = useState<string>(SHOPPING_BAG_OPTIONS[0]);
+  const [showNewBagInput, setShowNewBagInput] = useState(false);
+  const [newBagName, setNewBagName] = useState('');
+  const [shoppingList, setShoppingList] = useState<ShoppingChecklistItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('schoola_family_shopping_bag_v3');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed.map((item: ShoppingChecklistItem) => ({
+            ...item,
+            bagName: item.bagName ? LEGACY_BAG_NAME_MAP[item.bagName] || item.bagName : undefined,
+          }));
+        }
+      }
+    } catch {
+      // Ignore storage access errors
+    }
+    return DEFAULT_SHOPPING_LIST;
+  });
+  const [emptySlotValues, setEmptySlotValues] = useState<string[]>(['', '', '']);
   const [newShopItem, setNewShopItem] = useState('');
-
-  const activeArticle =
-    MUM_HUMOUR_ARTICLES.find((a) => a.id === activeArticleId) || MUM_HUMOUR_ARTICLES[0];
 
   const routineItems = [
     { key: 'read_15', label: '15 minutes of reading or phonics together' },
@@ -180,7 +234,7 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
     setShoppingList((prev) => {
       const next = updater(prev);
       try {
-        localStorage.setItem('schoola_family_shopping_bag_v2', JSON.stringify(next));
+        localStorage.setItem('schoola_family_shopping_bag_v3', JSON.stringify(next));
       } catch {
         // Ignore storage write errors
       }
@@ -193,21 +247,47 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
     const trimmed = newShopItem.trim();
     if (!trimmed) return;
     updateAndSaveShoppingList((prev) => [
-      { id: `shop-${Date.now()}`, label: trimmed, bagName: selectedBag, checked: false },
       ...prev,
+      { id: `shop-${Date.now()}`, label: trimmed, bagName: selectedBag, checked: false },
     ]);
     setNewShopItem('');
   };
 
-  const handleQuickBagAdd = (label: string) => {
-    updateAndSaveShoppingList((prev) => {
-      if (prev.some((i) => i.label.toLowerCase() === label.toLowerCase())) return prev;
-      return [{ id: `shop-${Date.now()}`, label, bagName: selectedBag, checked: false }, ...prev];
-    });
+  const handleSaveEmptySlot = (slotIdx: number) => {
+    const trimmed = (emptySlotValues[slotIdx] || '').trim();
+    if (!trimmed) return;
+    updateAndSaveShoppingList((prev) => [
+      ...prev,
+      {
+        id: `shop-${Date.now()}-${slotIdx}`,
+        label: trimmed,
+        bagName: selectedBag,
+        checked: false,
+      },
+    ]);
+    setEmptySlotValues((prev) => prev.map((v, i) => (i === slotIdx ? '' : v)));
   };
 
-  const handleClearShoppingPage = () => {
-    updateAndSaveShoppingList(() => []);
+  const handleAddCustomBag = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = newBagName.trim();
+    if (!trimmed) return;
+    if (!allBags.some((b) => b.toLowerCase() === trimmed.toLowerCase())) {
+      const next = [...customBags, trimmed];
+      setCustomBags(next);
+      try {
+        localStorage.setItem('schoola_custom_shopping_bags_v1', JSON.stringify(next));
+      } catch {
+        // Ignore storage write errors
+      }
+    }
+    setSelectedBag(trimmed);
+    setNewBagName('');
+    setShowNewBagInput(false);
+  };
+
+  const handleResetShoppingDefaults = () => {
+    updateAndSaveShoppingList(() => DEFAULT_SHOPPING_LIST);
   };
 
   const toggleShoppingItem = (id: string) => {
@@ -403,7 +483,7 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
                           notepadMode === 'shopping' ? 'text-rose-100' : 'text-rose-950/80'
                         }`}
                       >
-                        Mum&apos;s articles, gift picks &amp; links
+                        Bags, checklist &amp; shop links
                       </span>
                     </div>
                   </div>
@@ -414,7 +494,7 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
                         : 'bg-slate-950/15 text-slate-950'
                     }`}
                   >
-                    {notepadMode === 'shopping' ? 'Active' : 'Articles'}
+                    {notepadMode === 'shopping' ? 'Active' : 'Bags'}
                   </span>
                 </button>
                 <div
@@ -473,7 +553,7 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
                     {notepadMode === 'overview' && 'Progress Tracker & Home Learning Routine'}
                     {notepadMode === 'curriculum' && 'Curriculum Directory · Expandable Links'}
                     {notepadMode === 'calendar' && 'UK School Term Calendar & Sync'}
-                    {notepadMode === 'shopping' && 'Shopping List & Mum Gift Articles'}
+                    {notepadMode === 'shopping' && 'Family Shopping Bag & Quick Links'}
                   </p>
                 </div>
 
@@ -561,11 +641,10 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
                       <div>
                         <p className="text-xs font-extrabold text-[#B45309] flex items-center gap-1.5">
                           <Sparkles className="w-3.5 h-3.5 text-[#FF9900]" />
-                          Mum&apos;s Shopping List &amp; Seasonal Gift Articles
+                          Family Shopping Bag &amp; Quick Links
                         </p>
                         <p className="text-[11px] text-slate-700 mt-0.5">
-                          Tap the red Shopping List pocket card for lunchbox hacks, under-£5 teacher
-                          gifts &amp; Amazon All Discounts.
+                          Tap the red Shopping List pocket card to manage bags, add items &amp; shop.
                         </p>
                       </div>
                       <button
@@ -927,21 +1006,16 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
                             <p className="text-xs sm:text-sm font-extrabold text-rose-950">
                               Family Shopping Bag ({shoppingList.length})
                             </p>
-                            <p className="text-[10px] font-semibold text-rose-900/80 leading-snug">
-                              Pick a bag &amp; add an item to create a live Shop link on Amazon UK.
-                            </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          {shoppingList.length > 0 && (
-                            <button
-                              type="button"
-                              onClick={handleClearShoppingPage}
-                              className="text-[11px] font-bold text-rose-700 hover:underline cursor-pointer"
-                            >
-                              Blank Page
-                            </button>
-                          )}
+                        <div className="flex items-center gap-2.5 shrink-0">
+                          <button
+                            type="button"
+                            onClick={handleResetShoppingDefaults}
+                            className="text-[11px] font-bold text-rose-700 hover:underline cursor-pointer"
+                          >
+                            Reset List
+                          </button>
                           <button
                             type="button"
                             onClick={() => onSelectTab('shopping')}
@@ -952,216 +1026,210 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
                         </div>
                       </div>
 
-                      {/* Bag Picker Row ("Add a Bag to Shop") */}
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <span className="text-[10px] font-extrabold text-rose-900 uppercase tracking-wider mr-0.5">
-                          Bag:
-                        </span>
-                        {SHOPPING_BAG_OPTIONS.map((bag) => {
-                          const active = selectedBag === bag;
-                          return (
+                      {/* Bag Picker Row + Add a Custom Bag to Shop */}
+                      <div className="space-y-2">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className="text-[10px] font-extrabold text-rose-900 uppercase tracking-wider mr-0.5">
+                            Bag:
+                          </span>
+                          {allBags.map((bag) => {
+                            const active = selectedBag === bag;
+                            return (
+                              <button
+                                key={bag}
+                                type="button"
+                                onClick={() => setSelectedBag(bag)}
+                                className={`px-2 py-0.5 rounded-md text-[10px] font-bold border cursor-pointer transition-colors ${
+                                  active
+                                    ? 'bg-rose-600 border-rose-700 text-white'
+                                    : 'bg-white/85 border-rose-200 text-rose-900 hover:bg-white'
+                                }`}
+                              >
+                                {bag}
+                              </button>
+                            );
+                          })}
+                          <button
+                            type="button"
+                            onClick={() => setShowNewBagInput((prev) => !prev)}
+                            className="px-2 py-0.5 rounded-md text-[10px] font-extrabold border border-dashed border-rose-400 bg-rose-50 hover:bg-rose-100 text-rose-800 inline-flex items-center gap-1 cursor-pointer"
+                          >
+                            <Plus className="w-2.5 h-2.5" />
+                            New Bag
+                          </button>
+                        </div>
+
+                        {showNewBagInput && (
+                          <form onSubmit={handleAddCustomBag} className="flex gap-1.5">
+                            <input
+                              type="text"
+                              value={newBagName}
+                              onChange={(e) => setNewBagName(e.target.value)}
+                              placeholder="Name new bag (e.g. PE Kit Bag)..."
+                              className="flex-1 min-h-[32px] px-2.5 py-1 rounded-lg border border-rose-300 bg-white text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-rose-500"
+                            />
                             <button
-                              key={bag}
-                              type="button"
-                              onClick={() => setSelectedBag(bag)}
-                              className={`px-2 py-0.5 rounded-md text-[10px] font-bold border cursor-pointer transition-colors ${
-                                active
-                                  ? 'bg-rose-600 border-rose-700 text-white'
-                                  : 'bg-white/85 border-rose-200 text-rose-900 hover:bg-white'
-                              }`}
+                              type="submit"
+                              className="min-h-[32px] px-3 py-1 rounded-lg bg-[#0F2147] text-white text-[11px] font-bold cursor-pointer shrink-0"
                             >
-                              {bag}
+                              Create Bag
                             </button>
+                          </form>
+                        )}
+                      </div>
+
+                      {/* Shopping List Items + 3 Empty Slots Directly Below to Add New Items */}
+                      <div className="space-y-2">
+                        {shoppingList.map((item) => {
+                          const amazonSearchUrl = buildAmazonAllDiscountsUrl(
+                            item.label,
+                            DEFAULT_AMAZON_TAG
+                          );
+                          return (
+                            <div
+                              key={item.id}
+                              className="flex items-center justify-between gap-2 bg-white px-2.5 py-2 rounded-xl border border-rose-200/80 shadow-2xs"
+                            >
+                              <button
+                                type="button"
+                                onClick={() => toggleShoppingItem(item.id)}
+                                className="flex items-center gap-2 text-left min-w-0 flex-1 cursor-pointer"
+                              >
+                                <CheckCircle2
+                                  className={`w-4 h-4 shrink-0 ${
+                                    item.checked ? 'text-emerald-600' : 'text-slate-300'
+                                  }`}
+                                />
+                                <div className="min-w-0">
+                                  <span
+                                    className={`text-xs font-semibold block truncate ${
+                                      item.checked
+                                        ? 'line-through text-slate-400'
+                                        : 'text-slate-900'
+                                    }`}
+                                  >
+                                    {item.label}
+                                  </span>
+                                  {item.bagName && (
+                                    <span className="text-[10px] font-bold text-rose-700 block truncate">
+                                      {item.bagName}
+                                    </span>
+                                  )}
+                                </div>
+                              </button>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <a
+                                  href={amazonSearchUrl}
+                                  target="_blank"
+                                  rel="nofollow sponsored noopener noreferrer"
+                                  title={`Shop "${item.label}" on Amazon UK`}
+                                  className="px-3 py-1.5 rounded-full bg-[#FFD814] hover:bg-[#F7CA00] border border-[#F59E0B] text-[#0F1111] text-[11px] font-extrabold inline-flex items-center gap-1 whitespace-nowrap"
+                                >
+                                  <ShoppingBag className="w-3 h-3 text-[#C45500]" />
+                                  Shop
+                                  <ExternalLink className="w-2.5 h-2.5" />
+                                </a>
+                                <button
+                                  type="button"
+                                  onClick={() => removeShoppingItem(item.id)}
+                                  aria-label={`Remove ${item.label}`}
+                                  className="p-1 text-slate-400 hover:text-rose-600 cursor-pointer shrink-0"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+
+                        {/* 3 Empty Blank Lined Slots Ready to Type & Add Directly */}
+                        {emptySlotValues.map((slotVal, slotIdx) => {
+                          const trimmedVal = slotVal.trim();
+                          const slotShopUrl = trimmedVal
+                            ? buildAmazonAllDiscountsUrl(trimmedVal, DEFAULT_AMAZON_TAG)
+                            : undefined;
+
+                          return (
+                            <form
+                              key={`empty-slot-${slotIdx}`}
+                              onSubmit={(e) => {
+                                e.preventDefault();
+                                handleSaveEmptySlot(slotIdx);
+                              }}
+                              className="flex items-center justify-between gap-2 bg-white/85 px-2.5 py-1.5 rounded-xl border border-dashed border-rose-300 focus-within:border-rose-500 focus-within:bg-white transition-colors"
+                            >
+                              <div className="flex items-center gap-2 min-w-0 flex-1">
+                                <span
+                                  aria-hidden="true"
+                                  className="w-4 h-4 rounded-full border-2 border-dashed border-rose-300 shrink-0"
+                                />
+                                <input
+                                  type="text"
+                                  value={slotVal}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setEmptySlotValues((prev) =>
+                                      prev.map((v, i) => (i === slotIdx ? val : v))
+                                    );
+                                  }}
+                                  placeholder={`Empty slot ${slotIdx + 1} — write item for ${selectedBag}...`}
+                                  className="w-full min-h-[30px] bg-transparent text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none"
+                                />
+                              </div>
+
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                {slotShopUrl && (
+                                  <a
+                                    href={slotShopUrl}
+                                    target="_blank"
+                                    rel="nofollow sponsored noopener noreferrer"
+                                    onClick={() => handleSaveEmptySlot(slotIdx)}
+                                    title={`Shop "${trimmedVal}" on Amazon UK`}
+                                    className="px-2.5 py-1 rounded-full bg-[#FFD814] hover:bg-[#F7CA00] border border-[#F59E0B] text-[#0F1111] text-[10px] font-extrabold inline-flex items-center gap-1 whitespace-nowrap"
+                                  >
+                                    <ShoppingBag className="w-3 h-3 text-[#C45500]" />
+                                    Shop
+                                    <ExternalLink className="w-2.5 h-2.5" />
+                                  </a>
+                                )}
+                                <button
+                                  type="submit"
+                                  disabled={!trimmedVal}
+                                  className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold inline-flex items-center gap-1 whitespace-nowrap transition-colors ${
+                                    trimmedVal
+                                      ? 'bg-rose-600 hover:bg-rose-700 text-white cursor-pointer'
+                                      : 'bg-rose-100 text-rose-400 cursor-default'
+                                  }`}
+                                >
+                                  <Plus className="w-3 h-3" />
+                                  Add
+                                </button>
+                              </div>
+                            </form>
                           );
                         })}
                       </div>
 
-                      <form onSubmit={handleAddShoppingItem} className="flex gap-2">
+                      {/* Quick Bottom Add Bar */}
+                      <form onSubmit={handleAddShoppingItem} className="flex gap-2 pt-0.5">
                         <input
                           type="text"
                           value={newShopItem}
                           onChange={(e) => setNewShopItem(e.target.value)}
-                          placeholder="Write item on blank page (e.g. waterproof boots)..."
-                          className="flex-1 min-h-[38px] px-3 py-1.5 rounded-xl border border-rose-200 bg-white text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-rose-500"
+                          placeholder={`Quick add to ${selectedBag}...`}
+                          className="flex-1 min-h-[36px] px-3 py-1.5 rounded-xl border border-rose-200 bg-white text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-rose-500"
                         />
                         <button
                           type="submit"
-                          className="min-h-[38px] px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold inline-flex items-center gap-1 cursor-pointer shrink-0"
+                          className="min-h-[36px] px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold inline-flex items-center gap-1 cursor-pointer shrink-0"
                         >
                           <Plus className="w-3.5 h-3.5" />
                           Add to Bag
                         </button>
                       </form>
-
-                      {/* Clean Blank Lined Page Area */}
-                      <div className="rounded-xl border border-rose-200/90 bg-white bg-[repeating-linear-gradient(to_bottom,#FFFFFF_0px,#FFFFFF_31px,#F8FAFC_32px)] min-h-[156px] p-2.5 space-y-2">
-                        {shoppingList.length === 0 ? (
-                          <div className="h-[132px] flex flex-col items-center justify-center text-center px-4 space-y-2.5">
-                            <p className="text-xs font-bold text-slate-600">
-                              Your blank shopping bag page is ready.
-                            </p>
-                            <p className="text-[11px] text-slate-500 max-w-xs leading-relaxed">
-                              Type any item above and tap <strong>Add to Bag</strong> to instantly create a <strong>Shop ↗</strong> search link on Amazon UK.
-                            </p>
-                            <div className="flex flex-wrap justify-center gap-1.5 pt-0.5">
-                              {['Kids winter boots', 'Pencil case', 'Teacher gift'].map((sample) => (
-                                <button
-                                  key={sample}
-                                  type="button"
-                                  onClick={() => handleQuickBagAdd(sample)}
-                                  className="px-2 py-0.5 rounded-md bg-rose-50 hover:bg-rose-100 border border-rose-200 text-[10px] font-bold text-rose-900 cursor-pointer"
-                                >
-                                  + {sample}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            {shoppingList.map((item) => {
-                              const amazonSearchUrl = buildAmazonAllDiscountsUrl(
-                                item.label,
-                                DEFAULT_AMAZON_TAG
-                              );
-                              return (
-                                <div
-                                  key={item.id}
-                                  className="flex items-center justify-between gap-2 bg-white px-2.5 py-2 rounded-xl border border-rose-200/80 shadow-2xs"
-                                >
-                                  <button
-                                    type="button"
-                                    onClick={() => toggleShoppingItem(item.id)}
-                                    className="flex items-center gap-2 text-left min-w-0 flex-1 cursor-pointer"
-                                  >
-                                    <CheckCircle2
-                                      className={`w-4 h-4 shrink-0 ${
-                                        item.checked ? 'text-emerald-600' : 'text-slate-300'
-                                      }`}
-                                    />
-                                    <div className="min-w-0">
-                                      <span
-                                        className={`text-xs font-semibold block truncate ${
-                                          item.checked
-                                            ? 'line-through text-slate-400'
-                                            : 'text-slate-900'
-                                        }`}
-                                      >
-                                        {item.label}
-                                      </span>
-                                      {item.bagName && (
-                                        <span className="text-[10px] font-bold text-rose-700 block truncate">
-                                          {item.bagName}
-                                        </span>
-                                      )}
-                                    </div>
-                                  </button>
-                                  <div className="flex items-center gap-1.5 shrink-0">
-                                    <a
-                                      href={amazonSearchUrl}
-                                      target="_blank"
-                                      rel="nofollow sponsored noopener noreferrer"
-                                      title={`Shop "${item.label}" on Amazon UK`}
-                                      className="px-3 py-1.5 rounded-full bg-[#FFD814] hover:bg-[#F7CA00] border border-[#F59E0B] text-[#0F1111] text-[11px] font-extrabold inline-flex items-center gap-1 whitespace-nowrap"
-                                    >
-                                      <ShoppingBag className="w-3 h-3 text-[#C45500]" />
-                                      Shop
-                                      <ExternalLink className="w-2.5 h-2.5" />
-                                    </a>
-                                    <button
-                                      type="button"
-                                      onClick={() => removeShoppingItem(item.id)}
-                                      aria-label={`Remove ${item.label}`}
-                                      className="p-1 text-slate-400 hover:text-rose-600 cursor-pointer shrink-0"
-                                    >
-                                      <Trash2 className="w-3.5 h-3.5" />
-                                    </button>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Mum Humour Articles + Amazon All-Discounts Links */}
-                    <div className="space-y-3">
-                      <p className="text-xs font-extrabold uppercase tracking-wider text-[#B45309] flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-[#FF9900]" />
-                        Mum&apos;s Honest Notes · Articles &amp; Product Picks
-                      </p>
-
-                      <div className="flex flex-wrap gap-1.5">
-                        {MUM_HUMOUR_ARTICLES.map((art) => {
-                          const selected = activeArticle.id === art.id;
-                          return (
-                            <button
-                              key={art.id}
-                              type="button"
-                              onClick={() => setActiveArticleId(art.id)}
-                              className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold border cursor-pointer transition-colors ${
-                                selected
-                                  ? 'bg-[#FFD814] border-[#F59E0B] text-slate-950'
-                                  : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-amber-50'
-                              }`}
-                            >
-                              {art.badge}
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      <article className="rounded-2xl bg-[#FFFBEB] border border-amber-200 p-4 space-y-3">
-                        <div>
-                          <h3 className="font-heading font-extrabold text-sm sm:text-base text-slate-900 leading-snug">
-                            {activeArticle.title}
-                          </h3>
-                          <p className="text-[11px] italic text-amber-900/80 mt-0.5">
-                            {activeArticle.byline}
-                          </p>
-                        </div>
-
-                        <p className="text-xs text-slate-700 leading-relaxed">
-                          {activeArticle.story}
-                        </p>
-
-                        <div className="space-y-1.5 pt-1">
-                          {activeArticle.placements.map((item) => (
-                            <a
-                              key={item.name}
-                              href={buildAmazonAllDiscountsUrl(
-                                item.searchQuery,
-                                DEFAULT_AMAZON_TAG
-                              )}
-                              target="_blank"
-                              rel="nofollow sponsored noopener noreferrer"
-                              className="group flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-white border border-amber-200 hover:border-[#FF9900] hover:bg-[#FFF8E7] transition-colors"
-                            >
-                              <div className="min-w-0">
-                                <span className="text-xs font-extrabold text-slate-900 group-hover:text-[#C45500] block truncate">
-                                  {item.name}
-                                </span>
-                                <span className="text-[11px] text-slate-600 block truncate">
-                                  {item.quip}
-                                </span>
-                              </div>
-                              <span className="px-2.5 py-1 rounded-lg bg-[#FFD814] text-slate-950 text-[10px] font-extrabold whitespace-nowrap inline-flex items-center gap-1 shrink-0">
-                                Deals
-                                <ExternalLink className="w-3 h-3" />
-                              </span>
-                            </a>
-                          ))}
-                        </div>
-                      </article>
                     </div>
                   </div>
                 )}
-              </div>
-
-              {/* Notepad Paper Bottom Note */}
-              <div className="pt-3 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-500">
-                <span>Saved locally on this device</span>
-                <span>As an Amazon Associate I earn from qualifying purchases.</span>
               </div>
             </div>
           </div>

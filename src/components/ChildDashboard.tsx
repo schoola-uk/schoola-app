@@ -79,7 +79,7 @@ export const ChildDashboard: React.FC<ChildDashboardProps> = ({
     setSelectedVoicePreset(id);
     const chosen = VOICE_PRESETS.find((v) => v.id === id);
     speakText(
-      `Hello ${progress.explorerName || 'Explorer'}! This is ${chosen?.label}, your ${chosen?.subtitle}.`,
+      chosen?.sampleLine || `Hello ${progress.explorerName || 'Explorer'}! This is ${chosen?.label}.`,
       undefined,
       id
     );
@@ -396,9 +396,8 @@ export const ChildDashboard: React.FC<ChildDashboardProps> = ({
                         ? 'bg-sky-600 text-white border-sky-700 shadow-xs'
                         : 'bg-white/90 text-slate-800 border-sky-200 hover:bg-sky-50'
                     }`}
-                    title={v.subtitle}
                   >
-                    {v.label} · {v.subtitle}
+                    {v.label}
                   </button>
                 );
               })}

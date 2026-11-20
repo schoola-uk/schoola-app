@@ -1,9 +1,12 @@
+import type { VoicePresetId } from '../utils/speech';
+
 export interface PrizeItem {
   id: string;
   name: string;
   category: 'creature' | 'collectible';
   cost: number;
   shortTag: string;
+  voiceId: VoicePresetId;
   panelGradient: string;
   borderColor: string;
   accentHex: string;
@@ -19,6 +22,7 @@ export const REWARD_PRIZES: PrizeItem[] = [
     category: 'creature',
     cost: 2,
     shortTag: 'Starter Pal',
+    voiceId: 'maya',
     panelGradient: 'from-emerald-400 to-teal-500',
     borderColor: 'border-emerald-700',
     accentHex: '#10B981',
@@ -33,6 +37,7 @@ export const REWARD_PRIZES: PrizeItem[] = [
     category: 'creature',
     cost: 4,
     shortTag: 'Sky Creature',
+    voiceId: 'leo',
     panelGradient: 'from-violet-500 to-purple-600',
     borderColor: 'border-purple-800',
     accentHex: '#7C3AED',
@@ -47,6 +52,7 @@ export const REWARD_PRIZES: PrizeItem[] = [
     category: 'creature',
     cost: 5,
     shortTag: 'Bamboo Pal',
+    voiceId: 'toby',
     panelGradient: 'from-sky-400 to-blue-600',
     borderColor: 'border-blue-800',
     accentHex: '#0284C7',
@@ -61,6 +67,7 @@ export const REWARD_PRIZES: PrizeItem[] = [
     category: 'creature',
     cost: 6,
     shortTag: 'Cloud Watcher',
+    voiceId: 'lily',
     panelGradient: 'from-amber-400 to-orange-500',
     borderColor: 'border-orange-700',
     accentHex: '#EA580C',
@@ -75,6 +82,7 @@ export const REWARD_PRIZES: PrizeItem[] = [
     category: 'creature',
     cost: 8,
     shortTag: 'Ocean Buddy',
+    voiceId: 'maya',
     panelGradient: 'from-pink-400 to-rose-500',
     borderColor: 'border-rose-700',
     accentHex: '#E11D48',
@@ -89,6 +97,7 @@ export const REWARD_PRIZES: PrizeItem[] = [
     category: 'collectible',
     cost: 3,
     shortTag: 'Maths Relic',
+    voiceId: 'leo',
     panelGradient: 'from-yellow-400 to-amber-500',
     borderColor: 'border-amber-700',
     accentHex: '#D97706',
@@ -103,6 +112,7 @@ export const REWARD_PRIZES: PrizeItem[] = [
     category: 'collectible',
     cost: 5,
     shortTag: 'World Relic',
+    voiceId: 'toby',
     panelGradient: 'from-teal-400 to-cyan-600',
     borderColor: 'border-cyan-800',
     accentHex: '#0D9488',
@@ -117,6 +127,7 @@ export const REWARD_PRIZES: PrizeItem[] = [
     category: 'collectible',
     cost: 6,
     shortTag: 'Story Relic',
+    voiceId: 'lily',
     panelGradient: 'from-fuchsia-500 to-pink-600',
     borderColor: 'border-pink-800',
     accentHex: '#C026D3',
@@ -131,6 +142,7 @@ export const REWARD_PRIZES: PrizeItem[] = [
     category: 'collectible',
     cost: 7,
     shortTag: 'Pathfinder',
+    voiceId: 'toby',
     panelGradient: 'from-indigo-500 to-blue-600',
     borderColor: 'border-indigo-800',
     accentHex: '#4F46E5',
@@ -145,6 +157,7 @@ export const REWARD_PRIZES: PrizeItem[] = [
     category: 'collectible',
     cost: 12,
     shortTag: 'Grand Prize',
+    voiceId: 'lily',
     panelGradient: 'from-rose-500 via-amber-500 to-orange-500',
     borderColor: 'border-rose-800',
     accentHex: '#F59E0B',

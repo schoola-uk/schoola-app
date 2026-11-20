@@ -19,7 +19,7 @@ import { PrintableCertificateModal } from './components/PrintableCertificateModa
 import { VoicePickerModal } from './components/VoicePickerControl';
 import { RedOrangeDoorIcon } from './components/WorldIllustrations';
 import { stopSpeaking } from './utils/speech';
-import { playCheerfulTing } from './utils/soundEffects';
+import { playCheerfulTing, playWelcomeLaughOnOpen } from './utils/soundEffects';
 import { useDeviceProfile } from './utils/deviceDetection';
 
 const PROGRESS_STORAGE_KEY = 'schoola_v2_progress';
@@ -123,6 +123,15 @@ export default function App() {
   const [mascotMessage, setMascotMessage] = useState(
     'Hi Explorer! Pick a daily challenge or enter a Learning World to start your adventure!'
   );
+
+  // On initial website open: stay silent (no spoken words) and play a gentle happy laugh sound
+  useEffect(() => {
+    stopSpeaking();
+    const cancelWelcomeSound = playWelcomeLaughOnOpen();
+    return () => {
+      cancelWelcomeSound();
+    };
+  }, []);
 
   // Persist locally (privacy-first, no personal data leaves the device)
   useEffect(() => {
@@ -325,10 +334,10 @@ export default function App() {
   );
 
   return (
-    <div className={`min-h-screen w-full overflow-x-hidden flex flex-col transition-colors duration-300 ${rootThemeClass}`}>
+    <div className={`min-h-screen w-full overflow-x-clip flex flex-col transition-colors duration-300 ${rootThemeClass}`}>
       {/* Always-Visible LBS Royal Navy Blue Sticky Top Navigation Header (#001E62) */}
-      <header className="sticky top-0 z-40 bg-[#001E62]/95 backdrop-blur-md text-white border-b border-[#25458E] shadow-md no-print">
-        <div className="w-full px-3.5 sm:px-10 lg:px-16 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4">
+      <header className="sticky top-0 z-40 w-full bg-[#001E62]/98 backdrop-blur-md text-white border-b border-[#25458E] shadow-lg no-print">
+        <div className="w-full px-3 sm:px-10 lg:px-16 h-13 sm:h-16 flex items-center justify-between gap-2 sm:gap-4">
           {/* Zone 1: Schoola Wordmark with LBS Crimson Accent Line + UK Companion Strapline */}
           <div className="flex items-center gap-5 min-w-0 shrink-0">
             <button
@@ -342,7 +351,7 @@ export default function App() {
               }}
               className="flex flex-col items-start text-left shrink-0 cursor-pointer group"
             >
-              <span className="font-playful font-extrabold text-2xl sm:text-[1.75rem] leading-none tracking-tight text-white whitespace-nowrap">
+              <span className="font-playful font-extrabold text-xl sm:text-[1.75rem] leading-none tracking-tight text-white whitespace-nowrap">
                 Schoola
               </span>
               <span className="w-full h-[2.5px] bg-[#C8102E] rounded-full mt-1" aria-hidden="true" />
@@ -470,25 +479,25 @@ export default function App() {
           </nav>
 
           {/* Zone 3: Voice Chooser, Theme Switcher & Parent Portal */}
-          <div className="flex items-center gap-2.5 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             <button
               type="button"
               onClick={() => setIsVoiceOpen(true)}
-              className="w-10 h-10 rounded-xl bg-white/12 hover:bg-white/22 border border-white/25 text-white flex items-center justify-center shrink-0 cursor-pointer transition-colors"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white flex items-center justify-center shrink-0 cursor-pointer transition-colors"
               aria-label="Choose child-friendly storyteller voice"
               title="Choose lovely storyteller voice"
             >
-              <Volume2 className="w-5 h-5 text-sky-200" />
+              <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 text-sky-200" />
             </button>
 
             <button
               type="button"
               onClick={() => setIsThemeOpen(true)}
-              className="w-10 h-10 rounded-xl bg-white/12 hover:bg-white/22 border border-white/25 text-white flex items-center justify-center shrink-0 cursor-pointer transition-colors"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white flex items-center justify-center shrink-0 cursor-pointer transition-colors"
               aria-label="Switch colour theme"
               title="Switch colour theme"
             >
-              <Palette className="w-5 h-5 text-amber-200" />
+              <Palette className="w-4 h-4 sm:w-5 sm:h-5 text-amber-200" />
             </button>
 
             <button
@@ -498,24 +507,24 @@ export default function App() {
                 setActiveTopic(null);
                 setRole(role === 'parent' ? 'child' : 'parent');
               }}
-              className={`min-h-[40px] pl-2 pr-3.5 py-1 rounded-xl border transition-all flex items-center gap-2 whitespace-nowrap shrink-0 cursor-pointer shadow-xs ${
+              className={`min-h-[36px] sm:min-h-[40px] pl-2 pr-2.5 sm:pr-3.5 py-1 rounded-xl border transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap shrink-0 cursor-pointer shadow-xs ${
                 role === 'parent'
                   ? 'bg-emerald-600 hover:bg-emerald-700 border-emerald-400 text-white'
                   : 'bg-gradient-to-r from-[#EA580C] to-[#DC2626] hover:from-[#C2410C] hover:to-[#B91C1C] border-orange-300 text-white'
               }`}
             >
-              <RedOrangeDoorIcon className="w-5 h-6 shrink-0" />
-              <span className="text-xs font-extrabold whitespace-nowrap">
+              <RedOrangeDoorIcon className="w-4 h-5 sm:w-5 sm:h-6 shrink-0" />
+              <span className="text-[11px] sm:text-xs font-extrabold whitespace-nowrap">
                 {role === 'parent' ? 'Kids Hub' : 'Parent Portal'}
               </span>
             </button>
           </div>
         </div>
 
-        {/* Compact Easy-to-See Mobile Navigation Strip (fits cleanly on 360px+ phones) */}
+        {/* High-Visibility Easy-to-See Mobile Navigation Strip (360px+ iPhone/iPad/Mobile) */}
         <nav
           aria-label="Mobile navigation"
-          className="grid grid-cols-5 md:hidden items-center gap-1.5 px-3 pb-2.5"
+          className="grid grid-cols-5 md:hidden items-center gap-1.5 px-2.5 pb-2.5 pt-0.5"
         >
           <button
             type="button"
@@ -526,10 +535,10 @@ export default function App() {
               setRole('welcome');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            className={`min-h-[34px] px-2 py-1 rounded-xl text-[11px] font-playful font-bold text-center cursor-pointer transition-colors ${
+            className={`min-h-[36px] px-1.5 py-1 rounded-xl text-xs font-playful font-bold text-center cursor-pointer transition-colors ${
               role === 'welcome'
-                ? 'bg-white text-[#001E62]'
-                : 'bg-white/10 text-sky-100 hover:bg-white/20'
+                ? 'bg-white text-[#001E62] shadow-xs'
+                : 'bg-white/15 text-white hover:bg-white/25'
             }`}
           >
             Home
@@ -547,7 +556,7 @@ export default function App() {
                 document.getElementById('full-curriculum-directory')?.scrollIntoView({ behavior: 'smooth' });
               }, 60);
             }}
-            className="min-h-[34px] px-2 py-1 rounded-xl text-[11px] font-playful font-bold bg-[#FFE4E0] text-[#9A2E1B] text-center cursor-pointer"
+            className="min-h-[36px] px-1.5 py-1 rounded-xl text-xs font-playful font-bold bg-[#FFE4E0] text-[#9A2E1B] text-center cursor-pointer shadow-xs"
           >
             KS1
           </button>
@@ -564,7 +573,7 @@ export default function App() {
                 document.getElementById('full-curriculum-directory')?.scrollIntoView({ behavior: 'smooth' });
               }, 60);
             }}
-            className="min-h-[34px] px-2 py-1 rounded-xl text-[11px] font-playful font-bold bg-[#DBEAFE] text-[#1E3A8A] text-center cursor-pointer"
+            className="min-h-[36px] px-1.5 py-1 rounded-xl text-xs font-playful font-bold bg-[#DBEAFE] text-[#1E3A8A] text-center cursor-pointer shadow-xs"
           >
             KS2
           </button>
@@ -577,10 +586,10 @@ export default function App() {
               setChildViewMode('map');
               setRole('child');
             }}
-            className={`min-h-[34px] px-1.5 py-1 rounded-xl text-[11px] font-playful font-bold text-center cursor-pointer ${
+            className={`min-h-[36px] px-1 py-1 rounded-xl text-xs font-playful font-bold text-center cursor-pointer ${
               role === 'child' && childViewMode === 'map'
-                ? 'bg-emerald-400 text-slate-950'
-                : 'text-emerald-200 bg-emerald-500/25'
+                ? 'bg-emerald-400 text-slate-950 shadow-xs'
+                : 'text-emerald-100 bg-emerald-500/30 border border-emerald-400/40'
             }`}
           >
             Map
@@ -596,13 +605,14 @@ export default function App() {
             }}
             aria-label="Child Profile"
             title="Child Profile"
-            className={`min-h-[34px] px-2 py-1 rounded-xl border flex items-center justify-center gap-1 cursor-pointer ${
+            className={`min-h-[36px] px-1.5 py-1 rounded-xl border flex items-center justify-center gap-1 cursor-pointer ${
               role === 'child' && childViewMode === 'dashboard'
-                ? 'bg-amber-400/35 border-amber-300 text-white'
-                : 'bg-white/10 border-white/25 text-white'
+                ? 'bg-amber-400/40 border-amber-300 text-white shadow-xs'
+                : 'bg-white/15 border-white/30 text-white'
             }`}
           >
             {childFaceIcon}
+            <span className="text-[11px] font-playful font-bold">Kids</span>
           </button>
         </nav>
       </header>

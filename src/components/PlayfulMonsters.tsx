@@ -2,12 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Volume2, VolumeX } from 'lucide-react';
 import { playChimeSound } from './CorridorWidgets';
-import { speakText, stopSpeaking } from '../utils/speech';
+import { speakText, stopSpeaking, VoicePresetId } from '../utils/speech';
 
 interface MonsterDef {
   id: string;
   name: string;
   emoji: string;
+  voiceId: VoicePresetId;
   quips: string[];
   nameColor: string;
   ringColor: string;
@@ -19,6 +20,7 @@ const MONSTERS: MonsterDef[] = [
     id: 'bloop',
     name: 'Bloop',
     emoji: '🧮',
+    voiceId: 'leo',
     quips: [
       'Boing! Slide my golden abacus beads to win bright Stars!',
       'Count with Bloop! Ten shiny beads waiting on the brass rods!',
@@ -32,6 +34,7 @@ const MONSTERS: MonsterDef[] = [
     id: 'pip',
     name: 'Pip',
     emoji: '🔬',
+    voiceId: 'maya',
     quips: [
       'Bubbles! Spin the Speaking Globe to discover amazing UK wonders!',
       'Explore rivers, mountains and oceans with Pip to win Stars!',
@@ -45,6 +48,7 @@ const MONSTERS: MonsterDef[] = [
     id: 'zuzu',
     name: 'Zuzu',
     emoji: '📖',
+    voiceId: 'lily',
     quips: [
       'Ooh! Cast a glowing spelling rune in the Ancient Spellbook!',
       'Tap the right letters in order to unlock Wizard Stars!',
@@ -58,6 +62,7 @@ const MONSTERS: MonsterDef[] = [
     id: 'bramble',
     name: 'Bramble',
     emoji: '⭐',
+    voiceId: 'toby',
     quips: [
       'Ding-dong! Tap the Glowing Path or chime the golden School Bell!',
       'Follow the rainbow stepping stones and win sparkling Stars!',
@@ -131,11 +136,15 @@ const HighlightedAccentText: React.FC<{ text: string }> = ({ text }) => {
   );
 };
 
-const MonsterSvg: React.FC<{ id: string; jumping: boolean }> = ({ id, jumping }) => {
+export const MonsterSvg: React.FC<{ id: string; jumping?: boolean; className?: string }> = ({
+  id,
+  jumping = false,
+  className = 'w-20 h-20 sm:w-24 sm:h-24',
+}) => {
   switch (id) {
     case 'bloop':
       return (
-        <svg viewBox="0 0 90 90" className="w-20 h-20 sm:w-24 sm:h-24" fill="none">
+        <svg viewBox="0 0 90 90" className={className} fill="none" aria-hidden="true">
           <polygon points="24,22 18,6 34,16" fill="#FDE047" />
           <polygon points="66,22 72,6 56,16" fill="#FDE047" />
           <polygon points="45,16 45,2 52,15" fill="#FBBF24" />
@@ -156,7 +165,7 @@ const MonsterSvg: React.FC<{ id: string; jumping: boolean }> = ({ id, jumping })
       );
     case 'pip':
       return (
-        <svg viewBox="0 0 90 90" className="w-20 h-20 sm:w-24 sm:h-24" fill="none">
+        <svg viewBox="0 0 90 90" className={className} fill="none" aria-hidden="true">
           <path d="M45 18 V6" stroke="#065F46" strokeWidth="3.5" strokeLinecap="round" />
           <ellipse cx="38" cy="8" rx="8" ry="4" transform="rotate(-25 38 8)" fill="#A7F3D0" />
           <ellipse cx="52" cy="8" rx="8" ry="4" transform="rotate(25 52 8)" fill="#6EE7B7" />
@@ -175,7 +184,7 @@ const MonsterSvg: React.FC<{ id: string; jumping: boolean }> = ({ id, jumping })
       );
     case 'zuzu':
       return (
-        <svg viewBox="0 0 90 90" className="w-20 h-20 sm:w-24 sm:h-24" fill="none">
+        <svg viewBox="0 0 90 90" className={className} fill="none" aria-hidden="true">
           <circle cx="22" cy="24" r="10" fill="#FB7185" stroke="#9F1239" strokeWidth="2.5" />
           <circle cx="68" cy="24" r="10" fill="#FB7185" stroke="#9F1239" strokeWidth="2.5" />
           <circle cx="22" cy="24" r="5" fill="#FECDD3" />
@@ -195,7 +204,7 @@ const MonsterSvg: React.FC<{ id: string; jumping: boolean }> = ({ id, jumping })
       );
     default:
       return (
-        <svg viewBox="0 0 90 90" className="w-20 h-20 sm:w-24 sm:h-24" fill="none">
+        <svg viewBox="0 0 90 90" className={className} fill="none" aria-hidden="true">
           <ellipse cx="14" cy="46" rx="10" ry="6" transform="rotate(-20 14 46)" fill="#FDE68A" stroke="#D97706" strokeWidth="2" />
           <ellipse cx="76" cy="46" rx="10" ry="6" transform="rotate(20 76 46)" fill="#FDE68A" stroke="#D97706" strokeWidth="2" />
           <rect x="18" y="18" width="54" height="60" rx="24" fill="#FBBF24" stroke="#B45309" strokeWidth="3" />
@@ -230,11 +239,11 @@ export const PlayfulMonstersBar: React.FC<PlayfulMonstersBarProps> = ({
 
   const displayMessage = activeMessage || selectedMonster.quips[0];
 
-  const speakBubble = (text: string) => {
+  const speakBubble = (text: string, voiceId: VoicePresetId = selectedMonster.voiceId) => {
     if (!voiceEnabled) return;
     const clean = text.replace(/[\u{1F300}-\u{1FAFF}]/gu, '');
     setIsSpeaking(true);
-    speakText(clean, () => setIsSpeaking(false));
+    speakText(clean, () => setIsSpeaking(false), voiceId);
   };
 
   // Speak automatically whenever a playground widget or monster updates the bubble text
@@ -242,7 +251,7 @@ export const PlayfulMonstersBar: React.FC<PlayfulMonstersBarProps> = ({
     if (activeMessage && activeMessage !== prevMessageRef.current) {
       prevMessageRef.current = activeMessage;
       if (voiceEnabled) {
-        speakBubble(activeMessage);
+        speakBubble(activeMessage, selectedMonster.voiceId);
       }
     }
   }, [activeMessage, voiceEnabled]);
@@ -254,8 +263,9 @@ export const PlayfulMonstersBar: React.FC<PlayfulMonstersBarProps> = ({
     setSelectedMonster(m);
     setBouncingId(m.id);
     playChimeSound('spell');
+    prevMessageRef.current = nextQuip;
     onMonsterTap?.(m.subjectId, m.name, nextQuip);
-    speakBubble(nextQuip);
+    speakBubble(nextQuip, m.voiceId);
     setTimeout(() => setBouncingId(null), 700);
   };
 
@@ -324,7 +334,7 @@ export const PlayfulMonstersBar: React.FC<PlayfulMonstersBarProps> = ({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: -6 }}
               transition={{ duration: 0.2 }}
-              onClick={() => speakBubble(displayMessage)}
+              onClick={() => speakBubble(displayMessage, selectedMonster.voiceId)}
               className="relative bg-white/95 text-slate-900 rounded-[2rem] px-6 py-4 border-3 border-sky-300 shadow-lg text-left cursor-pointer"
             >
               {/* Speech Bubble Tail */}
@@ -354,7 +364,7 @@ export const PlayfulMonstersBar: React.FC<PlayfulMonstersBarProps> = ({
                       setVoiceEnabled(true);
                       const clean = displayMessage.replace(/[\u{1F300}-\u{1FAFF}]/gu, '');
                       setIsSpeaking(true);
-                      speakText(clean, () => setIsSpeaking(false));
+                      speakText(clean, () => setIsSpeaking(false), selectedMonster.voiceId);
                     }
                   }}
                   aria-label={voiceEnabled ? 'Mute monster voice' : 'Unmute monster voice'}

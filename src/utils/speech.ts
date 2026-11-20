@@ -1,206 +1,94 @@
 // Browser Web Speech API helper with child-friendly UK English RP voice profiles
 
-export type VoicePresetId =
-  | 'teacher'
-  | 'pixie'
-  | 'gentle'
-  | 'daisy'
-  | 'oliver'
-  | 'barnaby'
-  | 'leo'
-  | 'maya'
-  | 'toby'
-  | 'lily';
+export type VoicePresetId = 'leo' | 'maya' | 'toby' | 'lily';
 
 export interface VoicePreset {
   id: VoicePresetId;
   label: string;
-  subtitle: string;
+  monsterId: 'bloop' | 'pip' | 'bramble' | 'zuzu';
   sampleLine: string;
   pitch: number;
   rate: number;
   preferredGender: 'female' | 'male';
   preferredNames: string[];
-  isKidVoice?: boolean;
 }
 
 export const VOICE_PRESETS: VoicePreset[] = [
   {
-    id: 'teacher',
-    label: 'Miss Clara',
-    subtitle: 'Warm UK Storyteller',
-    sampleLine: 'Hello explorer! I am Miss Clara, and I would love to read today’s story with you.',
-    pitch: 1.07,
-    rate: 0.89,
-    preferredGender: 'female',
-    preferredNames: [
-      'Libby',
-      'Sonia',
-      'Google UK English Female',
-      'Martha',
-      'Serena',
-      'Kate',
-      'Stephanie',
-      'Samantha',
-    ],
-  },
-  {
-    id: 'pixie',
-    label: 'Pip',
-    subtitle: 'Cheerful Story Fairy',
-    sampleLine: 'Hi there! I am Pip the fairy, ready to sprinkle stars on your learning adventure!',
-    pitch: 1.15,
-    rate: 0.94,
-    preferredGender: 'female',
-    preferredNames: [
-      'Maisie',
-      'Libby',
-      'Google UK English Female',
-      'Martha',
-      'Serena',
-      'Kate',
-      'Samantha',
-    ],
-  },
-  {
-    id: 'gentle',
-    label: 'Willow',
-    subtitle: 'Gentle Bedtime Calm',
-    sampleLine: 'Take a calm breath, little explorer. Let us read this page slowly and gently together.',
-    pitch: 1.04,
-    rate: 0.83,
-    preferredGender: 'female',
-    preferredNames: [
-      'Serena',
-      'Kate',
-      'Sonia',
-      'Hazel',
-      'Libby',
-      'Google UK English Female',
-      'Stephanie',
-    ],
-  },
-  {
-    id: 'daisy',
-    label: 'Daisy',
-    subtitle: 'Sweet Younger Friend',
-    sampleLine: 'Yay! I am Daisy! Let us discover something fun and magical today!',
-    pitch: 1.18,
-    rate: 0.92,
-    preferredGender: 'female',
-    preferredNames: [
-      'Maisie',
-      'Libby',
-      'Google UK English Female',
-      'Samantha',
-      'Ava',
-      'Zoe',
-    ],
-  },
-  {
-    id: 'oliver',
-    label: 'Oliver',
-    subtitle: 'Kind Adventure Guide',
-    sampleLine: 'Hello adventurer! I am Oliver. Ready to unlock a brand new star badge together?',
-    pitch: 1.01,
-    rate: 0.91,
-    preferredGender: 'male',
-    preferredNames: [
-      'Oliver',
-      'Arthur',
-      'Ryan',
-      'Google UK English Male',
-      'Daniel',
-      'Jamie',
-    ],
-  },
-  {
-    id: 'barnaby',
-    label: 'Grandad Barnaby',
-    subtitle: 'Cosy Classic Narrator',
-    sampleLine: 'Gather round, young explorer! I am Grandad Barnaby, and I have a wonderful tale for you.',
-    pitch: 0.94,
-    rate: 0.87,
-    preferredGender: 'male',
-    preferredNames: [
-      'George',
-      'Arthur',
-      'Daniel',
-      'Google UK English Male',
-      'Oliver',
-    ],
-  },
-  {
     id: 'leo',
     label: 'Leo',
-    subtitle: 'Energetic Kid Explorer',
-    sampleLine: "Hey everyone! I'm Leo! Let's zoom through today's quiz and win heaps of shiny stars!",
-    pitch: 1.48,
-    rate: 1.12,
+    monsterId: 'bloop',
+    sampleLine: "Hey explorer! I'm Leo. Take a steady breath and let's solve today's challenge together.",
+    pitch: 0.88,
+    rate: 0.86,
     preferredGender: 'male',
     preferredNames: [
-      'Oliver',
-      'Arthur',
-      'Ryan',
-      'Google UK English Male',
       'Daniel',
+      'Arthur',
+      'Oliver',
+      'Ryan',
+      'George',
+      'Google UK English Male',
       'Jamie',
     ],
-    isKidVoice: true,
   },
   {
     id: 'maya',
     label: 'Maya',
-    subtitle: 'Bubbly Kid Scientist',
-    sampleLine: "Woohoo! I'm Maya! Grab your magnifying glass and let's discover something super cool!",
-    pitch: 1.56,
-    rate: 1.14,
+    monsterId: 'pip',
+    sampleLine: "Hello friend! I'm Maya. Let's read today's story slowly and discover something wonderful together.",
+    pitch: 1.52,
+    rate: 0.86,
     preferredGender: 'female',
     preferredNames: [
-      'Maisie',
       'Libby',
+      'Maisie',
+      'Hazel',
+      'Sonia',
       'Google UK English Female',
       'Martha',
       'Serena',
-      'Samantha',
+      'Kate',
     ],
-    isKidVoice: true,
   },
   {
     id: 'toby',
     label: 'Toby',
-    subtitle: 'Bouncy Puzzle Buddy',
-    sampleLine: "Hiya pal! I'm Toby! Ready to crack tricky puzzles and beat our best score together?",
-    pitch: 1.4,
-    rate: 1.08,
+    monsterId: 'bramble',
+    sampleLine: "Hiya pal, I'm Toby! Och, let's crack some braw puzzles and win plenty of shiny stars today!",
+    pitch: 1.18,
+    rate: 0.97,
     preferredGender: 'male',
     preferredNames: [
+      'Fiona',
+      'Malcolm',
+      'Stuart',
       'Jamie',
-      'Ryan',
-      'Oliver',
+      'Scottish',
       'Arthur',
+      'Oliver',
+      'Ryan',
       'Google UK English Male',
       'Daniel',
     ],
-    isKidVoice: true,
   },
   {
     id: 'lily',
     label: 'Lily',
-    subtitle: 'Sparkly Story Kid',
-    sampleLine: "Yippee! I'm Lily! Pick a fun adventure with me and let's jump straight into today's story!",
-    pitch: 1.68,
-    rate: 1.16,
+    monsterId: 'zuzu',
+    sampleLine: "Goodness me, hello darling explorer! I'm Lily. Shall we have a rather splendid adventure today?",
+    pitch: 1.38,
+    rate: 0.93,
     preferredGender: 'female',
     preferredNames: [
-      'Maisie',
-      'Libby',
+      'Kate',
+      'Serena',
+      'Stephanie',
+      'Martha',
+      'Sonia',
       'Google UK English Female',
-      'Samantha',
-      'Ava',
-      'Zoe',
+      'Libby',
     ],
-    isKidVoice: true,
   },
 ];
 
@@ -245,7 +133,7 @@ export function isSpeechSupported(): boolean {
 }
 
 export function getSelectedVoicePreset(): VoicePresetId {
-  if (typeof window === 'undefined') return 'teacher';
+  if (typeof window === 'undefined') return 'leo';
   try {
     const saved = localStorage.getItem(VOICE_STORAGE_KEY) as VoicePresetId | null;
     if (saved && VOICE_PRESETS.some((p) => p.id === saved)) {
@@ -254,7 +142,7 @@ export function getSelectedVoicePreset(): VoicePresetId {
   } catch {
     // Ignore storage access errors
   }
-  return 'teacher';
+  return 'leo';
 }
 
 export function setSelectedVoicePreset(id: VoicePresetId): void {
@@ -289,19 +177,35 @@ function isFriendlyVoice(v: SpeechSynthesisVoice): boolean {
   return !ROBOTIC_VOICE_BLOCKLIST.some((bad) => lower.includes(bad));
 }
 
+function isBritishOrScottishVoice(v: SpeechSynthesisVoice): boolean {
+  const lang = v.lang.toLowerCase();
+  const name = v.name.toLowerCase();
+  return (
+    lang.startsWith('en-gb') ||
+    lang.startsWith('en-sc') ||
+    name.includes('uk') ||
+    name.includes('british') ||
+    name.includes('scottish') ||
+    name.includes('fiona') ||
+    name.includes('malcolm') ||
+    name.includes('stuart')
+  );
+}
+
 function voiceQualityScore(v: SpeechSynthesisVoice): number {
   const name = v.name.toLowerCase();
   const lang = v.lang.toLowerCase();
   let score = 0;
-  if (lang.startsWith('en-gb')) score += 40;
-  else if (lang.startsWith('en-au') || lang.startsWith('en-ie')) score += 20;
-  else if (lang.startsWith('en')) score += 10;
+  if (lang.startsWith('en-gb') || lang.startsWith('en-sc')) score += 60;
+  else if (isBritishOrScottishVoice(v)) score += 50;
+  else if (lang.startsWith('en-ie')) score += 20;
+  else if (lang.startsWith('en')) score += 5;
 
   if (name.includes('natural') || name.includes('online')) score += 35;
   if (name.includes('enhanced') || name.includes('premium') || name.includes('siri')) score += 25;
   if (name.includes('google')) score += 20;
   if (name.includes('libby') || name.includes('maisie') || name.includes('sonia')) score += 22;
-  if (name.includes('martha') || name.includes('serena') || name.includes('kate')) score += 18;
+  if (name.includes('kate') || name.includes('serena') || name.includes('martha')) score += 20;
   return score;
 }
 
@@ -310,10 +214,18 @@ export function getLovelySystemVoices(): SpeechSynthesisVoice[] {
   const voices = window.speechSynthesis.getVoices();
   if (!voices.length) return [];
 
+  const friendlyBritish = voices.filter(
+    (v) => isBritishOrScottishVoice(v) && isFriendlyVoice(v)
+  );
   const englishFriendly = voices.filter(
     (v) => v.lang.toLowerCase().startsWith('en') && isFriendlyVoice(v)
   );
-  const pool = englishFriendly.length > 0 ? englishFriendly : voices.filter(isFriendlyVoice);
+  const pool =
+    friendlyBritish.length > 0
+      ? friendlyBritish
+      : englishFriendly.length > 0
+      ? englishFriendly
+      : voices.filter(isFriendlyVoice);
 
   return [...pool].sort((a, b) => voiceQualityScore(b) - voiceQualityScore(a));
 }
@@ -326,6 +238,43 @@ export function subscribeVoicesLoaded(callback: () => void): () => void {
   return () => {
     synth.removeEventListener?.('voiceschanged', handler);
   };
+}
+
+function pickVoiceFromPool(
+  preferredNames: string[],
+  britishPool: SpeechSynthesisVoice[],
+  usedURIs: Set<string>,
+  genderHint: 'female' | 'male'
+): SpeechSynthesisVoice | null {
+  // 1. Prefer an unused British voice matching character name priority
+  for (const name of preferredNames) {
+    const unusedMatch = britishPool.find(
+      (v) => !usedURIs.has(v.voiceURI) && v.name.toLowerCase().includes(name.toLowerCase())
+    );
+    if (unusedMatch) return unusedMatch;
+  }
+
+  // 2. Otherwise pick any unused British voice matching gender hint
+  const femaleHints = ['female', 'libby', 'maisie', 'sonia', 'kate', 'serena', 'martha', 'stephanie', 'hazel', 'fiona', 'woman'];
+  const maleHints = ['male', 'daniel', 'arthur', 'oliver', 'ryan', 'george', 'jamie', 'malcolm', 'stuart', 'man'];
+  const hints = genderHint === 'female' ? femaleHints : maleHints;
+
+  const unusedGenderMatch = britishPool.find(
+    (v) =>
+      !usedURIs.has(v.voiceURI) &&
+      hints.some((h) => v.name.toLowerCase().includes(h))
+  );
+  if (unusedGenderMatch) return unusedGenderMatch;
+
+  // 3. Otherwise allow reuse of a matching British preferred voice (e.g. Chrome desktop has only 2 UK voices)
+  for (const name of preferredNames) {
+    const match = britishPool.find((v) =>
+      v.name.toLowerCase().includes(name.toLowerCase())
+    );
+    if (match) return match;
+  }
+
+  return britishPool.find((v) => !usedURIs.has(v.voiceURI)) || britishPool[0] || null;
 }
 
 function findBestBritishVoice(preset: VoicePreset): SpeechSynthesisVoice | null {
@@ -341,25 +290,19 @@ function findBestBritishVoice(preset: VoicePreset): SpeechSynthesisVoice | null 
   }
 
   const friendlyVoices = getLovelySystemVoices();
-  const pool = friendlyVoices.length > 0 ? friendlyVoices : allVoices;
+  const britishPool = friendlyVoices.filter(isBritishOrScottishVoice);
+  const effectivePool = britishPool.length > 0 ? britishPool : friendlyVoices.length > 0 ? friendlyVoices : allVoices;
 
-  const britishVoices = pool.filter(
-    (v) =>
-      v.lang.toLowerCase().startsWith('en-gb') ||
-      v.name.toLowerCase().includes('uk') ||
-      v.name.toLowerCase().includes('british')
-  );
-
-  const preferredPool = britishVoices.length > 0 ? britishVoices : pool;
-
-  for (const preferredName of preset.preferredNames) {
-    const match = preferredPool.find((v) =>
-      v.name.toLowerCase().includes(preferredName.toLowerCase())
-    );
-    if (match) return match;
+  // Assign distinct British voices across all 4 presets when multiple UK voices exist
+  const usedURIs = new Set<string>();
+  const resolved: Partial<Record<VoicePresetId, SpeechSynthesisVoice | null>> = {};
+  for (const p of VOICE_PRESETS) {
+    const picked = pickVoiceFromPool(p.preferredNames, effectivePool, usedURIs, p.preferredGender);
+    resolved[p.id] = picked;
+    if (picked) usedURIs.add(picked.voiceURI);
   }
 
-  return preferredPool[0] || pool[0] || null;
+  return resolved[preset.id] || effectivePool[0] || null;
 }
 
 function cleanTextForChildSpeech(raw: string): string {
@@ -403,6 +346,9 @@ export function speakText(
     if (chosenVoice) {
       utterance.voice = chosenVoice;
       utterance.lang = chosenVoice.lang || 'en-GB';
+      if (preset.id === 'toby' && chosenVoice.name.toLowerCase().includes('fiona')) {
+        utterance.pitch = 0.96;
+      }
     }
 
     if (onEnd) {

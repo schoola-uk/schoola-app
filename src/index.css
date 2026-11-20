@@ -11,7 +11,7 @@
 
 html,
 body {
-  overflow-x: hidden;
+  overflow-x: clip;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
 }
@@ -207,6 +207,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 .theme-dark main [data-light-card="true"] .bg-white,
 .theme-dark main [data-light-card="true"] .bg-slate-50,
 .theme-dark main [data-light-card="true"] .bg-slate-100,
+.theme-dark main [data-light-card="true"] input,
 .theme-dark main .bg-amber-50 .bg-white,
 .theme-dark main .bg-emerald-50 .bg-white,
 .theme-dark main .bg-sky-50 .bg-white,
@@ -215,6 +216,11 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   background-color: #FFFFFF !important;
   color: #0F172A !important;
   border-color: #CBD5E1 !important;
+}
+
+.theme-dark main [data-light-card="true"] input.bg-transparent {
+  background-color: transparent !important;
+  color: #0F172A !important;
 }
 
 .theme-dark main [data-light-card="true"] .bg-\[\#F8FAFC\],

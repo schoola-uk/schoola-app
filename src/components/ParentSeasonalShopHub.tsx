@@ -366,7 +366,7 @@ export const ParentSeasonalShopHub: React.FC = () => {
                   rel="nofollow sponsored noopener noreferrer"
                   className="inline-flex items-center justify-between px-3 py-1.5 rounded-lg bg-[#FFF8E7] hover:bg-[#FFD814] border border-[#FF9900]/60 text-[11px] font-extrabold text-[#0F1111] transition-colors"
                 >
-                  <span>Check Amazon Deals</span>
+                  <span>Shop Deals</span>
                   <ExternalLink className="w-3 h-3 shrink-0" />
                 </a>
               </div>
@@ -572,7 +572,7 @@ export const ParentSeasonalShopHub: React.FC = () => {
                     className="min-h-[40px] w-full px-4 py-2 rounded-full bg-[#FFD814] hover:bg-[#F7CA00] border border-[#FCD200] text-[#0F1111] text-xs font-extrabold flex items-center justify-center gap-2 transition-colors"
                   >
                     <span>
-                      {allDiscountsOnly ? 'Shop All Discounts' : 'Check Price on Amazon'}
+                      {allDiscountsOnly ? 'Shop All Discounts' : 'Shop'}
                     </span>
                     <ExternalLink className="w-3.5 h-3.5 shrink-0" />
                   </a>

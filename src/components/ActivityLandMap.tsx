@@ -433,9 +433,13 @@ export const ActivityLandMap: React.FC<ActivityLandMapProps> = ({
   const handleTapAdoptedPrize = (prize: PrizeItem) => {
     playPrizeNotes(prize.synthNotes, prize.waveType);
     setPlayingPrizeId(prize.id);
-    speakText(prize.accomplishmentText, () => {
-      setPlayingPrizeId((curr) => (curr === prize.id ? null : curr));
-    });
+    speakText(
+      prize.accomplishmentText,
+      () => {
+        setPlayingPrizeId((curr) => (curr === prize.id ? null : curr));
+      },
+      prize.voiceId
+    );
   };
 
   const handleAdopt = (prize: PrizeItem) => {

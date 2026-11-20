@@ -12,6 +12,7 @@ import {
   VOICE_PRESETS,
   VoicePresetId,
 } from '../utils/speech';
+import { MonsterSvg } from './PlayfulMonsters';
 
 interface VoicePickerModalProps {
   isOpen: boolean;
@@ -73,13 +74,58 @@ export const VoicePickerModal: React.FC<VoicePickerModalProps> = ({ isOpen, onCl
       <div
         data-light-card="true"
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-xl bg-white text-slate-900 rounded-3xl border border-slate-200 shadow-2xl p-6 sm:p-7 space-y-5 max-h-[90vh] overflow-y-auto"
+        className="relative w-full max-w-xl rounded-3xl border-2 border-sky-200 bg-gradient-to-b from-[#BAE6FD] via-[#E0F2FE] to-[#F8FAFC] text-slate-900 shadow-2xl p-6 sm:p-7 space-y-5 max-h-[90vh] overflow-y-auto overflow-x-hidden"
       >
-        <div className="flex items-start justify-between gap-3 border-b border-slate-200 pb-4">
+        {/* Dreamy Fluffy Cloud Background */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 overflow-hidden select-none"
+        >
+          <svg
+            viewBox="0 0 600 420"
+            className="w-full h-full object-cover opacity-90"
+            preserveAspectRatio="xMidYMid slice"
+          >
+            {/* Upper Left Fluffy Cloud */}
+            <g fill="#FFFFFF" opacity="0.85">
+              <circle cx="85" cy="70" r="38" />
+              <circle cx="122" cy="58" r="46" />
+              <circle cx="165" cy="72" r="34" />
+              <rect x="75" y="72" width="102" height="36" rx="18" />
+            </g>
+            {/* Upper Right Soft Cloud */}
+            <g fill="#FFFFFF" opacity="0.78">
+              <circle cx="435" cy="84" r="34" />
+              <circle cx="475" cy="68" r="44" />
+              <circle cx="518" cy="82" r="32" />
+              <rect x="425" y="80" width="108" height="34" rx="17" />
+            </g>
+            {/* Middle Rolling Cloud */}
+            <g fill="#FFFFFF" opacity="0.68">
+              <circle cx="245" cy="215" r="42" />
+              <circle cx="295" cy="198" r="54" />
+              <circle cx="348" cy="215" r="40" />
+              <rect x="230" y="212" width="135" height="44" rx="22" />
+            </g>
+            {/* Bottom Horizon Cloud Bank */}
+            <g fill="#FFFFFF" opacity="0.92">
+              <circle cx="60" cy="378" r="58" />
+              <circle cx="145" cy="364" r="68" />
+              <circle cx="245" cy="376" r="62" />
+              <circle cx="350" cy="362" r="72" />
+              <circle cx="455" cy="374" r="64" />
+              <circle cx="545" cy="368" r="56" />
+              <rect x="0" y="370" width="600" height="60" />
+            </g>
+          </svg>
+        </div>
+
+        {/* Header */}
+        <div className="relative z-10 flex items-start justify-between gap-3 border-b border-sky-200/80 pb-4">
           <div>
-            <p className="text-xs font-extrabold uppercase tracking-wider text-sky-700 flex items-center gap-1.5">
+            <p className="text-xs font-extrabold uppercase tracking-wider text-sky-800 flex items-center gap-1.5">
               <Volume2 className="w-4 h-4" />
-              Child-Friendly Storyteller Voices
+              UK Storyteller Monsters
             </p>
             <h2
               id="voice-picker-title"
@@ -87,9 +133,6 @@ export const VoicePickerModal: React.FC<VoicePickerModalProps> = ({ isOpen, onCl
             >
               Choose a Lovely Voice
             </h2>
-            <p className="text-xs text-slate-600 mt-0.5">
-              Tap any character below to preview their storyteller or playful kid voice for stories, phonics, and quizzes.
-            </p>
           </div>
           <button
             type="button"
@@ -98,13 +141,14 @@ export const VoicePickerModal: React.FC<VoicePickerModalProps> = ({ isOpen, onCl
               onClose();
             }}
             aria-label="Close voice picker"
-            className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center cursor-pointer shrink-0"
+            className="w-9 h-9 rounded-xl bg-white/85 hover:bg-white border border-sky-200 text-slate-700 flex items-center justify-center cursor-pointer shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {/* 4 Monster Face Voice Cards (No text descriptions) */}
+        <div className="relative z-10 grid grid-cols-2 gap-3.5">
           {VOICE_PRESETS.map((voice) => {
             const active = selectedPreset === voice.id;
             return (
@@ -112,35 +156,25 @@ export const VoicePickerModal: React.FC<VoicePickerModalProps> = ({ isOpen, onCl
                 key={voice.id}
                 type="button"
                 onClick={() => handleSelectPreset(voice.id)}
-                className={`text-left p-3.5 rounded-2xl border transition-all cursor-pointer flex items-start justify-between gap-2.5 ${
+                className={`relative rounded-3xl border-2 p-4 sm:p-5 transition-all cursor-pointer flex flex-col items-center justify-center gap-2.5 backdrop-blur-xs ${
                   active
-                    ? 'bg-sky-50 border-sky-500 ring-2 ring-sky-200'
-                    : voice.isKidVoice
-                    ? 'bg-amber-50/50 border-amber-200 hover:bg-amber-50 hover:border-amber-300'
-                    : 'bg-slate-50 border-slate-200 hover:bg-amber-50/70 hover:border-amber-300'
+                    ? 'bg-white border-sky-500 ring-4 ring-sky-300/60 shadow-lg -translate-y-0.5'
+                    : 'bg-white/85 border-white hover:bg-white hover:border-sky-300 shadow-sm'
                 }`}
               >
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <p className="font-heading font-extrabold text-sm text-slate-900">
-                      {voice.label}
-                    </p>
-                    {voice.isKidVoice && (
-                      <span className="px-1.5 py-0.5 rounded-md bg-amber-200/80 text-amber-950 text-[10px] font-extrabold tracking-tight">
-                        Kid Voice
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-[11px] font-bold text-sky-800">{voice.subtitle}</p>
-                  <p className="text-[11px] text-slate-600 mt-1 line-clamp-2">
-                    &ldquo;{voice.sampleLine}&rdquo;
-                  </p>
-                </div>
                 {active && (
-                  <span className="w-5 h-5 rounded-full bg-sky-600 text-white flex items-center justify-center shrink-0 mt-0.5">
-                    <Check className="w-3 h-3" />
+                  <span className="absolute top-3 right-3 w-6 h-6 rounded-full bg-sky-600 text-white flex items-center justify-center shadow-xs">
+                    <Check className="w-3.5 h-3.5" />
                   </span>
                 )}
+                <MonsterSvg
+                  id={voice.monsterId}
+                  jumping={active}
+                  className="w-20 h-20 sm:w-24 sm:h-24 drop-shadow-sm"
+                />
+                <p className="font-heading font-extrabold text-base sm:text-lg text-slate-900">
+                  {voice.label}
+                </p>
               </button>
             );
           })}
@@ -148,7 +182,7 @@ export const VoicePickerModal: React.FC<VoicePickerModalProps> = ({ isOpen, onCl
 
         {/* Optional Live Device / OS Voice Selector */}
         {deviceVoices.length > 0 && (
-          <div className="pt-3 border-t border-slate-200 space-y-2">
+          <div className="relative z-10 pt-3 border-t border-sky-200/80 space-y-2">
             <label
               htmlFor="device-voice-select"
               className="block text-xs font-extrabold text-slate-800"
@@ -159,7 +193,7 @@ export const VoicePickerModal: React.FC<VoicePickerModalProps> = ({ isOpen, onCl
               id="device-voice-select"
               value={systemVoiceURI}
               onChange={(e) => handleSelectDeviceVoice(e.target.value)}
-              className="w-full min-h-[42px] px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-semibold text-slate-900"
+              className="w-full min-h-[42px] px-3 py-2 rounded-xl border border-sky-200 bg-white text-xs font-semibold text-slate-900"
             >
               <option value="auto">Auto-pick best natural UK voice (Recommended)</option>
               {deviceVoices.map((dv) => (
@@ -171,11 +205,11 @@ export const VoicePickerModal: React.FC<VoicePickerModalProps> = ({ isOpen, onCl
           </div>
         )}
 
-        <div className="pt-2 flex flex-wrap items-center justify-between gap-3">
+        <div className="relative z-10 pt-2 flex flex-wrap items-center justify-between gap-3">
           <button
             type="button"
             onClick={stopSpeaking}
-            className="min-h-[38px] px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer"
+            className="min-h-[38px] px-3.5 py-1.5 rounded-xl bg-white/90 hover:bg-white border border-sky-200 text-slate-700 text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer"
           >
             <VolumeX className="w-3.5 h-3.5" />
             Stop Voice

@@ -114,11 +114,23 @@ const ROAD_STAR_MILESTONES: RoadStarMilestone[] = [
   },
 ];
 
-const BUSH_MONSTERS = [
+const BUSH_MONSTERS: Array<{
+  id: string;
+  name: string;
+  trait: string;
+  voiceId: VoicePresetId;
+  color: string;
+  belly: string;
+  spot: string;
+  bushX: string;
+  minStars: number;
+  greeting: string;
+}> = [
   {
     id: 'fern',
     name: 'Fern',
     trait: 'Leafy Bush Explorer',
+    voiceId: 'maya',
     color: '#34D399',
     belly: '#A7F3D0',
     spot: '#059669',
@@ -130,6 +142,7 @@ const BUSH_MONSTERS = [
     id: 'pebble',
     name: 'Pebble',
     trait: 'Berry Bush Thinker',
+    voiceId: 'leo',
     color: '#38BDF8',
     belly: '#BAE6FD',
     spot: '#0284C7',
@@ -141,6 +154,7 @@ const BUSH_MONSTERS = [
     id: 'sunny',
     name: 'Sunny',
     trait: 'Blossom Bush Hopper',
+    voiceId: 'toby',
     color: '#FB923C',
     belly: '#FED7AA',
     spot: '#EA580C',
@@ -152,6 +166,7 @@ const BUSH_MONSTERS = [
     id: 'pippin',
     name: 'Pippin',
     trait: 'Starry Hedge Dreamer',
+    voiceId: 'lily',
     color: '#C084FC',
     belly: '#E9D5FF',
     spot: '#7E22CE',
@@ -193,7 +208,7 @@ export const ExplorerRoadmapSection: React.FC<ExplorerRoadmapSectionProps> = ({
     setPeekedMonsterId(monster.id);
     setWigglingId(monster.id);
     window.setTimeout(() => setWigglingId(null), 550);
-    speakText(monster.greeting);
+    speakText(monster.greeting, undefined, monster.voiceId);
   };
 
   const handleStarClick = (milestone: RoadStarMilestone) => {
@@ -738,7 +753,6 @@ export const CosmicDailyChallengeCard: React.FC<CosmicDailyChallengeCardProps> =
                       ? 'bg-amber-400 text-slate-950 shadow-sm'
                       : 'bg-white/10 hover:bg-white/20 text-white'
                   }`}
-                  title={v.subtitle}
                 >
                   {v.label}
                 </button>
