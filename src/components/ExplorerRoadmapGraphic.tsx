@@ -674,7 +674,7 @@ export const CosmicDailyChallengeCard: React.FC<CosmicDailyChallengeCardProps> =
     setSelectedVoicePreset(id);
     const chosen = VOICE_PRESETS.find((v) => v.id === id);
     speakText(
-      `Hello! I am ${chosen?.label}. Ready for ${activeChallenge.title}?`,
+      chosen?.sampleLine || `Hello explorer! Ready for ${activeChallenge.title}?`,
       undefined,
       id
     );

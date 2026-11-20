@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Check, ChevronDown, ChevronUp, Lock, Moon, Palette, ShieldCheck, Sparkles, Star, Sun, X } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, Lock, Moon, Palette, ShieldCheck, Sparkles, Star, Sun, Volume2, X } from 'lucide-react';
 import {
   CustomRevisionEvent,
   LearnerProgress,
@@ -16,6 +16,7 @@ import { ActivityLandMap } from './components/ActivityLandMap';
 import { LearningHub } from './components/LearningHub';
 import { ParentTeacherHub } from './components/ParentTeacherHub';
 import { PrintableCertificateModal } from './components/PrintableCertificateModal';
+import { VoicePickerModal } from './components/VoicePickerControl';
 import { RedOrangeDoorIcon } from './components/WorldIllustrations';
 import { stopSpeaking } from './utils/speech';
 import { playCheerfulTing } from './utils/soundEffects';
@@ -111,6 +112,7 @@ export default function App() {
   });
 
   const [isThemeOpen, setIsThemeOpen] = useState(false);
+  const [isVoiceOpen, setIsVoiceOpen] = useState(false);
   const [directoryOpen, setDirectoryOpen] = useState(false);
   const [directoryKS, setDirectoryKS] = useState<'ks1' | 'ks2'>('ks1');
   const [certTitle, setCertTitle] = useState<string | null>(null);
@@ -308,9 +310,7 @@ export default function App() {
   }, [activeTopic, progress.selectedYear]);
 
   const rootThemeClass = `theme-${theme}`;
-
-  const isMapFocus =
-    role === 'child' && !activeTopic && !activeWorldSubjectId && childViewMode === 'map';
+  const isMapFocus = role === 'child' && !activeTopic && childViewMode === 'map';
 
   const childFaceIcon = (
     <svg viewBox="0 0 28 28" className="w-6 h-6 shrink-0" fill="none" aria-hidden="true">
@@ -326,10 +326,9 @@ export default function App() {
 
   return (
     <div className={`min-h-screen w-full overflow-x-hidden flex flex-col transition-colors duration-300 ${rootThemeClass}`}>
-      {/* Exact LBS Royal Navy Blue Top Navigation Bar (#001E62) */}
-      {!isMapFocus && (
-      <header className="sticky top-0 z-40 bg-[#001E62] text-white border-b border-[#25458E] shadow-md no-print">
-        <div className="w-full px-5 sm:px-10 lg:px-16 h-16 flex items-center justify-between gap-4">
+      {/* Always-Visible LBS Royal Navy Blue Sticky Top Navigation Header (#001E62) */}
+      <header className="sticky top-0 z-40 bg-[#001E62]/95 backdrop-blur-md text-white border-b border-[#25458E] shadow-md no-print">
+        <div className="w-full px-3.5 sm:px-10 lg:px-16 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4">
           {/* Zone 1: Schoola Wordmark with LBS Crimson Accent Line + UK Companion Strapline */}
           <div className="flex items-center gap-5 min-w-0 shrink-0">
             <button
@@ -470,8 +469,18 @@ export default function App() {
             </button>
           </nav>
 
-          {/* Zone 3: Theme Switcher Icon Button & Parent Portal */}
+          {/* Zone 3: Voice Chooser, Theme Switcher & Parent Portal */}
           <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => setIsVoiceOpen(true)}
+              className="w-10 h-10 rounded-xl bg-white/12 hover:bg-white/22 border border-white/25 text-white flex items-center justify-center shrink-0 cursor-pointer transition-colors"
+              aria-label="Choose child-friendly storyteller voice"
+              title="Choose lovely storyteller voice"
+            >
+              <Volume2 className="w-5 h-5 text-sky-200" />
+            </button>
+
             <button
               type="button"
               onClick={() => setIsThemeOpen(true)}
@@ -503,10 +512,10 @@ export default function App() {
           </div>
         </div>
 
-        {/* Compact Mobile Navigation Strip */}
+        {/* Compact Easy-to-See Mobile Navigation Strip (fits cleanly on 360px+ phones) */}
         <nav
           aria-label="Mobile navigation"
-          className="flex md:hidden items-center gap-2 px-5 pb-2.5 overflow-x-auto"
+          className="grid grid-cols-5 md:hidden items-center gap-1.5 px-3 pb-2.5"
         >
           <button
             type="button"
@@ -517,8 +526,10 @@ export default function App() {
               setRole('welcome');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            className={`px-3 py-1 rounded-full text-xs font-playful font-bold whitespace-nowrap shrink-0 cursor-pointer ${
-              role === 'welcome' ? 'bg-white/20 text-white' : 'text-sky-100'
+            className={`min-h-[34px] px-2 py-1 rounded-xl text-[11px] font-playful font-bold text-center cursor-pointer transition-colors ${
+              role === 'welcome'
+                ? 'bg-white text-[#001E62]'
+                : 'bg-white/10 text-sky-100 hover:bg-white/20'
             }`}
           >
             Home
@@ -536,7 +547,7 @@ export default function App() {
                 document.getElementById('full-curriculum-directory')?.scrollIntoView({ behavior: 'smooth' });
               }, 60);
             }}
-            className="px-3 py-1 rounded-full text-xs font-playful font-bold bg-[#FFE4E0] text-[#9A2E1B] whitespace-nowrap shrink-0 cursor-pointer"
+            className="min-h-[34px] px-2 py-1 rounded-xl text-[11px] font-playful font-bold bg-[#FFE4E0] text-[#9A2E1B] text-center cursor-pointer"
           >
             KS1
           </button>
@@ -553,7 +564,7 @@ export default function App() {
                 document.getElementById('full-curriculum-directory')?.scrollIntoView({ behavior: 'smooth' });
               }, 60);
             }}
-            className="px-3 py-1 rounded-full text-xs font-playful font-bold bg-[#DBEAFE] text-[#1E3A8A] whitespace-nowrap shrink-0 cursor-pointer"
+            className="min-h-[34px] px-2 py-1 rounded-xl text-[11px] font-playful font-bold bg-[#DBEAFE] text-[#1E3A8A] text-center cursor-pointer"
           >
             KS2
           </button>
@@ -566,9 +577,13 @@ export default function App() {
               setChildViewMode('map');
               setRole('child');
             }}
-            className="px-3 py-1 rounded-full text-xs font-playful font-bold text-emerald-200 bg-emerald-500/25 whitespace-nowrap shrink-0 cursor-pointer"
+            className={`min-h-[34px] px-1.5 py-1 rounded-xl text-[11px] font-playful font-bold text-center cursor-pointer ${
+              role === 'child' && childViewMode === 'map'
+                ? 'bg-emerald-400 text-slate-950'
+                : 'text-emerald-200 bg-emerald-500/25'
+            }`}
           >
-            Activity Land
+            Map
           </button>
           <button
             type="button"
@@ -581,13 +596,16 @@ export default function App() {
             }}
             aria-label="Child Profile"
             title="Child Profile"
-            className="w-8 h-8 rounded-full bg-white/15 border border-white/25 flex items-center justify-center shrink-0 cursor-pointer"
+            className={`min-h-[34px] px-2 py-1 rounded-xl border flex items-center justify-center gap-1 cursor-pointer ${
+              role === 'child' && childViewMode === 'dashboard'
+                ? 'bg-amber-400/35 border-amber-300 text-white'
+                : 'bg-white/10 border-white/25 text-white'
+            }`}
           >
             {childFaceIcon}
           </button>
         </nav>
       </header>
-      )}
 
       {/* Main Stage */}
       <main className="flex-1">
@@ -1019,6 +1037,9 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Child-Friendly Storyteller Voice Chooser Modal */}
+      <VoicePickerModal isOpen={isVoiceOpen} onClose={() => setIsVoiceOpen(false)} />
 
       {/* Printable Achievement Certificate Modal */}
       <PrintableCertificateModal

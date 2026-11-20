@@ -37,6 +37,7 @@ type WalletNotepadMode = 'overview' | 'curriculum' | 'calendar' | 'shopping';
 interface ShoppingChecklistItem {
   id: string;
   label: string;
+  bagName?: string;
   checked: boolean;
 }
 
@@ -49,12 +50,13 @@ interface ParentLeatherWalletNotebookProps {
   onToggleChecklist: (key: string) => void;
 }
 
-const DEFAULT_SHOPPING_LIST: ShoppingChecklistItem[] = [
-  { id: 'shop-1', label: 'Leakproof bento lunchbox & flip bottle', checked: false },
-  { id: 'shop-2', label: 'Class signing card + under-£5 teacher gift', checked: false },
-  { id: 'shop-3', label: 'Under-£15 girls birthday party gift stash', checked: false },
-  { id: 'shop-4', label: 'Winter wellies / puddle suit check', checked: false },
-];
+const SHOPPING_BAG_OPTIONS = [
+  'School Prep Bag',
+  'Winter Kit Bag',
+  'Teacher Gift Bag',
+  'Party Bag',
+  'Christmas Bag',
+] as const;
 
 export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookProps> = ({
   progress,
@@ -76,9 +78,21 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
   const [calSubscribed, setCalSubscribed] = useState(false);
   const [calFeedCopied, setCalFeedCopied] = useState(false);
 
-  // Shopping list & witty mum articles state inside notepad
+  // Shopping list (starts as clean empty blank lined page) & witty mum articles state inside notepad
   const [activeArticleId, setActiveArticleId] = useState<string>(MUM_HUMOUR_ARTICLES[0].id);
-  const [shoppingList, setShoppingList] = useState<ShoppingChecklistItem[]>(DEFAULT_SHOPPING_LIST);
+  const [selectedBag, setSelectedBag] = useState<string>(SHOPPING_BAG_OPTIONS[0]);
+  const [shoppingList, setShoppingList] = useState<ShoppingChecklistItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('schoola_family_shopping_bag_v2');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch {
+      // Ignore storage access errors
+    }
+    return [];
+  });
   const [newShopItem, setNewShopItem] = useState('');
 
   const activeArticle =
@@ -162,25 +176,48 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
     setCalSubscribed(true);
   };
 
+  const updateAndSaveShoppingList = (updater: (prev: ShoppingChecklistItem[]) => ShoppingChecklistItem[]) => {
+    setShoppingList((prev) => {
+      const next = updater(prev);
+      try {
+        localStorage.setItem('schoola_family_shopping_bag_v2', JSON.stringify(next));
+      } catch {
+        // Ignore storage write errors
+      }
+      return next;
+    });
+  };
+
   const handleAddShoppingItem = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = newShopItem.trim();
     if (!trimmed) return;
-    setShoppingList((prev) => [
+    updateAndSaveShoppingList((prev) => [
+      { id: `shop-${Date.now()}`, label: trimmed, bagName: selectedBag, checked: false },
       ...prev,
-      { id: `shop-${Date.now()}`, label: trimmed, checked: false },
     ]);
     setNewShopItem('');
   };
 
+  const handleQuickBagAdd = (label: string) => {
+    updateAndSaveShoppingList((prev) => {
+      if (prev.some((i) => i.label.toLowerCase() === label.toLowerCase())) return prev;
+      return [{ id: `shop-${Date.now()}`, label, bagName: selectedBag, checked: false }, ...prev];
+    });
+  };
+
+  const handleClearShoppingPage = () => {
+    updateAndSaveShoppingList(() => []);
+  };
+
   const toggleShoppingItem = (id: string) => {
-    setShoppingList((prev) =>
+    updateAndSaveShoppingList((prev) =>
       prev.map((item) => (item.id === id ? { ...item, checked: !item.checked } : item))
     );
   };
 
   const removeShoppingItem = (id: string) => {
-    setShoppingList((prev) => prev.filter((item) => item.id !== id));
+    updateAndSaveShoppingList((prev) => prev.filter((item) => item.id !== id));
   };
 
   return (
@@ -585,13 +622,34 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
                         type="text"
                         value={dirSearch}
                         onChange={(e) => setDirSearch(e.target.value)}
-                        placeholder="Filter topic, subject, or year..."
+                        placeholder="Search by keyword (e.g. phonics, fractions, romans, plants)..."
                         className="w-full min-h-[38px] pl-8 pr-3 py-1.5 rounded-xl border border-slate-300 bg-white text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-500"
                       />
                     </div>
 
+                    {/* Subtle Keyword Filter Chips */}
+                    <div className="flex flex-wrap items-center gap-1">
+                      {['phonics', 'fractions', 'plants', 'space', 'romans', 'electricity', 'coding'].map((kw) => {
+                        const active = dirSearch.toLowerCase() === kw;
+                        return (
+                          <button
+                            key={kw}
+                            type="button"
+                            onClick={() => setDirSearch(active ? '' : kw)}
+                            className={`px-2 py-0.5 rounded-md text-[10px] font-bold capitalize cursor-pointer transition-colors ${
+                              active
+                                ? 'bg-emerald-600 text-white'
+                                : 'bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-800'
+                            }`}
+                          >
+                            #{kw}
+                          </button>
+                        );
+                      })}
+                    </div>
+
                     {/* Scrollable Expandable Curriculum Resource List */}
-                    <div className="max-h-[390px] overflow-y-auto pr-1.5 space-y-2 border-y border-slate-200 py-2">
+                    <div className="max-h-[365px] overflow-y-auto pr-1.5 space-y-1.5 border-y border-slate-200 py-2">
                       {filteredDirectoryTopics.map((topic) => {
                         const isOpen = Boolean(expandedTopicIds[topic.id]);
                         const cleanKeyword = topic.title.replace(/^[^:—]+[:—]\s*/, '').trim();
@@ -606,7 +664,7 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
                         return (
                           <div
                             key={topic.id}
-                            className="rounded-xl border border-slate-200 bg-white overflow-hidden"
+                            className="rounded-xl border border-slate-200/90 bg-white overflow-hidden"
                           >
                             <button
                               type="button"
@@ -639,7 +697,7 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
                                 <p className="text-[11px] text-slate-700 leading-relaxed">
                                   {topic.objectives[0]}
                                 </p>
-                                <div className="flex flex-wrap gap-1.5">
+                                <div className="flex flex-wrap items-center gap-2.5 pt-1 text-[11px] font-semibold">
                                   <button
                                     type="button"
                                     onClick={() => onOpenTopicInHub(topic)}
@@ -652,11 +710,10 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
                                       href={`https://www.youtube.com/watch?v=${matchedVid.youtubeId}`}
                                       target="_blank"
                                       rel="noreferrer"
-                                      className="px-2.5 py-1 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-[11px] font-bold inline-flex items-center gap-1"
+                                      className="text-rose-700 hover:text-rose-900 hover:underline inline-flex items-center gap-1"
                                     >
                                       <Youtube className="w-3 h-3" />
                                       Video
-                                      <ExternalLink className="w-2.5 h-2.5" />
                                     </a>
                                   )}
                                   <a
@@ -665,7 +722,7 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
                                     )}&d=BITESIZE`}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="px-2.5 py-1 rounded-lg bg-white border border-slate-300 text-slate-800 text-[11px] font-bold inline-flex items-center gap-1 hover:border-sky-500"
+                                    className="text-slate-600 hover:text-sky-700 hover:underline inline-flex items-center gap-1"
                                   >
                                     BBC Bitesize <ExternalLink className="w-2.5 h-2.5" />
                                   </a>
@@ -675,7 +732,7 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
                                     )}`}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="px-2.5 py-1 rounded-lg bg-white border border-slate-300 text-slate-800 text-[11px] font-bold inline-flex items-center gap-1 hover:border-emerald-500"
+                                    className="text-slate-600 hover:text-emerald-700 hover:underline inline-flex items-center gap-1"
                                   >
                                     Twinkl <ExternalLink className="w-2.5 h-2.5" />
                                   </a>
@@ -685,9 +742,9 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
                                     )}`}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="px-2.5 py-1 rounded-lg bg-white border border-slate-300 text-slate-800 text-[11px] font-bold inline-flex items-center gap-1 hover:border-amber-500"
+                                    className="text-slate-600 hover:text-amber-700 hover:underline inline-flex items-center gap-1"
                                   >
-                                    Oak Academy <ExternalLink className="w-2.5 h-2.5" />
+                                    Oak <ExternalLink className="w-2.5 h-2.5" />
                                   </a>
                                 </div>
                               </div>
@@ -827,62 +884,96 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
                 )}
 
                 {/* ==========================================================
-                    NOTEPAD VIEW 4 (RED CARD): SHOPPING LIST & ARTICLES WITH LINKS
+                    NOTEPAD VIEW 4 (RED CARD): BLANK SHOPPING BAG PAGE & ARTICLES WITH LINKS
                     ========================================================== */}
                 {notepadMode === 'shopping' && (
                   <div className="space-y-4">
-                    {/* Compact Interactive Shopping List */}
-                    <div className="rounded-2xl bg-[#FFF1F2] border border-rose-200 p-3.5 space-y-2.5">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="text-xs font-extrabold text-rose-950 flex items-center gap-1.5">
-                          <ShoppingBag className="w-3.5 h-3.5 text-rose-600" />
-                          My Family Shopping List
-                        </p>
-                        <button
-                          type="button"
-                          onClick={() => onSelectTab('shopping')}
-                          className="text-[11px] font-extrabold text-[#007185] hover:underline cursor-pointer"
-                        >
-                          All Seasonal Bags →
-                        </button>
+                    {/* Interactive Blank Ruled Shopping Bag Page with Live Amazon Search Links */}
+                    <div className="rounded-2xl bg-[#FFF1F2] border border-rose-200 p-4 space-y-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          {/* Custom Colourful 3D Family Shopping Bag Graphic */}
+                          <svg
+                            viewBox="0 0 48 52"
+                            className="w-10 h-11 shrink-0 drop-shadow-xs"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="M15 16 C15 7 33 7 33 16"
+                              fill="none"
+                              stroke="#BE123C"
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                            />
+                            <path d="M7 16 L35 16 L38 46 L4 46 Z" fill="#F43F5E" rx="4" />
+                            <path d="M35 16 L43 19 L45 43 L38 46 Z" fill="#BE123C" />
+                            <path
+                              d="M19 17 C19 9 35 9 35 17"
+                              fill="none"
+                              stroke="#881337"
+                              strokeWidth="2.4"
+                              strokeLinecap="round"
+                            />
+                            <circle cx="21" cy="30" r="6.5" fill="#FFD814" />
+                            <path
+                              d="M17.5 31 Q21 34 24.5 31"
+                              fill="none"
+                              stroke="#1E293B"
+                              strokeWidth="1.6"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                          <div className="min-w-0">
+                            <p className="text-xs sm:text-sm font-extrabold text-rose-950">
+                              Family Shopping Bag ({shoppingList.length})
+                            </p>
+                            <p className="text-[10px] font-semibold text-rose-900/80 leading-snug">
+                              Pick a bag &amp; add an item to create a live Shop link on Amazon UK.
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          {shoppingList.length > 0 && (
+                            <button
+                              type="button"
+                              onClick={handleClearShoppingPage}
+                              className="text-[11px] font-bold text-rose-700 hover:underline cursor-pointer"
+                            >
+                              Blank Page
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => onSelectTab('shopping')}
+                            className="text-[11px] font-extrabold text-[#007185] hover:underline cursor-pointer"
+                          >
+                            All Bags →
+                          </button>
+                        </div>
                       </div>
 
-                      <div className="max-h-[120px] overflow-y-auto space-y-1.5 pr-1">
-                        {shoppingList.map((item) => (
-                          <div
-                            key={item.id}
-                            className="flex items-center justify-between gap-2 bg-white px-2.5 py-1.5 rounded-lg border border-rose-200/80"
-                          >
+                      {/* Bag Picker Row ("Add a Bag to Shop") */}
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="text-[10px] font-extrabold text-rose-900 uppercase tracking-wider mr-0.5">
+                          Bag:
+                        </span>
+                        {SHOPPING_BAG_OPTIONS.map((bag) => {
+                          const active = selectedBag === bag;
+                          return (
                             <button
+                              key={bag}
                               type="button"
-                              onClick={() => toggleShoppingItem(item.id)}
-                              className="flex items-center gap-2 text-left min-w-0 flex-1 cursor-pointer"
+                              onClick={() => setSelectedBag(bag)}
+                              className={`px-2 py-0.5 rounded-md text-[10px] font-bold border cursor-pointer transition-colors ${
+                                active
+                                  ? 'bg-rose-600 border-rose-700 text-white'
+                                  : 'bg-white/85 border-rose-200 text-rose-900 hover:bg-white'
+                              }`}
                             >
-                              <CheckCircle2
-                                className={`w-4 h-4 shrink-0 ${
-                                  item.checked ? 'text-emerald-600' : 'text-slate-300'
-                                }`}
-                              />
-                              <span
-                                className={`text-xs font-semibold truncate ${
-                                  item.checked
-                                    ? 'line-through text-slate-400'
-                                    : 'text-slate-900'
-                                }`}
-                              >
-                                {item.label}
-                              </span>
+                              {bag}
                             </button>
-                            <button
-                              type="button"
-                              onClick={() => removeShoppingItem(item.id)}
-                              aria-label={`Remove ${item.label}`}
-                              className="text-slate-400 hover:text-rose-600 cursor-pointer shrink-0"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
 
                       <form onSubmit={handleAddShoppingItem} className="flex gap-2">
@@ -890,17 +981,107 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
                           type="text"
                           value={newShopItem}
                           onChange={(e) => setNewShopItem(e.target.value)}
-                          placeholder="Add item to shopping list..."
-                          className="flex-1 min-h-[34px] px-3 py-1 rounded-lg border border-rose-200 bg-white text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-rose-500"
+                          placeholder="Write item on blank page (e.g. waterproof boots)..."
+                          className="flex-1 min-h-[38px] px-3 py-1.5 rounded-xl border border-rose-200 bg-white text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-rose-500"
                         />
                         <button
                           type="submit"
-                          className="min-h-[34px] px-3 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold inline-flex items-center gap-1 cursor-pointer"
+                          className="min-h-[38px] px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold inline-flex items-center gap-1 cursor-pointer shrink-0"
                         >
                           <Plus className="w-3.5 h-3.5" />
-                          Add
+                          Add to Bag
                         </button>
                       </form>
+
+                      {/* Clean Blank Lined Page Area */}
+                      <div className="rounded-xl border border-rose-200/90 bg-white bg-[repeating-linear-gradient(to_bottom,#FFFFFF_0px,#FFFFFF_31px,#F8FAFC_32px)] min-h-[156px] p-2.5 space-y-2">
+                        {shoppingList.length === 0 ? (
+                          <div className="h-[132px] flex flex-col items-center justify-center text-center px-4 space-y-2.5">
+                            <p className="text-xs font-bold text-slate-600">
+                              Your blank shopping bag page is ready.
+                            </p>
+                            <p className="text-[11px] text-slate-500 max-w-xs leading-relaxed">
+                              Type any item above and tap <strong>Add to Bag</strong> to instantly create a <strong>Shop ↗</strong> search link on Amazon UK.
+                            </p>
+                            <div className="flex flex-wrap justify-center gap-1.5 pt-0.5">
+                              {['Kids winter boots', 'Pencil case', 'Teacher gift'].map((sample) => (
+                                <button
+                                  key={sample}
+                                  type="button"
+                                  onClick={() => handleQuickBagAdd(sample)}
+                                  className="px-2 py-0.5 rounded-md bg-rose-50 hover:bg-rose-100 border border-rose-200 text-[10px] font-bold text-rose-900 cursor-pointer"
+                                >
+                                  + {sample}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            {shoppingList.map((item) => {
+                              const amazonSearchUrl = buildAmazonAllDiscountsUrl(
+                                item.label,
+                                DEFAULT_AMAZON_TAG
+                              );
+                              return (
+                                <div
+                                  key={item.id}
+                                  className="flex items-center justify-between gap-2 bg-white px-2.5 py-2 rounded-xl border border-rose-200/80 shadow-2xs"
+                                >
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleShoppingItem(item.id)}
+                                    className="flex items-center gap-2 text-left min-w-0 flex-1 cursor-pointer"
+                                  >
+                                    <CheckCircle2
+                                      className={`w-4 h-4 shrink-0 ${
+                                        item.checked ? 'text-emerald-600' : 'text-slate-300'
+                                      }`}
+                                    />
+                                    <div className="min-w-0">
+                                      <span
+                                        className={`text-xs font-semibold block truncate ${
+                                          item.checked
+                                            ? 'line-through text-slate-400'
+                                            : 'text-slate-900'
+                                        }`}
+                                      >
+                                        {item.label}
+                                      </span>
+                                      {item.bagName && (
+                                        <span className="text-[10px] font-bold text-rose-700 block truncate">
+                                          {item.bagName}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </button>
+                                  <div className="flex items-center gap-1.5 shrink-0">
+                                    <a
+                                      href={amazonSearchUrl}
+                                      target="_blank"
+                                      rel="nofollow sponsored noopener noreferrer"
+                                      title={`Shop "${item.label}" on Amazon UK`}
+                                      className="px-3 py-1.5 rounded-full bg-[#FFD814] hover:bg-[#F7CA00] border border-[#F59E0B] text-[#0F1111] text-[11px] font-extrabold inline-flex items-center gap-1 whitespace-nowrap"
+                                    >
+                                      <ShoppingBag className="w-3 h-3 text-[#C45500]" />
+                                      Shop
+                                      <ExternalLink className="w-2.5 h-2.5" />
+                                    </a>
+                                    <button
+                                      type="button"
+                                      onClick={() => removeShoppingItem(item.id)}
+                                      aria-label={`Remove ${item.label}`}
+                                      className="p-1 text-slate-400 hover:text-rose-600 cursor-pointer shrink-0"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     {/* Mum Humour Articles + Amazon All-Discounts Links */}

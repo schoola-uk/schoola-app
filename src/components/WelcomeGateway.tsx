@@ -65,29 +65,53 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
 
   return (
     <div className="w-full">
-      {/* 1. HERO HEADER PHOTO BANNER (bubble-show-card.jpg) — PRESERVES BRIGHT PINK & MAGENTA STAGE LIGHTING */}
+      {/* 1. HERO HEADER PHOTO BANNER (school-home.png) */}
       <section
         aria-label="Schoola UK Primary Curriculum Hero"
-        className="relative w-full overflow-hidden bg-[#240928] text-white"
+        className="relative w-full overflow-hidden bg-[#0B1736] text-white"
       >
-        {/* Background Header Photo from schoola-uk/curriculum */}
+        {/* Mobile & Tablet Visible Uncropped Header Showcase */}
+        <div className="block lg:hidden relative w-full aspect-[16/9] sm:aspect-[21/9] bg-[#0B1736] border-b border-white/15 overflow-hidden">
+          <img
+            src="https://raw.githubusercontent.com/schoola-uk/schoola-app/main/school-home.png"
+            alt="Schoola UK primary learning adventure header"
+            onError={(e) => {
+              const img = e.currentTarget;
+              if (!img.dataset.fallbackApplied) {
+                img.dataset.fallbackApplied = '1';
+                img.src = 'https://github.com/schoola-uk/schoola-app/blob/main/school-home.png?raw=true';
+              } else if (img.dataset.fallbackApplied === '1') {
+                img.dataset.fallbackApplied = '2';
+                img.src = './bubble-show-card.jpg';
+              }
+            }}
+            className="w-full h-full object-cover object-center select-none"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0B1736]/75 via-transparent to-transparent pointer-events-none" />
+        </div>
+
+        {/* Desktop Full-Bleed Background Header Photo */}
         <img
-          src="./bubble-show-card.jpg"
-          alt="Children enjoying a bright pink bubble science show"
+          src="https://raw.githubusercontent.com/schoola-uk/schoola-app/main/school-home.png"
+          alt=""
+          aria-hidden="true"
           onError={(e) => {
             const img = e.currentTarget;
             if (!img.dataset.fallbackApplied) {
               img.dataset.fallbackApplied = '1';
-              img.src = 'https://raw.githubusercontent.com/schoola-uk/curriculum/main/bubble-show-card.jpg';
+              img.src = 'https://github.com/schoola-uk/schoola-app/blob/main/school-home.png?raw=true';
+            } else if (img.dataset.fallbackApplied === '1') {
+              img.dataset.fallbackApplied = '2';
+              img.src = './bubble-show-card.jpg';
             }
           }}
-          className="absolute inset-0 w-full h-full object-cover object-[center_24%] sm:object-[68%_22%] select-none"
+          className="hidden lg:block absolute inset-0 w-full h-full object-cover object-center select-none"
         />
-        {/* Soft left-edge plum/rose scrim so bright pink & magenta lights shine untouched across the photo */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#240928]/88 via-[#4B1443]/38 to-transparent pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#240928]/65 via-transparent to-transparent pointer-events-none" />
+        {/* Soft left-edge scrim on desktop so headline stays legible while showcasing school-home.png */}
+        <div className="hidden lg:block absolute inset-0 bg-gradient-to-r from-[#0B1736]/82 via-[#0B1736]/38 to-transparent pointer-events-none" />
+        <div className="hidden lg:block absolute inset-0 bg-gradient-to-t from-[#0B1736]/55 via-transparent to-transparent pointer-events-none" />
 
-        <div className="relative z-10 w-full px-6 sm:px-12 lg:px-20 pt-16 pb-16 sm:pt-24 sm:pb-24 space-y-16">
+        <div className="relative z-10 w-full px-5 sm:px-12 lg:px-20 pt-8 pb-14 sm:pt-12 lg:pt-24 sm:pb-24 space-y-12 lg:space-y-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
             {/* Left: Curriculum Headline + Subcopy + Key Stage & Year Controls */}
             <div className="lg:col-span-7 text-left space-y-5">

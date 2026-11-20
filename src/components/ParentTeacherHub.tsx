@@ -10,19 +10,16 @@ import {
   Filter,
   LayoutGrid,
   Mail,
-  Play,
   Printer,
   RotateCcw,
   Search,
-  Share2,
   ShoppingBag,
   Table2,
   Trash2,
-  Tv,
   Youtube,
 } from 'lucide-react';
 import { SUBJECTS, TOPICS } from '../data/curriculum';
-import { CURATED_YOUTUBE_VIDEOS, EDUCATION_CHANNELS, findMatchingYouTubeVideo } from '../data/youtubeVideos';
+import { findMatchingYouTubeVideo } from '../data/youtubeVideos';
 import {
   downloadSchoolTermsCalendar,
   downloadTopicRevisionEvent,
@@ -33,6 +30,7 @@ import { CustomRevisionEvent, LearnerProgress, ParentView, Topic } from '../type
 import { NewsletterSubscription } from './NewsletterSubscription';
 import { ParentSeasonalShopHub } from './ParentSeasonalShopHub';
 import { ParentLeatherWalletNotebook } from './ParentLeatherWalletNotebook';
+import { CuratedVideoClassroom } from './CuratedVideoClassroom';
 import { BADGES } from '../data/learningWorlds';
 
 interface ParentTeacherHubProps {
@@ -126,8 +124,6 @@ export const ParentTeacherHub: React.FC<ParentTeacherHubProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [yearFilter, setYearFilter] = useState<string>('All');
   const [subjectFilter, setSubjectFilter] = useState<string>('All');
-  const [videoSubject, setVideoSubject] = useState<string>('All');
-  const [copiedVideoId, setCopiedVideoId] = useState<string | null>(null);
 
   // Custom revision scheduler state
   const [schedulerTopicId, setSchedulerTopicId] = useState('');
@@ -194,29 +190,6 @@ export const ParentTeacherHub: React.FC<ParentTeacherHubProps> = ({
       time: schedulerTime,
     });
     setSchedulerNotice(`Saved study block for "${topic.title}" and downloaded .ics calendar file.`);
-  };
-
-  const handleShareOrCopyVideo = async (videoId: string, youtubeId: string, title: string) => {
-    const url = `https://www.youtube.com/watch?v=${youtubeId}`;
-    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
-      try {
-        await navigator.share({ title, url });
-        return;
-      } catch {
-        // User cancelled or share unavailable; fall back to copying link
-      }
-    }
-    try {
-      if (typeof navigator !== 'undefined' && navigator.clipboard) {
-        await navigator.clipboard.writeText(url);
-        setCopiedVideoId(videoId);
-        window.setTimeout(() => {
-          setCopiedVideoId((curr) => (curr === videoId ? null : curr));
-        }, 2200);
-      }
-    } catch {
-      // Ignore clipboard failures
-    }
   };
 
   const tabs: { id: ParentView; label: string; icon: React.ReactNode }[] = [
@@ -295,6 +268,9 @@ export const ParentTeacherHub: React.FC<ParentTeacherHubProps> = ({
             onToggleChecklist={onToggleChecklist}
           />
 
+          {/* Verified UK Primary Video Links · 69 Lessons (KS1–KS2) directly after the wallet */}
+          <CuratedVideoClassroom />
+
           {/* Completed Topics Quick Review */}
           <div className="bg-[#0F172A] border border-slate-800 rounded-3xl p-7 sm:p-9 space-y-5">
             <h2 className="font-heading font-bold text-lg text-white">
@@ -334,76 +310,6 @@ export const ParentTeacherHub: React.FC<ParentTeacherHubProps> = ({
             )}
           </div>
 
-          {/* UK Curriculum Trust & Video Classroom Banner */}
-          <div className="bg-gradient-to-r from-[#111827] via-[#1E293B] to-[#1E1B4B] border border-indigo-900/60 text-white rounded-3xl p-8 sm:p-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8 lg:gap-12">
-            <div className="space-y-1.5">
-              <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-rose-300">
-                <Youtube className="w-4 h-4" />
-                <span>Verified UK Video Lessons</span>
-                <span aria-hidden="true">·</span>
-                <span>All 12 Primary Subjects (KS1–KS2)</span>
-              </div>
-              <h2 className="font-heading font-extrabold text-xl">
-                Curated Video Classroom &amp; National Curriculum Directory
-              </h2>
-              <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
-                Explore the full colour-coded KS1 &amp; KS2 curriculum table with instant topic-matched videos, BBC Bitesize guides, Twinkl worksheets, and Oak National Academy lessons.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-3 shrink-0">
-              <button
-                type="button"
-                onClick={() => setTab('curriculum')}
-                className="min-h-[42px] px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold text-xs cursor-pointer whitespace-nowrap"
-              >
-                Open KS1–KS2 Rainbow Table →
-              </button>
-              <button
-                type="button"
-                onClick={() => setTab('videos')}
-                className="min-h-[42px] px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs inline-flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
-              >
-                Open Video Classroom ({CURATED_YOUTUBE_VIDEOS.length}) →
-              </button>
-            </div>
-          </div>
-
-          {/* Upcoming Seasonal Shopping & Amazon Associates Teaser Banner */}
-          <div
-            data-amazon-panel="true"
-            className="bg-white border-2 border-[#FF9900] text-[#0F1111] rounded-3xl p-8 sm:p-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8 lg:gap-12 shadow-lg"
-          >
-            <div className="space-y-2">
-              <div className="flex flex-wrap items-center gap-2 text-xs font-extrabold">
-                <span className="px-2.5 py-0.5 rounded bg-[#232F3E] text-[#FFD814] inline-flex items-center gap-1.5">
-                  <ShoppingBag className="w-3.5 h-3.5 text-[#FF9900]" />
-                  Amazon.co.uk Parents Shop
-                </span>
-                <span className="px-2.5 py-0.5 rounded bg-[#CC0C39] text-white">
-                  Special All-Discounts Filter Inside
-                </span>
-                <span className="text-[#565959] font-semibold">
-                  As an Amazon Associate I earn from qualifying purchases.
-                </span>
-              </div>
-              <h2 className="font-heading font-extrabold text-xl text-[#0F1111]">
-                Seasonal Shopping Bags, Christmas &amp; Gift Guides
-              </h2>
-              <p className="text-xs sm:text-sm text-[#565959] max-w-xl">
-                Winter wear, teacher gifts, girls party picks, lunchboxes, sport bikes &amp; tablets — with live All-Discounts links.
-              </p>
-            </div>
-            <div className="shrink-0">
-              <button
-                type="button"
-                onClick={() => setTab('shopping')}
-                className="min-h-[46px] px-6 py-2.5 rounded-full bg-[#FFD814] hover:bg-[#F7CA00] border border-[#FCD200] text-[#0F1111] font-extrabold text-xs inline-flex items-center gap-2 whitespace-nowrap cursor-pointer shadow-xs"
-              >
-                <ShoppingBag className="w-4 h-4 text-[#C45500]" />
-                Open Seasonal Bags &amp; Discounts →
-              </button>
-            </div>
-          </div>
         </div>
       )}
 
@@ -1034,164 +940,7 @@ export const ParentTeacherHub: React.FC<ParentTeacherHubProps> = ({
       )}
 
       {/* TAB 4: CURATED VIDEO CLASSROOM */}
-      {tab === 'videos' && (
-        <div className="space-y-12">
-          {/* Verified Video Classroom Banner */}
-          <div className="bg-gradient-to-r from-[#111827] via-[#1E293B] to-[#312E81] border border-indigo-900/50 text-white rounded-3xl p-8 sm:p-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6 lg:gap-10">
-            <div className="space-y-1.5">
-              <p className="text-xs font-bold text-rose-300 flex items-center gap-1.5">
-                <Youtube className="w-4 h-4" />
-                Verified UK Primary Video Links · {CURATED_YOUTUBE_VIDEOS.length} Lessons (KS1–KS2)
-              </p>
-              <h2 className="font-heading font-extrabold text-xl">
-                Curated UK Primary Video Classroom
-              </h2>
-              <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
-                Videos open in your external player or YouTube app instead of playing on this website — ideal for watching on a phone or casting and screen-sharing to your TV.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-              <span className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900/70 border border-slate-700 text-xs font-semibold text-sky-300">
-                <Tv className="w-3.5 h-3.5" />
-                External Player &amp; TV Ready
-              </span>
-              <a
-                href="https://www.youtube.com/@bbcteach"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="min-h-[42px] px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold inline-flex items-center gap-1.5 whitespace-nowrap"
-              >
-                Browse @bbcteach <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2.5">
-            {['All', ...SUBJECTS.map((s) => s.id)].map((subj) => (
-              <button
-                key={subj}
-                type="button"
-                onClick={() => setVideoSubject(subj)}
-                className={`min-h-[40px] px-4 py-2 rounded-xl text-xs font-bold border cursor-pointer ${
-                  videoSubject === subj
-                    ? 'bg-sky-500 text-slate-950 border-sky-400'
-                    : 'bg-[#0F172A] text-slate-300 border-slate-800 hover:bg-slate-800'
-                }`}
-              >
-                {subj}
-              </button>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7 lg:gap-8">
-            {CURATED_YOUTUBE_VIDEOS.filter(
-              (v) => videoSubject === 'All' || v.subjectId === videoSubject
-            ).map((video) => {
-              const videoUrl = `https://www.youtube.com/watch?v=${video.youtubeId}`;
-              const isCopied = copiedVideoId === video.id;
-              return (
-                <div
-                  key={video.id}
-                  className="bg-[#0F172A] border border-slate-800 hover:border-sky-500/60 transition-colors rounded-2xl overflow-hidden flex flex-col justify-between"
-                >
-                  <div>
-                    <a
-                      href={videoUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`Open "${video.title}" in external video player`}
-                      className="block aspect-video bg-slate-950 relative overflow-hidden group"
-                    >
-                      <img
-                        src={`https://img.youtube.com/vi/${video.youtubeId}/mqdefault.jpg`}
-                        alt={video.title}
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="absolute inset-0 bg-slate-950/30 group-hover:bg-slate-950/15 transition-colors flex items-center justify-center">
-                        <span className="w-12 h-12 rounded-full bg-white/95 text-slate-900 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                          <Play className="w-5 h-5 fill-slate-900 ml-0.5" />
-                        </span>
-                      </div>
-                      <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded-md bg-slate-950/85 text-[10px] font-bold text-sky-300 border border-slate-700/80 inline-flex items-center gap-1">
-                        <ExternalLink className="w-2.5 h-2.5" />
-                        External Player
-                      </span>
-                    </a>
-                    <div className="p-5 sm:p-6 space-y-2">
-                      <p className="text-xs font-semibold text-sky-400">
-                        {video.subjectId} · {video.channelName} · {video.duration}
-                      </p>
-                      <h3 className="font-heading font-bold text-sm text-white">{video.title}</h3>
-                      <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{video.description}</p>
-                    </div>
-                  </div>
-                  <div className="p-5 sm:p-6 pt-0 flex items-center gap-3">
-                    <a
-                      href={videoUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 min-h-[42px] px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-extrabold flex items-center justify-center gap-1.5 transition-colors"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      Open in External Player
-                    </a>
-                    <button
-                      type="button"
-                      onClick={() => handleShareOrCopyVideo(video.id, video.youtubeId, video.title)}
-                      className={`min-h-[42px] px-3 py-2 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors ${
-                        isCopied
-                          ? 'bg-emerald-950/80 border-emerald-500 text-emerald-300'
-                          : 'border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-200'
-                      }`}
-                      aria-label={`Share or copy link for ${video.title} to cast to TV`}
-                      title="Share link to phone player or copy for TV casting"
-                    >
-                      {isCopied ? (
-                        <>
-                          <Check className="w-3.5 h-3.5" />
-                          Copied
-                        </>
-                      ) : (
-                        <>
-                          <Share2 className="w-3.5 h-3.5" />
-                          Cast
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="bg-[#0F172A] border border-slate-800 rounded-3xl p-7 sm:p-9 space-y-6">
-            <h3 className="font-heading font-bold text-base text-white">
-              Trusted UK Primary Educational Channels
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {EDUCATION_CHANNELS.map((ch) => (
-                <a
-                  key={ch.name}
-                  href={ch.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="p-5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-sky-500 hover:bg-slate-800/80 transition-colors space-y-1.5 block"
-                >
-                  <p className="font-bold text-sm text-white flex items-center justify-between gap-2">
-                    <span>
-                      {ch.logo} {ch.name}
-                    </span>
-                    <ExternalLink className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  </p>
-                  <p className="text-xs text-sky-400 font-mono">{ch.handle}</p>
-                  <p className="text-xs text-slate-400 leading-relaxed pt-1">{ch.description}</p>
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+      {tab === 'videos' && <CuratedVideoClassroom />}
 
       {/* TAB 5: UPCOMING SEASONAL SHOPPING & AMAZON ASSOCIATES HUB */}
       {tab === 'shopping' && <ParentSeasonalShopHub />}
