@@ -34,7 +34,7 @@ const MONSTERS: MonsterDef[] = [
     id: 'pip',
     name: 'Pip',
     emoji: '🔬',
-    voiceId: 'maya',
+    voiceId: 'amy',
     quips: [
       'Bubbles! Spin the Speaking Globe to discover amazing UK wonders!',
       'Explore rivers, mountains and oceans with Pip to win Stars!',

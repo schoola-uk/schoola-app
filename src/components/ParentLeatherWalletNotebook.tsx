@@ -19,7 +19,7 @@ import {
   Youtube,
 } from 'lucide-react';
 import {
-  buildAmazonAllDiscountsUrl,
+  buildSmartAmazonShopUrl,
   DEFAULT_AMAZON_TAG,
 } from '../data/seasonalShop';
 import { SUBJECTS, TOPICS } from '../data/curriculum';
@@ -1081,7 +1081,7 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
                       {/* Shopping List Items + 3 Empty Slots Directly Below to Add New Items */}
                       <div className="space-y-2">
                         {shoppingList.map((item) => {
-                          const amazonSearchUrl = buildAmazonAllDiscountsUrl(
+                          const amazonSearchUrl = buildSmartAmazonShopUrl(
                             item.label,
                             DEFAULT_AMAZON_TAG
                           );
@@ -1146,7 +1146,7 @@ export const ParentLeatherWalletNotebook: React.FC<ParentLeatherWalletNotebookPr
                         {emptySlotValues.map((slotVal, slotIdx) => {
                           const trimmedVal = slotVal.trim();
                           const slotShopUrl = trimmedVal
-                            ? buildAmazonAllDiscountsUrl(trimmedVal, DEFAULT_AMAZON_TAG)
+                            ? buildSmartAmazonShopUrl(trimmedVal, DEFAULT_AMAZON_TAG)
                             : undefined;
 
                           return (

@@ -187,47 +187,57 @@ export function GlobeTrivia({ onEarnStar, setFairyMessage }: GlobeTriviaProps) {
   };
 
   return (
-    <div className="bg-white border-2 border-sky-300 border-b-4 rounded-3xl p-5 shadow-md text-slate-900 relative overflow-hidden flex flex-col items-center">
-      <div className="absolute top-3 right-3 flex items-center gap-1 bg-sky-100 border border-sky-200 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase text-sky-700">
-        <Compass className="w-3 h-3 animate-spin" /> Geography Globe
+    <div className="h-full bg-white border-2 border-sky-300 border-b-4 rounded-3xl p-5 shadow-md text-slate-900 relative overflow-hidden flex flex-col justify-between">
+      <div className="w-full flex items-center justify-between gap-2 mb-4 min-w-0">
+        <h3 className="font-heading font-extrabold text-sm text-sky-900 flex items-center gap-1.5 min-w-0 truncate">
+          <span className="shrink-0">🌍</span>
+          <span className="truncate">The Speaking Globe</span>
+        </h3>
+        <span className="shrink-0 inline-flex items-center gap-1 bg-sky-100 border border-sky-200 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase text-sky-700 whitespace-nowrap">
+          <Compass className="w-3 h-3 animate-spin shrink-0" /> Geography Globe
+        </span>
       </div>
 
-      <h3 className="font-heading font-extrabold text-sm text-sky-900 mb-3 flex items-center gap-1.5 self-start">
-        <span>🌍</span> The Speaking Globe
-      </h3>
-
       {/* Illustrated Spinning Earth Globe */}
-      <div className="relative w-32 h-32 my-3 flex items-center justify-center">
-        <div
-          className="absolute inset-0 bg-sky-100/70 rounded-full border-2 border-dashed border-sky-300 animate-spin"
-          style={{ animationDuration: '30s' }}
-        />
-        <motion.button
-          type="button"
-          animate={isSpinning ? { rotate: 360 * 3 } : { y: [0, -4, 0] }}
-          transition={
-            isSpinning
-              ? { duration: 1.2, ease: 'easeInOut' }
-              : { duration: 3, repeat: Infinity, ease: 'easeInOut' }
-          }
-          onClick={handleSpin}
-          aria-label="Spin the Speaking Globe"
-          className="relative w-24 h-24 rounded-full border-3 border-white shadow-lg flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition-transform overflow-hidden"
-        >
-          <svg viewBox="0 0 100 100" className="w-full h-full" fill="none">
-            <circle cx="50" cy="50" r="50" fill="#0284C7" />
-            <circle cx="38" cy="34" r="32" fill="#38BDF8" opacity="0.45" />
-            <path d="M22 28 Q35 18 46 28 Q50 42 36 48 Q24 44 22 28 Z" fill="#34D399" />
-            <path d="M58 22 Q76 24 80 42 Q72 54 58 46 Q52 34 58 22 Z" fill="#10B981" />
-            <path d="M36 58 Q52 54 62 68 Q56 82 38 78 Q30 70 36 58 Z" fill="#34D399" />
-            <ellipse cx="34" cy="24" rx="10" ry="4" fill="#FFFFFF" opacity="0.65" />
-            <ellipse cx="64" cy="64" rx="11" ry="4" fill="#FFFFFF" opacity="0.55" />
-          </svg>
-        </motion.button>
-        {isSpinning && (
-          <div className="absolute inset-0 bg-sky-500/20 rounded-full flex items-center justify-center text-[10px] font-black tracking-widest text-sky-900 bg-white/75 px-2">
-            SPINNING...
-          </div>
+      <div className="flex-1 flex flex-col items-center justify-center w-full my-2 gap-3">
+        <div className="relative w-32 h-32 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-sky-100/70 rounded-full border-2 border-dashed border-sky-300 animate-spin"
+            style={{ animationDuration: '30s' }}
+          />
+          <motion.button
+            type="button"
+            animate={isSpinning ? { rotate: 360 * 3 } : { y: [0, -4, 0] }}
+            transition={
+              isSpinning
+                ? { duration: 1.2, ease: 'easeInOut' }
+                : { duration: 3, repeat: Infinity, ease: 'easeInOut' }
+            }
+            onClick={handleSpin}
+            aria-label="Spin the Speaking Globe"
+            className="relative w-24 h-24 rounded-full border-3 border-white shadow-lg flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition-transform overflow-hidden"
+          >
+            <svg viewBox="0 0 100 100" className="w-full h-full" fill="none">
+              <circle cx="50" cy="50" r="50" fill="#0284C7" />
+              <circle cx="38" cy="34" r="32" fill="#38BDF8" opacity="0.45" />
+              <path d="M22 28 Q35 18 46 28 Q50 42 36 48 Q24 44 22 28 Z" fill="#34D399" />
+              <path d="M58 22 Q76 24 80 42 Q72 54 58 46 Q52 34 58 22 Z" fill="#10B981" />
+              <path d="M36 58 Q52 54 62 68 Q56 82 38 78 Q30 70 36 58 Z" fill="#34D399" />
+              <ellipse cx="34" cy="24" rx="10" ry="4" fill="#FFFFFF" opacity="0.65" />
+              <ellipse cx="64" cy="64" rx="11" ry="4" fill="#FFFFFF" opacity="0.55" />
+            </svg>
+          </motion.button>
+          {isSpinning && (
+            <div className="absolute inset-0 bg-sky-500/20 rounded-full flex items-center justify-center text-[10px] font-black tracking-widest text-sky-900 bg-white/75 px-2">
+              SPINNING...
+            </div>
+          )}
+        </div>
+
+        {!trivia && (
+          <p className="text-xs text-slate-600 font-medium text-center max-w-[230px] leading-relaxed">
+            Spin the UK Geography globe to unlock trivia clues and win a golden star!
+          </p>
         )}
       </div>
 
@@ -236,16 +246,16 @@ export function GlobeTrivia({ onEarnStar, setFairyMessage }: GlobeTriviaProps) {
           type="button"
           onClick={handleSpin}
           disabled={isSpinning}
-          className="w-full min-h-[42px] py-2 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 border-b-4 border-blue-800 text-white font-heading font-extrabold text-xs rounded-2xl shadow-sm transition-all active:translate-y-0.5 cursor-pointer flex items-center justify-center gap-1.5"
+          className="w-full min-h-[42px] py-2 mt-3 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 border-b-4 border-blue-800 text-white font-heading font-extrabold text-xs rounded-2xl shadow-sm transition-all active:translate-y-0.5 cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap"
         >
-          <RotateCw className="w-3.5 h-3.5" />
+          <RotateCw className="w-3.5 h-3.5 shrink-0" />
           Spin the Globe
         </button>
       ) : (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full text-left bg-sky-50 border border-sky-200 rounded-2xl p-3.5"
+          className="w-full text-left bg-sky-50 border border-sky-200 rounded-2xl p-3.5 mt-3"
         >
           <p className="text-xs font-extrabold text-slate-900 mb-2.5 leading-snug">
             {trivia.question}
@@ -317,7 +327,7 @@ export function AbacusMath({ onEarnStar, setFairyMessage }: AbacusMathProps) {
     completed: boolean;
   } | null>(null);
 
-  const generateChallenge = () => {
+  const generateChallenge = (silentInit = false) => {
     const rodIdx = Math.floor(Math.random() * 3);
     const num1 = Math.floor(Math.random() * 6) + 1;
     const num2 = Math.floor(Math.random() * 4);
@@ -329,12 +339,14 @@ export function AbacusMath({ onEarnStar, setFairyMessage }: AbacusMathProps) {
       rodIndex: rodIdx,
       completed: false
     });
-    setFairyMessage(`An abacus math puzzle appears! Slide the wooden beads on the copper rod to match the sum.`);
-    playChimeSound('step');
+    if (!silentInit) {
+      setFairyMessage(`An abacus math puzzle appears! Slide the wooden beads on the copper rod to match the sum.`);
+      playChimeSound('step');
+    }
   };
 
   useEffect(() => {
-    generateChallenge();
+    generateChallenge(true);
   }, []);
 
   const slideBead = (rodIdx: number, val: number) => {
@@ -352,98 +364,103 @@ export function AbacusMath({ onEarnStar, setFairyMessage }: AbacusMathProps) {
   };
 
   return (
-    <div className="bg-white border-2 border-amber-300 border-b-4 rounded-3xl p-5 shadow-md text-slate-900 relative overflow-hidden">
-      <div className="absolute top-3 right-3 flex items-center gap-1 bg-amber-100 border border-amber-200 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase text-amber-800">
-        🧮 Math Beads
+    <div className="h-full bg-white border-2 border-amber-300 border-b-4 rounded-3xl p-5 shadow-md text-slate-900 relative overflow-hidden flex flex-col justify-between">
+      <div className="w-full flex items-center justify-between gap-2 mb-4 min-w-0">
+        <h3 className="font-heading font-extrabold text-sm text-amber-950 flex items-center gap-1.5 min-w-0 truncate">
+          <span className="shrink-0">🧮</span>
+          <span className="truncate">Magical Math Abacus</span>
+        </h3>
+        <span className="shrink-0 inline-flex items-center gap-1 bg-amber-100 border border-amber-200 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase text-amber-800 whitespace-nowrap">
+          🧮 Math Beads
+        </span>
       </div>
 
-      <h3 className="font-heading font-extrabold text-sm text-amber-950 mb-3 flex items-center gap-1.5 text-left">
-        <span>🧮</span> Magical Math Abacus
-      </h3>
-
       {/* Interactive Abacus display board */}
-      <div className="bg-amber-100 border-4 border-amber-700 rounded-2xl p-4 my-3 flex flex-col gap-4 shadow-inner relative">
+      <div className="bg-amber-100 border-4 border-amber-700 rounded-2xl px-4 py-4 flex flex-col gap-3.5 shadow-inner relative overflow-hidden">
         {/* Brass side rails */}
-        <div className="absolute left-1.5 top-0 bottom-0 w-1.5 bg-amber-600 rounded-full" />
-        <div className="absolute right-1.5 top-0 bottom-0 w-1.5 bg-amber-600 rounded-full" />
+        <div className="absolute left-1.5 top-0 bottom-0 w-1.5 bg-amber-600 rounded-full pointer-events-none" />
+        <div className="absolute right-1.5 top-0 bottom-0 w-1.5 bg-amber-600 rounded-full pointer-events-none" />
 
-        {[0, 1, 2].map((rodIdx) => (
-          <div key={rodIdx} className="relative h-7 flex items-center justify-between px-3">
-            {/* The metal horizontal wire bar */}
-            <div className="absolute inset-x-3 h-1.5 bg-amber-800/40 rounded-full" />
-
-            {/* Clickable zones to position beads */}
-            <div className="absolute inset-x-3 h-full flex">
-              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                <button
-                  key={num}
-                  type="button"
-                  onClick={() => slideBead(rodIdx, num)}
-                  className="flex-1 h-full cursor-pointer z-20 outline-hidden opacity-0"
-                  aria-label={`Slide ${num} beads on row ${rodIdx + 1}`}
-                  title={`Slide ${num} beads`}
-                />
-              ))}
-            </div>
-
-            {/* Render Sliding Beads */}
-            <div className="w-full flex justify-between items-center relative h-full z-10 pointer-events-none">
-              {/* Left group of beads */}
-              <div className="flex gap-0.5">
-                {Array.from({ length: beads[rodIdx] }).map((_, bIdx) => (
-                  <motion.div
-                    layout
-                    key={`left-${bIdx}`}
-                    className="w-3.5 h-6 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 border border-rose-700 shadow-sm"
-                  />
-                ))}
+        {[0, 1, 2].map((rodIdx) => {
+          const leftCount = beads[rodIdx];
+          const rightCount = 10 - leftCount;
+          return (
+            <div key={rodIdx} className="relative flex items-center gap-2 w-full min-w-0">
+              {/* Row Number Badge cleanly aligned */}
+              <div className="bg-amber-800 text-white text-[9px] font-black w-5 h-5 rounded-full flex items-center justify-center shrink-0 shadow-xs z-20">
+                R{rodIdx + 1}
               </div>
 
-              {/* Right group of beads */}
-              <div className="flex gap-0.5">
-                {Array.from({ length: 10 - beads[rodIdx] }).map((_, bIdx) => (
-                  <motion.div
-                    layout
-                    key={`right-${bIdx}`}
-                    className="w-3.5 h-6 rounded-full bg-gradient-to-r from-sky-400 to-indigo-500 border border-sky-700 shadow-sm"
-                  />
-                ))}
+              {/* Rod wire & clickable zones */}
+              <div className="relative flex-1 min-w-0 h-7 flex items-center">
+                {/* Horizontal metal wire bar */}
+                <div className="w-full h-1.5 bg-amber-800/40 rounded-full pointer-events-none" />
+
+                {/* Clickable zones to position beads */}
+                <div className="absolute inset-0 flex z-20">
+                  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                    <button
+                      key={num}
+                      type="button"
+                      onClick={() => slideBead(rodIdx, num)}
+                      className="flex-1 h-full cursor-pointer outline-hidden opacity-0"
+                      aria-label={`Slide ${num} beads on row ${rodIdx + 1}`}
+                      title={`Slide ${num} beads`}
+                    />
+                  ))}
+                </div>
+
+                {/* 11-column fluid bead grid (guaranteed inside rails) */}
+                <div className="absolute inset-0 grid grid-cols-11 gap-[2px] items-center justify-items-center z-10 pointer-events-none">
+                  {Array.from({ length: leftCount }).map((_, bIdx) => (
+                    <div
+                      key={`left-${bIdx}`}
+                      className="w-full max-w-[14px] h-5 sm:h-6 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 border border-rose-700 shadow-xs"
+                    />
+                  ))}
+                  <div className="w-full h-1" aria-hidden="true" />
+                  {Array.from({ length: rightCount }).map((_, bIdx) => (
+                    <div
+                      key={`right-${bIdx}`}
+                      className="w-full max-w-[14px] h-5 sm:h-6 rounded-full bg-gradient-to-r from-sky-400 to-indigo-500 border border-sky-700 shadow-xs"
+                    />
+                  ))}
+                </div>
               </div>
             </div>
-
-            {/* Row Number Badge */}
-            <div className="absolute -left-1 bg-amber-800 text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center">
-              R{rodIdx + 1}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {currentChallenge && (
-        <div className="text-left mt-3 bg-amber-50 border border-amber-200 rounded-2xl p-3 flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-extrabold text-amber-800 uppercase">Sum Goal:</span>
+        <div className="text-left mt-4 bg-amber-50 border border-amber-200 rounded-2xl p-3.5 flex flex-col gap-2">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[10px] font-extrabold text-amber-800 uppercase whitespace-nowrap">
+              Sum Goal:
+            </span>
             {currentChallenge.completed ? (
-              <span className="text-[9px] bg-emerald-500 text-white font-black px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span className="text-[9px] bg-emerald-500 text-white font-black px-2 py-0.5 rounded-full inline-flex items-center gap-1 whitespace-nowrap">
                 <Check className="w-2.5 h-2.5" /> SUCCESS
               </span>
             ) : (
-              <span className="text-[9px] bg-amber-200/70 text-amber-900 font-black px-2 py-0.5 rounded-full">
+              <span className="text-[9px] bg-amber-200/70 text-amber-900 font-black px-2 py-0.5 rounded-full whitespace-nowrap">
                 ACTIVE Row {currentChallenge.rodIndex + 1}
               </span>
             )}
           </div>
-          <p className="text-xs font-extrabold text-slate-900">
+          <p className="text-xs font-extrabold text-slate-900 leading-snug">
             {currentChallenge.prompt}
           </p>
-          <div className="flex justify-between items-center mt-1">
-            <span className="text-[11px] text-slate-600 font-semibold">
-              Current Beads: <strong className="text-amber-900 text-xs">{beads[currentChallenge.rodIndex]}</strong> / {currentChallenge.targetValue}
+          <div className="flex flex-wrap justify-between items-center gap-2 pt-1.5 border-t border-amber-200/70">
+            <span className="text-[11px] text-slate-600 font-semibold whitespace-nowrap">
+              Current Beads:{' '}
+              <strong className="text-amber-900 text-xs">{beads[currentChallenge.rodIndex]}</strong>{' '}
+              / {currentChallenge.targetValue}
             </span>
             <button
               type="button"
-              onClick={generateChallenge}
-              className="text-[11px] font-extrabold text-amber-700 hover:underline cursor-pointer"
+              onClick={() => generateChallenge(false)}
+              className="text-[11px] font-extrabold text-amber-700 hover:underline cursor-pointer whitespace-nowrap"
             >
               New Puzzle ➔
             </button>
@@ -482,7 +499,7 @@ export function AncientSpellbook({ onEarnStar, setFairyMessage }: SpellbookProps
     { word: "CREATIVE", hint: "Thinking outside the wooden cabinet." }
   ];
 
-  const generateSpell = () => {
+  const generateSpell = (silentInit = false) => {
     const item = wordPool[Math.floor(Math.random() * wordPool.length)];
     const chars = item.word.split('');
     // Jumble the letters
@@ -495,12 +512,14 @@ export function AncientSpellbook({ onEarnStar, setFairyMessage }: SpellbookProps
       currentGuess: []
     });
     setHasSolved(false);
-    setFairyMessage("Open the Ancient Spellbook! Solve the word puzzle by clicking letters in the correct spelling sequence.");
-    playChimeSound('spell');
+    if (!silentInit) {
+      setFairyMessage("Open the Ancient Spellbook! Solve the word puzzle by clicking letters in the correct spelling sequence.");
+      playChimeSound('spell');
+    }
   };
 
   useEffect(() => {
-    generateSpell();
+    generateSpell(true);
   }, []);
 
   const handleLetterClick = (letter: string, index: number) => {
@@ -532,35 +551,37 @@ export function AncientSpellbook({ onEarnStar, setFairyMessage }: SpellbookProps
   };
 
   return (
-    <div className="bg-white border-2 border-violet-300 border-b-4 rounded-3xl p-5 shadow-md text-slate-900 relative overflow-hidden">
-      <div className="absolute top-3 right-3 flex items-center gap-1 bg-violet-100 border border-violet-200 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase text-violet-700">
-        📖 Spell Book
+    <div className="h-full bg-white border-2 border-violet-300 border-b-4 rounded-3xl p-5 shadow-md text-slate-900 relative overflow-hidden flex flex-col justify-between">
+      <div className="w-full flex items-center justify-between gap-2 mb-4 min-w-0">
+        <h3 className="font-heading font-extrabold text-sm text-violet-950 flex items-center gap-1.5 min-w-0 truncate">
+          <span className="shrink-0">📖</span>
+          <span className="truncate">Ancient Spellbook</span>
+        </h3>
+        <span className="shrink-0 inline-flex items-center gap-1 bg-violet-100 border border-violet-200 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase text-violet-700 whitespace-nowrap">
+          📖 Spell Book
+        </span>
       </div>
 
-      <h3 className="font-heading font-extrabold text-sm text-violet-950 mb-3 flex items-center gap-1.5 text-left">
-        <span>📖</span> Ancient Spellbook
-      </h3>
-
       {challenge && (
-        <div className="flex flex-col gap-4">
+        <div className="flex-1 flex flex-col justify-between gap-4">
           {/* Scroll book background */}
-          <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-3 border-amber-400 text-slate-800 rounded-2xl p-4 shadow-sm flex flex-col items-center relative">
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-3 border-amber-400 text-slate-800 rounded-2xl p-3.5 sm:p-4 shadow-sm flex flex-col items-center relative text-center">
             <p className="text-[10px] uppercase font-black tracking-widest text-amber-800 mb-1.5">
               Spelling Runes Challenge
             </p>
 
-            <span className="text-xs italic text-slate-700 mb-3.5 font-bold text-center leading-relaxed">
+            <span className="text-xs italic text-slate-700 mb-3 font-bold text-center leading-relaxed">
               &ldquo;{challenge.hint}&rdquo;
             </span>
 
             {/* Render Empty Blocks for word */}
-            <div className="flex gap-1.5 justify-center mb-3 flex-wrap">
+            <div className="flex gap-1 justify-center mb-2 flex-wrap max-w-full">
               {challenge.word.split('').map((_char, idx) => {
                 const filled = challenge.currentGuess[idx];
                 return (
                   <div
                     key={idx}
-                    className={`w-7 h-9 rounded-lg border-2 flex items-center justify-center font-black text-sm shadow-inner ${
+                    className={`w-6 h-8 sm:w-7 sm:h-9 rounded-lg border-2 flex items-center justify-center font-black text-xs sm:text-sm shadow-inner ${
                       filled
                         ? 'border-emerald-500 bg-emerald-100 text-emerald-800'
                         : 'border-amber-300 bg-white text-transparent'
@@ -576,7 +597,7 @@ export function AncientSpellbook({ onEarnStar, setFairyMessage }: SpellbookProps
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="bg-emerald-100 border border-emerald-300 rounded-full px-4 py-1 text-emerald-800 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5"
+                className="mt-1 bg-emerald-100 border border-emerald-300 rounded-full px-3 py-1 text-emerald-800 text-[10px] font-black uppercase tracking-wider inline-flex items-center gap-1.5"
               >
                 🔮 SPELL CAST SUCCESSFULLY!
               </motion.div>
@@ -584,7 +605,7 @@ export function AncientSpellbook({ onEarnStar, setFairyMessage }: SpellbookProps
           </div>
 
           {/* Letter Choice Buttons */}
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-3">
             <div className="flex flex-wrap gap-1.5 justify-center">
               {challenge.jumbled.map((letter, idx) => {
                 const targetUses = challenge.word.split('').filter((c) => c === letter).length;
@@ -597,7 +618,7 @@ export function AncientSpellbook({ onEarnStar, setFairyMessage }: SpellbookProps
                     key={idx}
                     disabled={isFullyUsed || hasSolved}
                     onClick={() => handleLetterClick(letter, idx)}
-                    className={`w-9 h-9 rounded-xl border-2 border-b-4 font-heading font-extrabold text-xs transition-all cursor-pointer ${
+                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl border-2 border-b-4 font-heading font-extrabold text-xs transition-all cursor-pointer ${
                       isFullyUsed
                         ? 'border-slate-200 bg-slate-100 text-slate-400 opacity-50 cursor-default'
                         : 'border-violet-300 bg-violet-100 text-violet-900 hover:bg-violet-200 active:translate-y-0.5'
@@ -609,19 +630,19 @@ export function AncientSpellbook({ onEarnStar, setFairyMessage }: SpellbookProps
               })}
             </div>
 
-            <div className="flex gap-2 justify-between">
+            <div className="flex items-center justify-between gap-2 pt-1">
               <button
                 type="button"
                 onClick={handleReset}
                 disabled={hasSolved}
-                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-[11px] font-extrabold uppercase transition-colors cursor-pointer"
+                className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-[11px] font-extrabold uppercase transition-colors cursor-pointer whitespace-nowrap"
               >
                 Clear Spell
               </button>
               <button
                 type="button"
-                onClick={generateSpell}
-                className="px-3.5 py-1.5 bg-gradient-to-r from-violet-500 to-indigo-600 border-b-2 border-indigo-800 text-white rounded-xl text-[11px] font-extrabold uppercase shadow-sm hover:opacity-95 cursor-pointer"
+                onClick={() => generateSpell(false)}
+                className="px-3.5 py-2 bg-gradient-to-r from-violet-500 to-indigo-600 border-b-2 border-indigo-800 text-white rounded-xl text-[11px] font-extrabold uppercase shadow-sm hover:opacity-95 cursor-pointer whitespace-nowrap"
               >
                 Next Spell ➔
               </button>
@@ -699,14 +720,16 @@ export function PatternPath({ onEarnStar, setFairyMessage }: PatternPathProps) {
   };
 
   return (
-    <div className="bg-white border-2 border-emerald-300 border-b-4 rounded-3xl p-5 shadow-md text-slate-900 relative overflow-hidden flex flex-col items-center">
-      <div className="absolute top-3 right-3 flex items-center gap-1 bg-emerald-100 border border-emerald-200 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase text-emerald-700">
-        ✨ Floor Path
+    <div className="h-full bg-white border-2 border-emerald-300 border-b-4 rounded-3xl p-5 shadow-md text-slate-900 relative overflow-hidden flex flex-col items-center justify-between">
+      <div className="w-full flex items-center justify-between gap-2 mb-4 min-w-0">
+        <h3 className="font-heading font-extrabold text-sm text-emerald-950 flex items-center gap-1.5 min-w-0 truncate">
+          <span className="shrink-0">✨</span>
+          <span className="truncate">Winding Pathway Game</span>
+        </h3>
+        <span className="shrink-0 inline-flex items-center gap-1 bg-emerald-100 border border-emerald-200 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase text-emerald-700 whitespace-nowrap">
+          ✨ Floor Path
+        </span>
       </div>
-
-      <h3 className="font-heading font-extrabold text-sm text-emerald-950 mb-3 flex items-center gap-1.5 self-start">
-        <span>✨</span> Winding Pathway Game
-      </h3>
 
       {/* Render the four glowing stepping stones layout */}
       <div className="grid grid-cols-2 gap-3 w-44 my-4">
@@ -819,14 +842,16 @@ export function VintageClockAndBell({ onEarnStar, setFairyMessage }: VintageCloc
   const formattedTime = time.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
   return (
-    <div className="bg-white border-2 border-indigo-300 border-b-4 rounded-3xl p-5 shadow-md text-slate-900 relative overflow-hidden flex flex-col items-center">
-      <div className="absolute top-3 right-3 flex items-center gap-1 bg-indigo-100 border border-indigo-200 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase text-indigo-700">
-        🕒 Live Chime
+    <div className="h-full bg-white border-2 border-indigo-300 border-b-4 rounded-3xl p-5 shadow-md text-slate-900 relative overflow-hidden flex flex-col items-center justify-between">
+      <div className="w-full flex items-center justify-between gap-2 mb-4 min-w-0">
+        <h3 className="font-heading font-extrabold text-sm text-indigo-950 flex items-center gap-1.5 min-w-0 truncate">
+          <span className="shrink-0">🕒</span>
+          <span className="truncate">Corridor Clock &amp; Bell</span>
+        </h3>
+        <span className="shrink-0 inline-flex items-center gap-1 bg-indigo-100 border border-indigo-200 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase text-indigo-700 whitespace-nowrap">
+          🕒 Live Chime
+        </span>
       </div>
-
-      <h3 className="font-heading font-extrabold text-sm text-indigo-950 mb-3 flex items-center gap-1.5 self-start">
-        <span>🕒</span> Corridor Clock &amp; Bell
-      </h3>
 
       <div className="flex flex-col items-center gap-4 my-2">
         {/* Retro grandfather wall clock casing */}
@@ -907,13 +932,15 @@ export function AtmosphereControl({ currentAtmosphere, onChangeAtmosphere, setFa
 
   return (
     <div className="bg-slate-900/90 border border-slate-700/30 rounded-2xl p-5 shadow-xl text-white relative overflow-hidden text-left">
-      <div className="absolute top-2 right-2 flex items-center gap-1 bg-slate-700/10 border border-slate-700/20 px-2 py-0.5 rounded text-[9px] font-black uppercase text-slate-400">
-        🔮 Ambiance
+      <div className="w-full flex items-center justify-between gap-2 mb-3 min-w-0">
+        <h3 className="font-bold text-sm text-indigo-200 flex items-center gap-1.5 min-w-0 truncate">
+          <span className="shrink-0">🔮</span>
+          <span className="truncate">Corridor Atmosphere</span>
+        </h3>
+        <span className="shrink-0 inline-flex items-center gap-1 bg-slate-700/10 border border-slate-700/20 px-2 py-0.5 rounded text-[9px] font-black uppercase text-slate-400 whitespace-nowrap">
+          🔮 Ambiance
+        </span>
       </div>
-
-      <h3 className="font-bold text-sm text-indigo-200 mb-3 flex items-center gap-1.5">
-        <span>🔮</span> Corridor Atmosphere
-      </h3>
 
       <p className="text-[10px] text-slate-400 font-semibold mb-4">
         Toggle the physical lighting and weather window visuals of the School Corridor corridor:

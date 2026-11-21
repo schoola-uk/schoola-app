@@ -1,6 +1,6 @@
 // Browser Web Speech API helper with child-friendly UK English RP voice profiles
 
-export type VoicePresetId = 'leo' | 'maya' | 'toby' | 'lily';
+export type VoicePresetId = 'leo' | 'amy' | 'toby' | 'lily';
 
 export interface VoicePreset {
   id: VoicePresetId;
@@ -33,10 +33,10 @@ export const VOICE_PRESETS: VoicePreset[] = [
     ],
   },
   {
-    id: 'maya',
-    label: 'Maya',
+    id: 'amy',
+    label: 'Amy',
     monsterId: 'pip',
-    sampleLine: "Hello friend! I'm Maya. Let's read today's story slowly and discover something wonderful together.",
+    sampleLine: "Hello friend! I'm Amy. Let's read today's story slowly and discover something wonderful together.",
     pitch: 1.52,
     rate: 0.86,
     preferredGender: 'female',
@@ -92,7 +92,7 @@ export const VOICE_PRESETS: VoicePreset[] = [
   },
 ];
 
-const VOICE_STORAGE_KEY = 'schoola_rp_voice_preset_v1';
+const VOICE_STORAGE_KEY = 'schoola_rp_voice_preset_v2';
 const SYSTEM_VOICE_STORAGE_KEY = 'schoola_system_voice_uri_v1';
 
 // Apple/OS novelty & retro Eloquence voices that sound robotic for children
@@ -133,7 +133,7 @@ export function isSpeechSupported(): boolean {
 }
 
 export function getSelectedVoicePreset(): VoicePresetId {
-  if (typeof window === 'undefined') return 'leo';
+  if (typeof window === 'undefined') return 'lily';
   try {
     const saved = localStorage.getItem(VOICE_STORAGE_KEY) as VoicePresetId | null;
     if (saved && VOICE_PRESETS.some((p) => p.id === saved)) {
@@ -142,7 +142,7 @@ export function getSelectedVoicePreset(): VoicePresetId {
   } catch {
     // Ignore storage access errors
   }
-  return 'leo';
+  return 'lily';
 }
 
 export function setSelectedVoicePreset(id: VoicePresetId): void {
@@ -172,23 +172,65 @@ export function setSelectedSystemVoiceURI(voiceURI: string): void {
   }
 }
 
+// Pre-warm Chrome/Edge voice list as soon as possible so UK voices are ready on first click
+if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+  try {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.addEventListener?.('voiceschanged', () => {
+      window.speechSynthesis.getVoices();
+    });
+  } catch {
+    // Ignore restricted synthesis init
+  }
+}
+
 function isFriendlyVoice(v: SpeechSynthesisVoice): boolean {
   const lower = v.name.toLowerCase();
   return !ROBOTIC_VOICE_BLOCKLIST.some((bad) => lower.includes(bad));
 }
 
+const BRITISH_VOICE_NAME_HINTS = [
+  'libby',
+  'maisie',
+  'sonia',
+  'ryan',
+  'george',
+  'thomas',
+  'alfie',
+  'elliot',
+  'hollie',
+  'mia',
+  'noah',
+  'daniel',
+  'arthur',
+  'oliver',
+  'kate',
+  'serena',
+  'martha',
+  'stephanie',
+  'hazel',
+  'susan',
+  'fiona',
+  'malcolm',
+  'stuart',
+  'jamie',
+  'british',
+  'scottish',
+  'england',
+  'london',
+  'united kingdom',
+  'uk english',
+  'great britain',
+];
+
 function isBritishOrScottishVoice(v: SpeechSynthesisVoice): boolean {
-  const lang = v.lang.toLowerCase();
+  const lang = v.lang.toLowerCase().replace(/_/g, '-');
   const name = v.name.toLowerCase();
+  if (lang.startsWith('en-gb') || lang.startsWith('en-sc')) return true;
+  if (!lang.startsWith('en')) return false;
   return (
-    lang.startsWith('en-gb') ||
-    lang.startsWith('en-sc') ||
-    name.includes('uk') ||
-    name.includes('british') ||
-    name.includes('scottish') ||
-    name.includes('fiona') ||
-    name.includes('malcolm') ||
-    name.includes('stuart')
+    /\buk\b/i.test(name) ||
+    BRITISH_VOICE_NAME_HINTS.some((hint) => name.includes(hint))
   );
 }
 
@@ -217,15 +259,11 @@ export function getLovelySystemVoices(): SpeechSynthesisVoice[] {
   const friendlyBritish = voices.filter(
     (v) => isBritishOrScottishVoice(v) && isFriendlyVoice(v)
   );
-  const englishFriendly = voices.filter(
-    (v) => v.lang.toLowerCase().startsWith('en') && isFriendlyVoice(v)
-  );
+  const allBritish = voices.filter(isBritishOrScottishVoice);
   const pool =
     friendlyBritish.length > 0
       ? friendlyBritish
-      : englishFriendly.length > 0
-      ? englishFriendly
-      : voices.filter(isFriendlyVoice);
+      : allBritish;
 
   return [...pool].sort((a, b) => voiceQualityScore(b) - voiceQualityScore(a));
 }
@@ -282,27 +320,30 @@ function findBestBritishVoice(preset: VoicePreset): SpeechSynthesisVoice | null 
   const allVoices = window.speechSynthesis.getVoices();
   if (!allVoices.length) return null;
 
-  // Respect explicit user-chosen system voice if present on this device
+  // Respect explicit user-chosen system voice ONLY if it is genuinely British/Scottish UK
   const customURI = getSelectedSystemVoiceURI();
   if (customURI && customURI !== 'auto') {
     const picked = allVoices.find((v) => v.voiceURI === customURI);
-    if (picked) return picked;
+    if (picked && isBritishOrScottishVoice(picked)) return picked;
   }
 
-  const friendlyVoices = getLovelySystemVoices();
-  const britishPool = friendlyVoices.filter(isBritishOrScottishVoice);
-  const effectivePool = britishPool.length > 0 ? britishPool : friendlyVoices.length > 0 ? friendlyVoices : allVoices;
+  // Strictly restrict to friendly British/Scottish voices — never pick en-US voices
+  const britishPool = getLovelySystemVoices();
+  if (britishPool.length === 0) {
+    // Returning null keeps utterance.lang = 'en-GB' instead of forcing an American voice
+    return null;
+  }
 
   // Assign distinct British voices across all 4 presets when multiple UK voices exist
   const usedURIs = new Set<string>();
   const resolved: Partial<Record<VoicePresetId, SpeechSynthesisVoice | null>> = {};
   for (const p of VOICE_PRESETS) {
-    const picked = pickVoiceFromPool(p.preferredNames, effectivePool, usedURIs, p.preferredGender);
+    const picked = pickVoiceFromPool(p.preferredNames, britishPool, usedURIs, p.preferredGender);
     resolved[p.id] = picked;
     if (picked) usedURIs.add(picked.voiceURI);
   }
 
-  return resolved[preset.id] || effectivePool[0] || null;
+  return resolved[preset.id] || britishPool[0] || null;
 }
 
 function cleanTextForChildSpeech(raw: string): string {
@@ -343,12 +384,15 @@ export function speakText(
     utterance.pitch = preset.pitch;
 
     const chosenVoice = findBestBritishVoice(preset);
-    if (chosenVoice) {
+    if (chosenVoice && isBritishOrScottishVoice(chosenVoice)) {
       utterance.voice = chosenVoice;
-      utterance.lang = chosenVoice.lang || 'en-GB';
+      const normalizedLang = (chosenVoice.lang || 'en-GB').replace(/_/g, '-');
+      utterance.lang = normalizedLang.toLowerCase().startsWith('en-sc') ? normalizedLang : 'en-GB';
       if (preset.id === 'toby' && chosenVoice.name.toLowerCase().includes('fiona')) {
         utterance.pitch = 0.96;
       }
+    } else {
+      utterance.lang = 'en-GB';
     }
 
     if (onEnd) {

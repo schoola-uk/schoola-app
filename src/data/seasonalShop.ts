@@ -182,21 +182,47 @@ export const MUM_HUMOUR_ARTICLES: MumHumourArticle[] = [
 
 export const DEFAULT_AMAZON_TAG = 'schoola-21';
 
-export function buildAmazonAffiliateUrl(target: string, tag: string): string {
+export function buildAmazonAffiliateUrl(target: string, tag: string = DEFAULT_AMAZON_TAG): string {
   const cleanTag = (tag || DEFAULT_AMAZON_TAG).trim() || DEFAULT_AMAZON_TAG;
-  const base = `https://www.amazon.co.uk/${target.replace(/^\/+/, '')}`;
-  const separator = base.includes('?') ? '&' : '?';
-  return `${base}${separator}tag=${encodeURIComponent(cleanTag)}`;
+  const url = new URL(`https://www.amazon.co.uk/${target.replace(/^\/+/, '')}`);
+  url.searchParams.set('linkCode', 'll2');
+  url.searchParams.set('tag', cleanTag);
+  url.searchParams.set('ref_', 'as_li_ss_tl');
+  return url.toString();
 }
 
 /**
  * Builds an Amazon.co.uk search URL pre-filtered with Amazon's "All Discounts" deal refinement
- * (rh=p_n_deal_type%3A26901100031&dc&rnid=26901097031&tag=...&ref=sr_nr_p_n_deal_type_1).
+ * and the verified Amazon Associates tracking tag (`tag=schoola-21`).
  */
 export function buildAmazonAllDiscountsUrl(searchQuery: string, tag: string = DEFAULT_AMAZON_TAG): string {
   const cleanTag = (tag || DEFAULT_AMAZON_TAG).trim() || DEFAULT_AMAZON_TAG;
   const encodedQuery = encodeURIComponent(searchQuery.replace(/\+/g, ' ')).replace(/%20/g, '+');
-  return `https://www.amazon.co.uk/s?k=${encodedQuery}&rh=p_n_deal_type%3A26901100031&dc&rnid=26901097031&tag=${encodeURIComponent(cleanTag)}&ref=sr_nr_p_n_deal_type_1`;
+  return `https://www.amazon.co.uk/s?k=${encodedQuery}&rh=p_n_deal_type%3A26901100031&dc&rnid=26901097031&linkCode=ll2&tag=${encodeURIComponent(cleanTag)}&ref_=as_li_ss_tl`;
+}
+
+/**
+ * Ensures any item a parent types or pastes (either product keywords or a direct amazon.co.uk URL)
+ * always generates a live Amazon UK link carrying our `tag=schoola-21` Associate ID.
+ */
+export function buildSmartAmazonShopUrl(input: string, tag: string = DEFAULT_AMAZON_TAG): string {
+  const cleanTag = (tag || DEFAULT_AMAZON_TAG).trim() || DEFAULT_AMAZON_TAG;
+  const trimmed = input.trim();
+
+  if (/^https?:\/\/(www\.)?amazon\.co\.uk\//i.test(trimmed)) {
+    try {
+      const parsed = new URL(trimmed);
+      parsed.searchParams.delete('linkId');
+      parsed.searchParams.set('linkCode', 'll2');
+      parsed.searchParams.set('tag', cleanTag);
+      parsed.searchParams.set('ref_', 'as_li_ss_tl');
+      return parsed.toString();
+    } catch {
+      // Fall back to search URL if malformed
+    }
+  }
+
+  return buildAmazonAllDiscountsUrl(trimmed, cleanTag);
 }
 
 export const PARENT_BLOG_ARTICLES: ParentBlogArticle[] = [

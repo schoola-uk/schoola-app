@@ -389,13 +389,13 @@ export const WelcomeGateway: React.FC<WelcomeGatewayProps> = ({
         {/* Interactive Panels Grid */}
         <div className="relative z-10 w-full pt-4">
           {panelPack === 'pack1' ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 items-start">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch">
               <AbacusMath onEarnStar={onEarnStar} setFairyMessage={setMonsterMessage} />
               <GlobeTrivia onEarnStar={onEarnStar} setFairyMessage={setMonsterMessage} />
               <AncientSpellbook onEarnStar={onEarnStar} setFairyMessage={setMonsterMessage} />
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10 items-start">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 items-stretch">
               <PatternPath onEarnStar={onEarnStar} setFairyMessage={setMonsterMessage} />
               <VintageClockAndBell onEarnStar={onEarnStar} setFairyMessage={setMonsterMessage} />
             </div>

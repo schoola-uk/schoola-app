@@ -130,7 +130,7 @@ const BUSH_MONSTERS: Array<{
     id: 'fern',
     name: 'Fern',
     trait: 'Leafy Bush Explorer',
-    voiceId: 'maya',
+    voiceId: 'amy',
     color: '#34D399',
     belly: '#A7F3D0',
     spot: '#059669',
